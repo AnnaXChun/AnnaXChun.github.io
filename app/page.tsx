@@ -12,216 +12,58 @@ gsap.registerPlugin(useGSAP, Observer);
 
 const slideLabels = [
   "个人定位",
-  "核心能力",
-  "技术栈矩阵",
-  "高并发与分布式",
-  "人工智能与数据",
-  "云原生与交互",
-  "代表项目",
-  "工程方法",
-  "联系与方向",
+  "工程主张",
+  "技术体系",
+  "高并发案例",
+  "人工智能案例",
+  "交付方法",
+  "联系方向",
 ] as const;
 
 const slideAccents = [
-  "#b9ff4f",
-  "#7b75ff",
-  "#ffda45",
-  "#ff784f",
-  "#7b75ff",
-  "#b9ff4f",
-  "#ff784f",
-  "#ffda45",
-  "#7b75ff",
-] as const;
-
-const capabilities = [
-  {
-    index: "01",
-    title: "分布式后端",
-    type: "系统架构",
-    text: "围绕服务边界、数据一致性、异步流程与故障隔离，构建可长期演进的服务体系。",
-    stack: ["服务拆分", "数据一致性", "事件驱动", "领域建模"],
-    color: "#b9ff4f",
-  },
-  {
-    index: "02",
-    title: "高并发工程",
-    type: "性能与稳定性",
-    text: "通过缓存、消息队列、背压、限流和容量治理，保障高负载下的稳定运行。",
-    stack: ["多级缓存", "流量治理", "异步处理", "性能分析"],
-    color: "#ff784f",
-  },
-  {
-    index: "03",
-    title: "生产级智能应用",
-    type: "人工智能工程",
-    text: "建设包含检索、工具调用、评测、护栏与链路追踪的智能应用。",
-    stack: ["大语言模型", "检索增强", "智能体", "自动化评测"],
-    color: "#7b75ff",
-  },
-  {
-    index: "04",
-    title: "云端交付",
-    type: "平台与研发效能",
-    text: "让构建、测试、发布、回滚和观测形成可重复的自动化交付链路。",
-    stack: ["容器编排", "持续交付", "灰度发布", "可观测性"],
-    color: "#ffda45",
-  },
+  "#c7ff4a",
+  "#ff6b49",
+  "#f4d84d",
+  "#ff704f",
+  "#8a7dff",
+  "#c7ff4a",
+  "#8a7dff",
 ] as const;
 
 const traits = [
-  { label: "调停者型人格", note: "性格", className: "trait-one", color: "#b9ff4f" },
-  { label: "双鱼座", note: "星座", className: "trait-two", color: "#ffda45" },
-  { label: "人工智能原生", note: "思维方式", className: "trait-three", color: "#7b75ff" },
-  { label: "系统设计", note: "专业能力", className: "trait-four", color: "#ff784f" },
-  { label: "实干派", note: "行动风格", className: "trait-five", color: "#f2eee6" },
-  { label: "高并发", note: "核心专长", className: "trait-six", color: "#b9ff4f" },
+  { label: "调停者型人格", note: "性格", className: "trait-one", color: "#c7ff4a" },
+  { label: "双鱼座", note: "星座", className: "trait-two", color: "#f4d84d" },
+  { label: "人工智能原生", note: "思维", className: "trait-three", color: "#8a7dff" },
+  { label: "系统设计", note: "专长", className: "trait-four", color: "#ff704f" },
+  { label: "实干派", note: "风格", className: "trait-five", color: "#f5f0e7" },
 ] as const;
 
-const deepStacks = [
+const technologyRows = [
   {
-    index: "01",
-    title: "高并发服务端",
-    statement: "面向峰值流量与复杂调用链，构建低延迟、可扩展、可降级的服务体系。",
-    color: "#b9ff4f",
-    groups: [
-      { title: "服务框架", items: ["Java 17", "Spring Boot 3", "Netty", "虚拟线程"] },
-      { title: "流量中间件", items: ["Redis 集群", "Kafka", "RocketMQ", "Sentinel"] },
-      { title: "交付能力", items: ["容量模型", "压测方案", "性能基线", "故障演练"] },
-    ],
+    label: "服务端",
+    items: "Java 17 · Spring Boot 3 · Spring Cloud · Netty · Go · Python",
   },
   {
-    index: "02",
-    title: "分布式系统",
-    statement: "围绕服务边界、数据流和失败路径，设计可演进的分布式架构。",
-    color: "#ff784f",
-    groups: [
-      { title: "服务治理", items: ["Spring Cloud", "Nacos", "Dubbo", "gRPC"] },
-      { title: "一致性方案", items: ["Seata", "事务消息", "最终一致性", "幂等补偿"] },
-      { title: "交付能力", items: ["系统架构图", "服务契约", "容灾方案", "演进路线"] },
-    ],
+    label: "高并发",
+    items: "Redis 集群 · Kafka · RocketMQ · Nginx · Sentinel · Dubbo",
   },
   {
-    index: "03",
-    title: "人工智能应用",
-    statement: "把模型能力接入真实业务，并建立质量、延迟、安全与成本边界。",
-    color: "#7b75ff",
-    groups: [
-      { title: "应用框架", items: ["Python", "FastAPI", "LangChain", "LlamaIndex"] },
-      { title: "模型与检索", items: ["vLLM", "Ollama", "Milvus", "知识图谱"] },
-      { title: "交付能力", items: ["知识问答", "智能助手", "流程自动化", "评测平台"] },
-    ],
+    label: "人工智能",
+    items: "LangChain · LlamaIndex · FastAPI · vLLM · Milvus · 向量检索",
   },
   {
-    index: "04",
-    title: "数据与存储",
-    statement: "根据访问模式、数据规模和一致性要求，选择并治理合适的存储方案。",
-    color: "#ffda45",
-    groups: [
-      { title: "关系与检索", items: ["MySQL", "PostgreSQL", "Elasticsearch", "ClickHouse"] },
-      { title: "数据治理", items: ["ShardingSphere", "读写分离", "索引优化", "慢查询治理"] },
-      { title: "交付能力", items: ["数据模型", "迁移方案", "备份恢复", "容量规划"] },
-    ],
-  },
-  {
-    index: "05",
-    title: "云原生交付",
-    statement: "让构建、测试、发布、回滚和观测形成可重复的自动化交付链路。",
-    color: "#b9ff4f",
-    groups: [
-      { title: "基础设施", items: ["Docker", "Kubernetes", "Helm", "Terraform"] },
-      { title: "交付与观测", items: ["Argo CD", "Prometheus", "Grafana", "OpenTelemetry"] },
-      { title: "交付能力", items: ["交付流水线", "环境规范", "回滚策略", "告警体系"] },
-    ],
-  },
-  {
-    index: "06",
-    title: "前端与三维交互",
-    statement: "兼顾组件复用、交互表现与运行性能，交付具有辨识度的产品体验。",
-    color: "#ff784f",
-    groups: [
-      { title: "界面框架", items: ["TypeScript", "React", "Next.js", "Three.js"] },
-      { title: "交互与质量", items: ["GSAP", "状态管理", "性能优化", "自动化测试"] },
-      { title: "交付能力", items: ["复杂管理后台", "数据可视化", "三维网站", "交互原型"] },
-    ],
+    label: "云与数据",
+    items: "Kubernetes · Docker · PostgreSQL · Elasticsearch · 可观测性",
   },
 ] as const;
 
-const technologyMatrix = [
-  {
-    index: "01",
-    title: "服务端开发",
-    color: "#b9ff4f",
-    items: ["Java 17", "Spring Boot 3", "Spring Cloud", "Netty", "Go", "Python"],
-  },
-  {
-    index: "02",
-    title: "高并发中间件",
-    color: "#ff784f",
-    items: ["Redis 集群", "Kafka", "RocketMQ", "Nginx", "Sentinel", "Dubbo"],
-  },
-  {
-    index: "03",
-    title: "数据与检索",
-    color: "#ffda45",
-    items: ["MySQL", "PostgreSQL", "Elasticsearch", "ClickHouse", "MongoDB", "Milvus"],
-  },
-  {
-    index: "04",
-    title: "人工智能工程",
-    color: "#7b75ff",
-    items: ["LangChain", "LlamaIndex", "FastAPI", "vLLM", "Ollama", "向量检索"],
-  },
-  {
-    index: "05",
-    title: "云原生平台",
-    color: "#b9ff4f",
-    items: ["Docker", "Kubernetes", "Helm", "Terraform", "Argo CD", "持续交付"],
-  },
-  {
-    index: "06",
-    title: "观测与前端",
-    color: "#ff784f",
-    items: ["Prometheus", "Grafana", "OpenTelemetry", "React", "Three.js", "GSAP"],
-  },
-] as const;
-
-const projectCases = [
-  {
-    index: "01",
-    title: "高峰值交易服务",
-    subtitle: "高并发 · 分布式 · 稳定性",
-    text: "围绕热点隔离、异步削峰、多级缓存与故障降级，设计面向突发流量的核心交易链路。",
-    metrics: [
-      { value: "10 万级", label: "每秒请求容量目标" },
-      { value: "百毫秒级", label: "核心链路延迟目标" },
-      { value: "99.99%", label: "服务可用性目标" },
-    ],
-    duties: ["容量建模与压测", "缓存与消息架构", "限流熔断与降级", "全链路观测"],
-    color: "#b9ff4f",
-  },
-  {
-    index: "02",
-    title: "企业智能知识中台",
-    subtitle: "检索增强 · 智能体 · 评测",
-    text: "把分散文档、业务系统和工具能力接入统一智能入口，建立可追溯、可评测的知识服务。",
-    metrics: [
-      { value: "千万级", label: "文档切片容量目标" },
-      { value: "秒级", label: "问答响应目标" },
-      { value: "90%+", label: "引用命中目标" },
-    ],
-    duties: ["检索与重排链路", "工具调用编排", "质量评测与护栏", "成本与延迟治理"],
-    color: "#7b75ff",
-  },
-] as const;
-
-const engineeringSteps = [
-  { index: "01", title: "需求澄清", text: "识别业务目标、关键约束、风险边界和可以验证的成功标准。" },
-  { index: "02", title: "架构权衡", text: "比较复杂度、性能、成本与演进空间，记录关键技术决策。" },
-  { index: "03", title: "质量内建", text: "用测试、代码审查、静态检查和自动化门禁保障交付质量。" },
-  { index: "04", title: "性能验证", text: "建立容量模型和性能基线，通过压测定位瓶颈并验证优化结果。" },
-  { index: "05", title: "稳定上线", text: "采用灰度、监控、告警、回滚与故障预案控制发布风险。" },
-  { index: "06", title: "持续演进", text: "基于运行数据和故障复盘，持续改善架构、流程与开发体验。" },
+const deliverySteps = [
+  { index: "01", title: "澄清", text: "把模糊需求变成可验证目标" },
+  { index: "02", title: "权衡", text: "在性能、成本与复杂度间取舍" },
+  { index: "03", title: "构建", text: "把质量门禁放进研发过程" },
+  { index: "04", title: "压测", text: "用数据定位瓶颈与容量边界" },
+  { index: "05", title: "上线", text: "灰度、监控、告警与回滚" },
+  { index: "06", title: "演进", text: "基于运行反馈持续改善系统" },
 ] as const;
 
 type AvatarProps = {
@@ -306,7 +148,7 @@ function Avatar({ accent }: AvatarProps) {
       <ambientLight intensity={1.5} />
       <directionalLight position={[4, 6, 5]} intensity={4.2} color="#fff7dc" />
       <pointLight position={[-4, 1, 3]} intensity={24} color="#817bff" />
-      <pointLight position={[4, -1, 2]} intensity={18} color="#b9ff4f" />
+      <pointLight position={[4, -1, 2]} intensity={18} color="#c7ff4a" />
 
       <Float speed={1.35} rotationIntensity={0.08} floatIntensity={0.22}>
         <group
@@ -402,33 +244,6 @@ function Avatar({ accent }: AvatarProps) {
   );
 }
 
-function StackPanel({ stack }: { stack: (typeof deepStacks)[number] }) {
-  return (
-    <article
-      className="stack-panel slide-reveal"
-      style={{ "--stack-accent": stack.color } as React.CSSProperties}
-    >
-      <div className="stack-panel-head">
-        <span>{stack.index}</span>
-        <h3>{stack.title}</h3>
-      </div>
-      <p>{stack.statement}</p>
-      <div className="stack-panel-groups">
-        {stack.groups.map((group) => (
-          <div className="stack-panel-group" key={group.title}>
-            <h4>{group.title}</h4>
-            <ul>
-              {group.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
 export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const shellRef = useRef<HTMLElement>(null);
@@ -448,7 +263,8 @@ export default function Home() {
         if (!slide) return;
         gsap.set(slide, {
           autoAlpha: index === 0 ? 1 : 0,
-          yPercent: index === 0 ? 0 : 100,
+          clipPath:
+            index === 0 ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)",
           zIndex: index === 0 ? 2 : 0,
         });
       });
@@ -458,10 +274,10 @@ export default function Home() {
       if (firstParts) {
         gsap.from(firstParts, {
           autoAlpha: 0,
-          y: reduceMotion.current ? 0 : 30,
-          duration: reduceMotion.current ? 0.01 : 0.7,
-          stagger: reduceMotion.current ? 0 : 0.07,
-          ease: "power3.out",
+          y: reduceMotion.current ? 0 : 46,
+          duration: reduceMotion.current ? 0.01 : 0.9,
+          stagger: reduceMotion.current ? 0 : 0.08,
+          ease: "power4.out",
         });
       }
     },
@@ -483,9 +299,11 @@ export default function Home() {
 
       const direction =
         directionHint ?? (nextIndex > currentIndex ? 1 : -1);
-      const duration = reduceMotion.current ? 0.01 : 0.86;
+      const duration = reduceMotion.current ? 0.01 : 1.05;
       const currentParts = currentSlide.querySelectorAll(".slide-reveal");
       const nextParts = nextSlide.querySelectorAll(".slide-reveal");
+      const closedClip =
+        direction > 0 ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)";
 
       animating.current = true;
       activeSlideRef.current = nextIndex;
@@ -493,19 +311,25 @@ export default function Home() {
 
       gsap.set(nextSlide, {
         autoAlpha: 1,
-        yPercent: direction * 100,
+        clipPath: closedClip,
         zIndex: 3,
+        scale: 1,
       });
       gsap.set(nextParts, {
         autoAlpha: reduceMotion.current ? 1 : 0,
-        y: reduceMotion.current ? 0 : direction * 42,
+        y: reduceMotion.current ? 0 : direction * 70,
       });
 
       gsap
         .timeline({
-          defaults: { ease: "power3.inOut", overwrite: "auto" },
+          defaults: { ease: "power4.inOut", overwrite: "auto" },
           onComplete: () => {
-            gsap.set(currentSlide, { autoAlpha: 0, zIndex: 0 });
+            gsap.set(currentSlide, {
+              autoAlpha: 0,
+              clipPath: "inset(0% 0% 0% 0%)",
+              scale: 1,
+              zIndex: 0,
+            });
             gsap.set(currentParts, { autoAlpha: 1, y: 0 });
             gsap.set(nextSlide, { zIndex: 2 });
             animating.current = false;
@@ -514,25 +338,36 @@ export default function Home() {
         .to(
           currentParts,
           {
-            autoAlpha: 0,
-            y: -direction * 24,
-            duration: reduceMotion.current ? 0.01 : 0.3,
-            stagger: reduceMotion.current ? 0 : 0.025,
+            autoAlpha: 0.18,
+            y: -direction * 54,
+            duration: reduceMotion.current ? 0.01 : 0.65,
+            stagger: reduceMotion.current ? 0 : 0.02,
           },
           0,
         )
-        .to(currentSlide, { yPercent: -direction * 100, duration }, 0)
-        .to(nextSlide, { yPercent: 0, duration }, reduceMotion.current ? 0 : 0.04)
+        .to(
+          currentSlide,
+          { scale: reduceMotion.current ? 1 : 0.94, duration },
+          0,
+        )
+        .to(
+          nextSlide,
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration,
+          },
+          0,
+        )
         .to(
           nextParts,
           {
             autoAlpha: 1,
             y: 0,
-            duration: reduceMotion.current ? 0.01 : 0.5,
-            stagger: reduceMotion.current ? 0 : 0.055,
-            ease: "power3.out",
+            duration: reduceMotion.current ? 0.01 : 0.72,
+            stagger: reduceMotion.current ? 0 : 0.065,
+            ease: "power4.out",
           },
-          reduceMotion.current ? 0 : 0.3,
+          reduceMotion.current ? 0 : 0.32,
         );
     },
   );
@@ -557,26 +392,25 @@ export default function Home() {
   useGSAP(
     () => {
       const media = gsap.matchMedia();
-
       media.add("(prefers-reduced-motion: no-preference)", () => {
         const tags = gsap.utils.toArray<HTMLElement>(".trait-tag");
         gsap.from(tags, {
           autoAlpha: 0,
-          y: 22,
-          scale: 0.8,
-          duration: 0.7,
-          stagger: 0.07,
-          ease: "back.out(1.7)",
+          y: 28,
+          scale: 0.82,
+          duration: 0.75,
+          stagger: 0.08,
+          ease: "back.out(1.8)",
         });
         gsap.to(tags, {
-          y: (index) => (index % 2 === 0 ? -10 : 10),
+          y: (index) => (index % 2 === 0 ? -12 : 12),
           rotation: (index) => (index % 2 === 0 ? "+=2" : "-=2"),
-          duration: (index) => 2.8 + (index % 3) * 0.42,
+          duration: (index) => 3 + (index % 3) * 0.45,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-          stagger: { each: 0.14, from: "random" },
-          delay: 0.85,
+          stagger: { each: 0.15, from: "random" },
+          delay: 0.9,
         });
       });
 
@@ -593,7 +427,7 @@ export default function Home() {
     <main
       ref={shellRef}
       className="resume-shell"
-      aria-label="高级软件开发工程师纵向幻灯片简历"
+      aria-label="高级软件开发工程师沉浸式个人简历"
       tabIndex={0}
       onKeyDown={(event) => {
         if (
@@ -618,20 +452,22 @@ export default function Home() {
         }
       }}
     >
-      <header className="global-header">
+      <header
+        className={`global-header ${
+          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
+        }`}
+      >
         <button
           className="wordmark"
           onClick={() => goToSlide(0, -1)}
           aria-label="返回第一屏"
         >
-          简历<span>°</span>
+          春祥<span>°</span>
         </button>
-        <div className="global-role">
-          <i />
-          高级软件开发工程师 · 人工智能与分布式系统
-        </div>
+        <div className="global-role">高级软件开发工程师 · 人工智能与分布式系统</div>
         <div className="global-count" aria-live="polite">
-          {String(activeSlide + 1).padStart(2, "0")} /{" "}
+          {String(activeSlide + 1).padStart(2, "0")}
+          <span>/</span>
           {String(slideLabels.length).padStart(2, "0")}
         </div>
       </header>
@@ -640,22 +476,39 @@ export default function Home() {
         ref={(node) => {
           slideRefs.current[0] = node;
         }}
-        className="resume-slide slide-hero"
+        className="resume-slide hero-slide"
         aria-hidden={activeSlide !== 0}
       >
+        <div className="hero-word slide-reveal" aria-hidden="true">
+          高级
+          <br />
+          工程师
+        </div>
+        <div className="hero-intro slide-reveal">
+          <span>春祥 / 软件开发工程师</span>
+          <h1>
+            让复杂系统
+            <br />
+            <em>可靠地运行。</em>
+          </h1>
+          <p>
+            设计高并发后端、人工智能应用与可持续演进的软件架构。
+          </p>
+        </div>
+
         <div
           className="hero-stage"
           ref={sceneRef}
-          aria-label="互动三维人物与个人特质"
+          aria-label="眼神跟随光标的互动三维人物"
         >
           <Canvas
-            camera={{ position: [0, 0.12, 7.45], fov: 38 }}
+            camera={{ position: [0, 0.05, 7.25], fov: 36 }}
             dpr={[1, 1.6]}
             gl={{ antialias: true, alpha: true }}
           >
             <Avatar accent={slideAccents[0]} />
           </Canvas>
-          <div className="trait-cloud" aria-label="个人特质与工程能力">
+          <div className="trait-cloud" aria-label="个人特质">
             {traits.map((trait) => (
               <div
                 key={trait.label}
@@ -669,78 +522,48 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="orbit-line orbit-one" />
-          <div className="orbit-line orbit-two" />
         </div>
 
-        <aside className="profile-panel">
-          <div className="profile-kicker slide-reveal">
-            <span>01 / 职业定位</span>
-            <span>可靠 · 可演进 · 能落地</span>
-          </div>
-          <div className="profile-copy">
-            <h1 className="slide-reveal">
-              高级开发
-              <br />
-              工程师
-            </h1>
-            <p className="profile-lead slide-reveal">
-              把复杂业务需求，转化为可靠、可演进、能长期维护的软件系统。
-            </p>
-            <p className="profile-detail slide-reveal">
-              具备扎实的后端与系统设计能力，也理解产品目标；能够从方案评审、核心开发一路推进到稳定上线。
-            </p>
-            <div className="profile-tags slide-reveal">
-              <span>后端开发</span>
-              <span>系统架构</span>
-              <span>产品思维</span>
-            </div>
-          </div>
-        </aside>
+        <div className="hero-foot slide-reveal">
+          <span>系统设计</span>
+          <span>高并发工程</span>
+          <span>人工智能原生</span>
+        </div>
       </section>
 
       <section
         ref={(node) => {
           slideRefs.current[1] = node;
         }}
-        className="resume-slide slide-overview"
+        className="resume-slide manifesto-slide"
         aria-hidden={activeSlide !== 1}
       >
-        <div className="overview-layout">
-          <div className="slide-heading slide-reveal">
-            <span>02 / 核心能力</span>
-            <h2>
-              面向真实
-              <br />
-              <em>生产环境。</em>
-            </h2>
-            <p>
-              不只实现功能，也关注系统在规模、故障、成本和长期演进中的表现。
-            </p>
-          </div>
-          <div className="capability-grid">
-            {capabilities.map((item) => (
-              <article
-                key={item.index}
-                className="capability-card slide-reveal"
-                style={
-                  { "--card-accent": item.color } as React.CSSProperties
-                }
-              >
-                <div className="capability-top">
-                  <span>{item.index}</span>
-                  <small>{item.type}</small>
-                </div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-                <div>
-                  {item.stack.map((skill) => (
-                    <span key={skill}>{skill}</span>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
+        <div className="manifesto-orb" aria-hidden="true" />
+        <div className="scene-kicker slide-reveal">02 / 工程主张</div>
+        <h2 className="manifesto-title slide-reveal">
+          不炫技。
+          <br />
+          <em>解决问题。</em>
+        </h2>
+        <p className="manifesto-copy slide-reveal">
+          我关注的不是技术名词本身，而是系统在流量、故障、成本和长期演进中，是否依然可控。
+        </p>
+        <div className="manifesto-principles slide-reveal">
+          <span>
+            <b>01</b>
+            <strong>可靠</strong>
+            故障有边界
+          </span>
+          <span>
+            <b>02</b>
+            <strong>清晰</strong>
+            复杂有结构
+          </span>
+          <span>
+            <b>03</b>
+            <strong>演进</strong>
+            变化有路径
+          </span>
         </div>
       </section>
 
@@ -751,214 +574,187 @@ export default function Home() {
         className="resume-slide technology-slide"
         aria-hidden={activeSlide !== 2}
       >
-        <div className="technology-layout">
-          <div className="technology-heading slide-reveal">
-            <span>03 / 技术栈矩阵</span>
-            <h2>
-              具体工具，
-              <br />
-              <em>服务工程目标。</em>
-            </h2>
-            <p>
-              从语言、框架到中间件与观测平台，覆盖大型软件从开发到运行的完整链路。
-            </p>
-          </div>
-          <div className="technology-grid">
-            {technologyMatrix.map((group) => (
-              <article
-                key={group.index}
-                className="technology-card slide-reveal"
-                style={
-                  { "--technology-accent": group.color } as React.CSSProperties
-                }
-              >
-                <div>
-                  <span>{group.index}</span>
-                  <h3>{group.title}</h3>
-                </div>
-                <ul>
-                  {group.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
+        <div className="scene-kicker slide-reveal">03 / 技术体系</div>
+        <h2 className="technology-title slide-reveal">
+          一套能打
+          <br />
+          <em>硬仗的工具。</em>
+        </h2>
+        <div className="technology-rows">
+          {technologyRows.map((row, index) => (
+            <div
+              className="technology-row slide-reveal"
+              key={row.label}
+              style={{ "--row-index": index } as React.CSSProperties}
+            >
+              <span>{row.label}</span>
+              <strong>{row.items}</strong>
+            </div>
+          ))}
         </div>
       </section>
 
-      {[0, 2, 4].map((start, slideOffset) => (
-        <section
-          key={start}
-          ref={(node) => {
-            slideRefs.current[slideOffset + 3] = node;
-          }}
-          className={`resume-slide stack-slide stack-slide-${slideOffset + 1}`}
-          aria-hidden={activeSlide !== slideOffset + 3}
-        >
-          <div className="stack-slide-inner">
-            <div className="stack-slide-title slide-reveal">
-              <span>0{slideOffset + 4} / 重点技术栈</span>
-              <h2>{slideLabels[slideOffset + 3]}</h2>
-              <p>从核心设计到工程实践，再到可以实际交付的成果。</p>
+      <section
+        ref={(node) => {
+          slideRefs.current[3] = node;
+        }}
+        className="resume-slide concurrency-slide"
+        aria-hidden={activeSlide !== 3}
+      >
+        <div className="scene-kicker slide-reveal">04 / 高并发案例</div>
+        <div className="case-number slide-reveal">10万级</div>
+        <div className="case-copy slide-reveal">
+          <span>代表项目类型</span>
+          <h2>高峰值交易服务</h2>
+          <p>
+            围绕热点隔离、异步削峰、多级缓存与故障降级，设计面向突发流量的核心交易链路。
+          </p>
+        </div>
+        <div className="case-metrics slide-reveal">
+          <span>
+            <strong>百毫秒级</strong>
+            核心链路延迟目标
+          </span>
+          <span>
+            <strong>99.99%</strong>
+            服务可用性目标
+          </span>
+          <span>
+            <strong>全链路</strong>
+            容量压测与故障观测
+          </span>
+        </div>
+        <div className="case-stack slide-reveal">
+          Java 17 · Spring Boot 3 · Netty · Redis 集群 · Kafka · Sentinel
+        </div>
+      </section>
+
+      <section
+        ref={(node) => {
+          slideRefs.current[4] = node;
+        }}
+        className="resume-slide intelligence-slide"
+        aria-hidden={activeSlide !== 4}
+      >
+        <div className="scene-kicker slide-reveal">05 / 人工智能案例</div>
+        <div className="intelligence-copy slide-reveal">
+          <span>企业智能知识中台</span>
+          <h2>
+            让模型回答，
+            <br />
+            <em>也让答案可信。</em>
+          </h2>
+          <p>
+            将分散文档、业务系统和工具能力接入统一智能入口，建立可追溯、可评测、可治理的知识服务。
+          </p>
+        </div>
+        <div className="ai-orbit slide-reveal" aria-label="人工智能工程链路">
+          <div className="orbit-ring ring-a" />
+          <div className="orbit-ring ring-b" />
+          <strong>90%+</strong>
+          <span>引用命中目标</span>
+          <i className="ai-node node-one">检索</i>
+          <i className="ai-node node-two">重排</i>
+          <i className="ai-node node-three">评测</i>
+          <i className="ai-node node-four">护栏</i>
+        </div>
+        <div className="intelligence-stack slide-reveal">
+          LangChain · LlamaIndex · FastAPI · vLLM · Milvus · 可观测智能体
+        </div>
+      </section>
+
+      <section
+        ref={(node) => {
+          slideRefs.current[5] = node;
+        }}
+        className="resume-slide delivery-slide"
+        aria-hidden={activeSlide !== 5}
+      >
+        <div className="scene-kicker slide-reveal">06 / 交付方法</div>
+        <h2 className="delivery-title slide-reveal">
+          从需求到上线，
+          <br />
+          <em>每一步都有依据。</em>
+        </h2>
+        <div className="delivery-track slide-reveal">
+          {deliverySteps.map((step) => (
+            <div key={step.index}>
+              <span>{step.index}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
             </div>
-            <div className="stack-pair">
-              {deepStacks.slice(start, start + 2).map((stack) => (
-                <StackPanel key={stack.index} stack={stack} />
-              ))}
-            </div>
-          </div>
-        </section>
-      ))}
+          ))}
+        </div>
+      </section>
 
       <section
         ref={(node) => {
           slideRefs.current[6] = node;
         }}
-        className="resume-slide project-slide"
+        className="resume-slide final-slide"
         aria-hidden={activeSlide !== 6}
       >
-        <div className="project-layout">
-          <div className="project-heading slide-reveal">
-            <span>07 / 代表项目类型</span>
-            <h2>用指标定义交付。</h2>
-            <p>
-              以下为可承担的工程规模与目标口径；正式投递时建议替换为本人已脱敏的真实项目数据。
-            </p>
-          </div>
-          <div className="project-grid">
-            {projectCases.map((project) => (
-              <article
-                key={project.index}
-                className="project-card slide-reveal"
-                style={
-                  { "--project-accent": project.color } as React.CSSProperties
-                }
-              >
-                <div className="project-card-head">
-                  <span>{project.index}</span>
-                  <small>{project.subtitle}</small>
-                </div>
-                <h3>{project.title}</h3>
-                <p>{project.text}</p>
-                <div className="project-metrics">
-                  {project.metrics.map((metric) => (
-                    <div key={metric.label}>
-                      <strong>{metric.value}</strong>
-                      <span>{metric.label}</span>
-                    </div>
-                  ))}
-                </div>
-                <ul>
-                  {project.duties.map((duty) => (
-                    <li key={duty}>{duty}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
+        <div className="scene-kicker slide-reveal">07 / 联系方向</div>
+        <h2 className="final-title slide-reveal">
+          一起做点
+          <br />
+          <em>难而正确的事。</em>
+        </h2>
+        <p className="final-copy slide-reveal">
+          春祥 · 高级软件开发工程师
+          <br />
+          期待参与需要系统思维、工程深度与人工智能能力的长期项目。
+        </p>
+        <div className="final-contact slide-reveal">
+          <span>
+            <b>求职方向</b>
+            高级软件开发 · 人工智能应用架构
+          </span>
+          <span>
+            <b>工作方式</b>
+            可远程协作 · 可深度参与长期项目
+          </span>
+          <span>
+            <b>联系入口</b>
+            请通过本简历发送渠道联系
+          </span>
         </div>
+        <div className="final-signature slide-reveal">可靠 · 清晰 · 可演进</div>
       </section>
 
-      <section
-        ref={(node) => {
-          slideRefs.current[7] = node;
-        }}
-        className="resume-slide method-slide"
-        aria-hidden={activeSlide !== 7}
+      <nav
+        className={`scene-nav ${
+          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
+        }`}
+        aria-label="场景导航"
       >
-        <div className="method-layout">
-          <div className="method-title slide-reveal">
-            <span>08 / 工程方法</span>
-            <h2>
-              从需求到上线，
-              <br />
-              <em>每一步都有依据。</em>
-            </h2>
-          </div>
-          <div className="method-grid">
-            {engineeringSteps.map((step) => (
-              <article key={step.index} className="method-card slide-reveal">
-                <span>{step.index}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+        {slideLabels.map((label, index) => (
+          <button
+            key={label}
+            className={index === activeSlide ? "is-active" : ""}
+            onClick={() =>
+              goToSlide(index, index > activeSlideRef.current ? 1 : -1)
+            }
+            aria-label={`查看“${label}”`}
+          >
+            <i />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
 
-      <section
-        ref={(node) => {
-          slideRefs.current[8] = node;
-        }}
-        className="resume-slide final-slide"
-        aria-hidden={activeSlide !== 8}
+      <div
+        className={`scene-actions ${
+          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
+        }`}
       >
-        <div className="final-layout">
-          <span className="final-index slide-reveal">09 / 个人档案与方向</span>
-          <h2 className="slide-reveal">
-            把复杂系统
-            <br />
-            <em>做对，做稳。</em>
-          </h2>
-          <p className="slide-reveal">
-            春祥 · 高级软件开发工程师。期待参与需要系统思维、工程深度与人工智能能力的长期项目。
-          </p>
-          <div className="final-tags slide-reveal">
-            <span>高级软件开发</span>
-            <span>人工智能工程</span>
-            <span>分布式架构</span>
-            <span>高并发系统</span>
-          </div>
-          <div className="contact-strip slide-reveal">
-            <div>
-              <span>求职方向</span>
-              <strong>高级软件开发 · 人工智能应用架构</strong>
-            </div>
-            <div>
-              <span>工作方式</span>
-              <strong>可远程协作 · 可深度参与长期项目</strong>
-            </div>
-            <div>
-              <span>联系入口</span>
-              <strong>请通过本简历发送渠道联系</strong>
-            </div>
-          </div>
-          <div className="final-note slide-reveal">
-            <span>当前方向</span>
-            <strong>高质量交付 · 可持续演进 · 真实业务价值</strong>
-          </div>
-        </div>
-      </section>
-
-      <div className="slide-controls" aria-label="幻灯片导航">
         <button onClick={() => move(-1)} aria-label="上一屏">
           ↑
         </button>
-        <div className="slide-progress">
-          {slideLabels.map((label, index) => (
-            <button
-              key={label}
-              className={index === activeSlide ? "is-active" : ""}
-              onClick={() =>
-                goToSlide(index, index > activeSlideRef.current ? 1 : -1)
-              }
-              aria-label={`查看“${label}”`}
-            >
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
+        <span>{slideLabels[activeSlide]}</span>
         <button onClick={() => move(1)} aria-label="下一屏">
           ↓
         </button>
-      </div>
-
-      <div className="gesture-hint">
-        <span>{slideLabels[activeSlide]}</span>
-        <i />
-        <span>滚动 / 滑动</span>
       </div>
     </main>
   );
