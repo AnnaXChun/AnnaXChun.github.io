@@ -2,8 +2,12 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Float, Html, RoundedBox } from "@react-three/drei";
-import { useCallback, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { useRef, useState } from "react";
 import * as THREE from "three";
+
+gsap.registerPlugin(useGSAP);
 
 const chapters = [
   {
@@ -135,7 +139,7 @@ function Sticker({
       transform
       sprite
       position={position}
-      distanceFactor={7.2}
+      distanceFactor={6.2}
       style={{ pointerEvents: "auto" }}
     >
       <button
@@ -200,7 +204,12 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
       <pointLight position={[4, -1, 2]} intensity={18} color="#b9ff4f" />
 
       <Float speed={1.35} rotationIntensity={0.08} floatIntensity={0.22}>
-        <group ref={body} position={[0, -0.45, 0]} rotation={[0, -0.04, 0]}>
+        <group
+          ref={body}
+          position={[0, -0.38, 0]}
+          rotation={[0, -0.04, 0]}
+          scale={0.88}
+        >
           <group ref={head}>
             <mesh position={[0, 1.42, 0]}>
               <sphereGeometry args={[0.76, 48, 48]} />
@@ -273,32 +282,32 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
           <Sticker
             index={0}
             label="ABOUT"
-            position={[-0.72, 1.77, 0.74]}
-            rotation={-8}
+            position={[-1.38, 1.15, 0.7]}
+            rotation={-7}
             activeIndex={activeIndex}
             onSelect={onSelect}
           />
           <Sticker
             index={1}
             label="RESEARCH"
-            position={[0.79, 0.74, 0.74]}
-            rotation={7}
+            position={[1.26, 0.66, 0.7]}
+            rotation={6}
             activeIndex={activeIndex}
             onSelect={onSelect}
           />
           <Sticker
             index={2}
             label="BUILD"
-            position={[-0.72, -0.37, 0.69]}
-            rotation={6}
+            position={[-1.15, -0.35, 0.68]}
+            rotation={5}
             activeIndex={activeIndex}
             onSelect={onSelect}
           />
           <Sticker
             index={3}
             label="NOW"
-            position={[0.67, -1.12, 0.62]}
-            rotation={-6}
+            position={[1.05, -1.22, 0.64]}
+            rotation={-5}
             activeIndex={activeIndex}
             onSelect={onSelect}
           />
@@ -323,27 +332,126 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const panelRef = useRef<HTMLElement>(null);
+  const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const activeIndexRef = useRef(0);
+  const isAnimating = useRef(false);
+  const wheelDistance = useRef(0);
   const touchStart = useRef<number | null>(null);
+  const reduceMotion = useRef(false);
   const chapter = chapters[activeIndex];
 
-  const move = useCallback((direction: number) => {
-    setActiveIndex((current) => (current + direction + chapters.length) % chapters.length);
-  }, []);
+  const { contextSafe } = useGSAP(
+    () => {
+      reduceMotion.current = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      slideRefs.current.forEach((slide, index) => {
+        if (!slide) return;
+        gsap.set(slide, {
+          autoAlpha: index === 0 ? 1 : 0,
+          yPercent: index === 0 ? 0 : 100,
+          zIndex: index === 0 ? 2 : 0,
+        });
+      });
+    },
+    { scope: panelRef },
+  );
+
+  const goToChapter = contextSafe(
+    (requestedIndex: number, directionHint?: number) => {
+      if (isAnimating.current) return;
+
+      const nextIndex =
+        (requestedIndex + chapters.length) % chapters.length;
+      const currentIndex = activeIndexRef.current;
+      if (nextIndex === currentIndex) return;
+
+      const currentSlide = slideRefs.current[currentIndex];
+      const nextSlide = slideRefs.current[nextIndex];
+      if (!currentSlide || !nextSlide) return;
+
+      const direction =
+        directionHint ?? (nextIndex > currentIndex ? 1 : -1);
+      const duration = reduceMotion.current ? 0.01 : 0.82;
+      const currentParts = currentSlide.querySelectorAll(".chapter-anim");
+      const nextParts = nextSlide.querySelectorAll(".chapter-anim");
+
+      isAnimating.current = true;
+      activeIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
+
+      gsap.set(nextSlide, {
+        autoAlpha: 1,
+        yPercent: direction * 100,
+        zIndex: 3,
+      });
+      gsap.set(nextParts, {
+        autoAlpha: reduceMotion.current ? 1 : 0,
+        y: reduceMotion.current ? 0 : direction * 38,
+      });
+
+      const timeline = gsap.timeline({
+        defaults: { ease: "power3.inOut", overwrite: "auto" },
+        onComplete: () => {
+          gsap.set(currentSlide, { autoAlpha: 0, zIndex: 0 });
+          gsap.set(currentParts, { autoAlpha: 1, y: 0 });
+          gsap.set(nextSlide, { zIndex: 2 });
+          isAnimating.current = false;
+        },
+      });
+
+      timeline
+        .to(
+          currentParts,
+          {
+            autoAlpha: reduceMotion.current ? 0 : 0,
+            y: reduceMotion.current ? 0 : -direction * 26,
+            duration: reduceMotion.current ? 0.01 : 0.34,
+            stagger: reduceMotion.current ? 0 : 0.025,
+          },
+          0,
+        )
+        .to(
+          currentSlide,
+          {
+            yPercent: -direction * 100,
+            duration,
+          },
+          0,
+        )
+        .to(
+          nextSlide,
+          {
+            yPercent: 0,
+            duration,
+          },
+          reduceMotion.current ? 0 : 0.06,
+        )
+        .to(
+          nextParts,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: reduceMotion.current ? 0.01 : 0.5,
+            stagger: reduceMotion.current ? 0 : 0.055,
+            ease: "power3.out",
+          },
+          reduceMotion.current ? 0 : 0.27,
+        );
+    },
+  );
+
+  const move = contextSafe((direction: number) => {
+    goToChapter(activeIndexRef.current + direction, direction);
+  });
 
   return (
     <main>
       <section
         className="hero"
         aria-label="Interactive portfolio introduction"
-        onTouchStart={(event) => {
-          touchStart.current = event.touches[0]?.clientX ?? null;
-        }}
-        onTouchEnd={(event) => {
-          if (touchStart.current === null) return;
-          const delta = (event.changedTouches[0]?.clientX ?? touchStart.current) - touchStart.current;
-          if (Math.abs(delta) > 55) move(delta > 0 ? -1 : 1);
-          touchStart.current = null;
-        }}
       >
         <header className="site-header">
           <a className="wordmark" href="#top" aria-label="Chunxiang portfolio home">
@@ -376,47 +484,114 @@ export default function Home() {
 
         <div className="scene-wrap" aria-label="Interactive 3D character with portfolio stickers">
           <Canvas
-            camera={{ position: [0, 0.1, 6.6], fov: 40 }}
+            camera={{ position: [0, 0.15, 7.65], fov: 38 }}
             dpr={[1, 1.6]}
             gl={{ antialias: true, alpha: true }}
           >
-            <Avatar activeIndex={activeIndex} onSelect={setActiveIndex} />
+            <Avatar
+              activeIndex={activeIndex}
+              onSelect={(index) => goToChapter(index)}
+            />
           </Canvas>
           <div className="orbit-line orbit-one" />
           <div className="orbit-line orbit-two" />
         </div>
 
-        <aside className="chapter-panel" aria-live="polite">
-          <div className="chapter-topline">
-            <span style={{ color: chapter.accent }}>{chapter.kicker}</span>
-            <span>{String(activeIndex + 1).padStart(2, "0")} — 04</span>
+        <aside
+          ref={panelRef}
+          className="chapter-panel"
+          aria-label="Portfolio chapters. Scroll up or down to navigate."
+          aria-live="polite"
+          tabIndex={0}
+          style={
+            { "--active-accent": chapter.accent } as React.CSSProperties
+          }
+          onWheel={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (isAnimating.current) return;
+
+            wheelDistance.current += event.deltaY;
+            if (Math.abs(wheelDistance.current) < 28) return;
+
+            move(wheelDistance.current > 0 ? 1 : -1);
+            wheelDistance.current = 0;
+          }}
+          onTouchStart={(event) => {
+            touchStart.current = event.touches[0]?.clientY ?? null;
+          }}
+          onTouchEnd={(event) => {
+            if (touchStart.current === null) return;
+            const endY =
+              event.changedTouches[0]?.clientY ?? touchStart.current;
+            const delta = endY - touchStart.current;
+            if (Math.abs(delta) > 48) move(delta < 0 ? 1 : -1);
+            touchStart.current = null;
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === "PageDown") {
+              event.preventDefault();
+              move(1);
+            }
+            if (event.key === "ArrowUp" || event.key === "PageUp") {
+              event.preventDefault();
+              move(-1);
+            }
+          }}
+        >
+          <div className="chapter-viewport">
+            {chapters.map((item, index) => (
+              <div
+                key={item.title}
+                ref={(node) => {
+                  slideRefs.current[index] = node;
+                }}
+                className="chapter-slide"
+                aria-hidden={index !== activeIndex}
+              >
+                <div className="chapter-topline chapter-anim">
+                  <span style={{ color: item.accent }}>{item.kicker}</span>
+                  <span>{String(index + 1).padStart(2, "0")} — 04</span>
+                </div>
+                <div className="chapter-content">
+                  <h2 className="chapter-anim">{item.title}</h2>
+                  <p className="chapter-statement chapter-anim">
+                    {item.statement}
+                  </p>
+                  <p className="chapter-detail chapter-anim">
+                    {item.detail}
+                  </p>
+                  <div className="meta-row chapter-anim">
+                    {item.meta.map((meta) => (
+                      <span key={meta}>{meta}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div key={chapter.title} className="chapter-content">
-            <h2>{chapter.title}</h2>
-            <p className="chapter-statement">{chapter.statement}</p>
-            <p className="chapter-detail">{chapter.detail}</p>
-            <div className="meta-row">
-              {chapter.meta.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </div>
+          <div className="chapter-gesture">
+            <span>SCROLL / SWIPE</span>
+            <i />
           </div>
           <div className="panel-controls">
             <button onClick={() => move(-1)} aria-label="Previous portfolio chapter">
-              ←
+              ↑
             </button>
             <div className="progress">
               {chapters.map((item, index) => (
                 <button
                   key={item.title}
                   className={index === activeIndex ? "is-active" : ""}
-                  onClick={() => setActiveIndex(index)}
+                  onClick={() =>
+                    goToChapter(index, index > activeIndexRef.current ? 1 : -1)
+                  }
                   aria-label={`Show ${item.title} chapter`}
                 />
               ))}
             </div>
             <button onClick={() => move(1)} aria-label="Next portfolio chapter">
-              →
+              ↓
             </button>
           </div>
         </aside>

@@ -37,7 +37,7 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /I BUILD/);
   assert.match(html, /LEARNING/);
   assert.match(html, /SELECTED WORK/);
-  assert.match(html, /<h2>About<\/h2>/);
+  assert.match(html, /<h2[^>]*>About<\/h2>/);
   assert.match(html, /Show Research chapter/);
   assert.match(html, /LET’S MAKE IT LEGIBLE/);
   assert.doesNotMatch(html, developmentPreviewMeta);
