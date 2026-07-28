@@ -96,6 +96,162 @@ const traits = [
   { label: "高并发", note: "核心专长", className: "trait-six", color: "#b9ff4f" },
 ] as const;
 
+const deepStacks = [
+  {
+    index: "01",
+    title: "高并发服务端",
+    statement: "面向峰值流量与复杂调用链，构建低延迟、可扩展、可降级的服务体系。",
+    color: "#b9ff4f",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["并发模型", "异步输入输出", "线程池与连接池", "低锁化设计"],
+      },
+      {
+        title: "工程实践",
+        items: ["多级缓存", "限流与熔断", "背压与削峰", "热点隔离"],
+      },
+      {
+        title: "可交付成果",
+        items: ["容量模型", "压测方案", "性能基线", "故障演练"],
+      },
+    ],
+  },
+  {
+    index: "02",
+    title: "分布式系统",
+    statement: "围绕服务边界、数据流和失败路径，设计可演进的分布式架构。",
+    color: "#ff784f",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["服务拆分", "事件驱动", "数据一致性", "幂等设计"],
+      },
+      {
+        title: "工程实践",
+        items: ["注册与发现", "配置治理", "分布式事务", "故障隔离"],
+      },
+      {
+        title: "可交付成果",
+        items: ["系统架构图", "服务契约", "容灾方案", "演进路线"],
+      },
+    ],
+  },
+  {
+    index: "03",
+    title: "人工智能应用",
+    statement: "把模型能力接入真实业务，并建立质量、延迟、安全与成本边界。",
+    color: "#7b75ff",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["大语言模型应用", "检索增强生成", "工具型智能体", "提示模板工程"],
+      },
+      {
+        title: "工程实践",
+        items: ["向量检索", "评测数据集", "安全护栏", "链路追踪"],
+      },
+      {
+        title: "可交付成果",
+        items: ["知识问答", "智能助手", "流程自动化", "评测平台"],
+      },
+    ],
+  },
+  {
+    index: "04",
+    title: "数据与存储",
+    statement: "根据访问模式、数据规模和一致性要求，选择并治理合适的存储方案。",
+    color: "#ffda45",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["关系型数据库", "键值与文档存储", "索引设计", "查询优化"],
+      },
+      {
+        title: "工程实践",
+        items: ["分库分表", "读写分离", "事务边界", "慢查询治理"],
+      },
+      {
+        title: "可交付成果",
+        items: ["数据模型", "迁移方案", "备份恢复", "容量规划"],
+      },
+    ],
+  },
+  {
+    index: "05",
+    title: "云原生交付",
+    statement: "让构建、测试、发布、回滚和观测形成可重复的自动化交付链路。",
+    color: "#b9ff4f",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["容器化", "容器编排", "弹性伸缩", "环境隔离"],
+      },
+      {
+        title: "工程实践",
+        items: ["持续集成与交付", "灰度发布", "配置与密钥", "日志与指标"],
+      },
+      {
+        title: "可交付成果",
+        items: ["交付流水线", "环境规范", "回滚策略", "告警体系"],
+      },
+    ],
+  },
+  {
+    index: "06",
+    title: "前端与三维交互",
+    statement: "兼顾组件复用、交互表现与运行性能，交付具有辨识度的产品体验。",
+    color: "#ff784f",
+    groups: [
+      {
+        title: "核心设计",
+        items: ["类型化界面开发", "组件架构", "服务端渲染", "三维图形"],
+      },
+      {
+        title: "工程实践",
+        items: ["状态管理", "性能优化", "设计系统", "无障碍体验"],
+      },
+      {
+        title: "可交付成果",
+        items: ["复杂管理后台", "数据可视化", "三维网站", "交互原型"],
+      },
+    ],
+  },
+] as const;
+
+const engineeringSteps = [
+  {
+    index: "01",
+    title: "需求澄清",
+    text: "识别业务目标、关键约束、风险边界和可以验证的成功标准。",
+  },
+  {
+    index: "02",
+    title: "架构权衡",
+    text: "比较复杂度、性能、成本与演进空间，记录关键技术决策。",
+  },
+  {
+    index: "03",
+    title: "质量内建",
+    text: "用测试、代码审查、静态检查和自动化门禁保障交付质量。",
+  },
+  {
+    index: "04",
+    title: "性能验证",
+    text: "建立容量模型和性能基线，通过压测定位瓶颈并验证优化结果。",
+  },
+  {
+    index: "05",
+    title: "稳定上线",
+    text: "采用灰度、监控、告警、回滚与故障预案控制发布风险。",
+  },
+  {
+    index: "06",
+    title: "持续演进",
+    text: "基于运行数据和故障复盘，持续改善架构、流程与开发体验。",
+  },
+] as const;
+
 type AvatarProps = {
   activeIndex: number;
 };
@@ -610,6 +766,74 @@ export default function Home() {
                 ))}
               </div>
               <span className="card-arrow">↗</span>
+            </article>
+          ))}
+        </div>
+        <a className="stack-jump" href="#stacks">
+          继续查看重点技术栈 ↓
+        </a>
+      </section>
+
+      <section className="stack-section" id="stacks">
+        <div className="stack-heading">
+          <div>
+            <p>重点技术栈</p>
+            <span>六组能力 · 从设计到交付</span>
+          </div>
+          <h2>
+            技术不是清单，
+            <br />
+            <span>而是解决问题的方法。</span>
+          </h2>
+        </div>
+
+        <div className="stack-grid">
+          {deepStacks.map((stack) => (
+            <article
+              key={stack.index}
+              className="stack-card"
+              style={
+                { "--stack-accent": stack.color } as React.CSSProperties
+              }
+            >
+              <div className="stack-card-head">
+                <span>{stack.index}</span>
+                <i />
+                <h3>{stack.title}</h3>
+              </div>
+              <p className="stack-statement">{stack.statement}</p>
+              <div className="stack-groups">
+                {stack.groups.map((group) => (
+                  <div key={group.title} className="stack-group">
+                    <h4>{group.title}</h4>
+                    <ul>
+                      {group.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="method-section" aria-labelledby="method-title">
+        <div className="method-heading">
+          <p>工程方法</p>
+          <h2 id="method-title">
+            从需求到上线，
+            <br />
+            每一步都有依据。
+          </h2>
+        </div>
+        <div className="method-grid">
+          {engineeringSteps.map((step) => (
+            <article key={step.index} className="method-card">
+              <span>{step.index}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
             </article>
           ))}
         </div>

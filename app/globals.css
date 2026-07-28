@@ -577,6 +577,214 @@ footer > p,
   font-size: 2rem;
 }
 
+.stack-jump {
+  width: fit-content;
+  margin: 3.5rem 0 0 auto;
+  padding-bottom: 0.45rem;
+  display: block;
+  border-bottom: 1px solid currentColor;
+  color: var(--acid);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.stack-section {
+  padding: 8vw 3vw 7vw;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(123, 117, 255, 0.2), transparent 25%),
+    var(--paper);
+}
+
+.stack-heading,
+.method-heading {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
+  gap: 4vw;
+  align-items: end;
+  padding-bottom: 5vw;
+}
+
+.stack-heading p,
+.method-heading p {
+  margin: 0 0 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.stack-heading > div > span {
+  color: rgba(23, 22, 29, 0.62);
+  font-size: 0.84rem;
+}
+
+.stack-heading h2,
+.method-heading h2 {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(3.2rem, 6.7vw, 7rem);
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+}
+
+.stack-heading h2 span {
+  color: var(--violet);
+}
+
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.stack-card {
+  --stack-accent: var(--acid);
+  position: relative;
+  min-height: 500px;
+  padding: 1.8rem;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: rgba(242, 238, 230, 0.66);
+  overflow: hidden;
+}
+
+.stack-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: var(--stack-accent);
+}
+
+.stack-card-head {
+  display: grid;
+  grid-template-columns: auto minmax(24px, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.stack-card-head > span {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.82rem;
+}
+
+.stack-card-head i {
+  height: 1px;
+  background: rgba(23, 22, 29, 0.22);
+}
+
+.stack-card h3 {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2rem, 3vw, 3.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.stack-statement {
+  margin: 3.2rem 0;
+  max-width: 34ch;
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  line-height: 1.5;
+}
+
+.stack-groups {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(23, 22, 29, 0.24);
+}
+
+.stack-group h4 {
+  margin: 0 0 0.9rem;
+  color: rgba(23, 22, 29, 0.6);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+}
+
+.stack-group ul {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.stack-group li {
+  position: relative;
+  padding-left: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.stack-group li::before {
+  content: "";
+  position: absolute;
+  top: 0.52em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--stack-accent);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+.method-section {
+  padding: 7vw 3vw;
+  background: var(--yellow);
+}
+
+.method-heading {
+  align-items: start;
+}
+
+.method-heading h2 {
+  font-size: clamp(3.4rem, 7.2vw, 7.5rem);
+}
+
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.method-card {
+  min-height: 250px;
+  padding: 1.4rem;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  transition:
+    background-color 220ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.method-card:hover {
+  background: var(--paper);
+  transform: translateY(-6px);
+}
+
+.method-card > span {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.78rem;
+}
+
+.method-card h3 {
+  margin: 4.5rem 0 0.8rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.8rem, 2.5vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.method-card p {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
 footer {
   min-height: 66svh;
   padding: 7vw 3vw 2vw;
@@ -658,6 +866,14 @@ footer h2 {
 
   .work-card:nth-last-child(-n + 2) {
     border-bottom: 0;
+  }
+
+  .stack-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .stack-card {
+    min-height: 620px;
   }
 }
 
@@ -788,6 +1004,48 @@ footer h2 {
 
   .card-index {
     margin-bottom: 4.5rem;
+  }
+
+  .stack-heading,
+  .method-heading {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .stack-heading h2,
+  .method-heading h2 {
+    font-size: 15vw;
+  }
+
+  .stack-grid,
+  .method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stack-card {
+    min-height: auto;
+    padding: 1.35rem;
+  }
+
+  .stack-card-head {
+    grid-template-columns: auto 1fr;
+  }
+
+  .stack-card-head i {
+    display: none;
+  }
+
+  .stack-card h3 {
+    text-align: right;
+  }
+
+  .stack-groups {
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+  }
+
+  .method-card {
+    min-height: 220px;
   }
 
   footer {

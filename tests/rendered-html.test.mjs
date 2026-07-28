@@ -39,6 +39,11 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /人工智能原生/);
   assert.match(html, /<h2[^>]*>高级开发工程师<\/h2>/);
   assert.match(html, /查看“大规模系统”章节/);
+  assert.match(html, /高并发服务端/);
+  assert.match(html, /检索增强生成/);
+  assert.match(html, /云原生交付/);
+  assert.match(html, /从需求到上线/);
+  assert.match(html, /持续演进/);
   assert.match(html, /把它做对，做稳/);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
