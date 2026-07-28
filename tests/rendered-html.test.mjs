@@ -33,13 +33,13 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Chunxiang — Senior Software Engineer<\/title>/i);
-  assert.match(html, /SENIOR SOFTWARE ENGINEER/);
-  assert.match(html, /HIGH CONCURRENCY/);
-  assert.match(html, /AI-NATIVE/);
-  assert.match(html, /<h2[^>]*>Senior Engineer<\/h2>/);
-  assert.match(html, /Show Systems at Scale chapter/);
-  assert.match(html, /LET’S BUILD IT RIGHT/);
+  assert.match(html, /<title>高级软件开发工程师｜三维交互简历<\/title>/i);
+  assert.match(html, /高级软件开发工程师/);
+  assert.match(html, /高并发/);
+  assert.match(html, /人工智能原生/);
+  assert.match(html, /<h2[^>]*>高级开发工程师<\/h2>/);
+  assert.match(html, /查看“大规模系统”章节/);
+  assert.match(html, /把它做对，做稳/);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });
@@ -55,7 +55,7 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /from "@react-three\/drei"/);
   assert.match(page, /from "@gsap\/react"/);
   assert.match(page, /双鱼座/);
-  assert.match(layout, /Chunxiang — Senior Software Engineer/);
+  assert.match(layout, /高级软件开发工程师｜三维交互简历/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
 

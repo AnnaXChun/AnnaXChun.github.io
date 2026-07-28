@@ -11,89 +11,89 @@ gsap.registerPlugin(useGSAP);
 
 const chapters = [
   {
-    kicker: "01 / PROFILE",
-    title: "Senior Engineer",
+    kicker: "01 / 职业定位",
+    title: "高级开发工程师",
     accent: "#b9ff4f",
     statement:
-      "I turn complex product requirements into reliable software that teams can evolve with confidence.",
+      "把复杂业务需求，转化为可靠、可演进、能长期维护的软件系统。",
     detail:
-      "A senior software engineer with strong product instincts, deep backend experience, and the range to move from architecture to production delivery.",
-    meta: ["BACKEND", "ARCHITECTURE", "PRODUCT THINKING"],
+      "具备扎实的后端与系统设计能力，也理解产品目标；能够从方案评审、核心开发一路推进到稳定上线。",
+    meta: ["后端开发", "系统架构", "产品思维"],
   },
   {
-    kicker: "02 / SCALE",
-    title: "Systems at Scale",
+    kicker: "02 / 规模化",
+    title: "大规模系统",
     accent: "#ff784f",
     statement:
-      "I design high-concurrency services that remain observable, resilient, and predictable under pressure.",
+      "面向高并发场景，设计可观测、可恢复、可预测的服务体系。",
     detail:
-      "From API boundaries and data consistency to queues, caching, rate limiting, and graceful degradation, I build for the failure modes that appear at scale.",
-    meta: ["MICROSERVICES", "KAFKA · REDIS", "PERFORMANCE"],
+      "覆盖服务边界、数据一致性、消息队列、缓存、限流、降级与容量治理，针对规模化运行中的真实故障进行设计。",
+    meta: ["微服务", "消息队列与缓存", "性能优化"],
   },
   {
-    kicker: "03 / INTELLIGENCE",
-    title: "AI-Native",
+    kicker: "03 / 智能化",
+    title: "人工智能工程",
     accent: "#7b75ff",
     statement:
-      "I use AI as an engineering capability—not a demo layer.",
+      "把人工智能作为工程能力，而不是停留在演示层。",
     detail:
-      "I integrate LLMs, RAG, tool-using agents, evaluation pipelines, and AI-assisted development into systems with clear quality, latency, and cost boundaries.",
-    meta: ["LLM · RAG", "AGENTS", "EVALUATION"],
+      "将大语言模型、检索增强生成、工具型智能体、评测体系与辅助开发流程融入产品，并明确质量、延迟和成本边界。",
+    meta: ["大语言模型", "智能体", "评测体系"],
   },
   {
-    kicker: "04 / DELIVERY",
-    title: "Ship & Lead",
+    kicker: "04 / 交付",
+    title: "交付与带领",
     accent: "#ffda45",
     statement:
-      "I raise the engineering bar while keeping delivery moving.",
+      "在持续交付的同时，提高团队的工程质量。",
     detail:
-      "Architecture reviews, pragmatic standards, CI/CD, observability, incident learning, and developer experience are all part of shipping durable software.",
-    meta: ["CLOUD NATIVE", "CI/CD", "TECH LEADERSHIP"],
+      "通过架构评审、务实规范、自动化交付、可观测性、故障复盘与开发体验建设，推动团队稳定交付耐用的软件。",
+    meta: ["云原生", "持续交付", "技术领导力"],
   },
 ] as const;
 
 const work = [
   {
     index: "01",
-    title: "Distributed backend",
-    type: "SYSTEM ARCHITECTURE",
-    text: "Service boundaries, data consistency, asynchronous workflows, fault isolation, and APIs designed for long-term change.",
-    stack: ["GO / JAVA", "GRPC", "DDD", "SQL / NOSQL"],
+    title: "分布式后端",
+    type: "系统架构",
+    text: "围绕服务边界、数据一致性、异步流程、故障隔离与接口演进，构建可长期维护的后端系统。",
+    stack: ["后端语言", "远程调用", "领域驱动设计", "多类型数据库"],
     color: "#b9ff4f",
   },
   {
     index: "02",
-    title: "High concurrency",
-    type: "PERFORMANCE ENGINEERING",
-    text: "Caching, message queues, backpressure, rate limiting, profiling, and observability for stable performance under load.",
-    stack: ["KAFKA", "REDIS", "ASYNC I/O", "PROMETHEUS"],
+    title: "高并发工程",
+    type: "性能与稳定性",
+    text: "通过缓存、消息队列、背压、限流、性能分析和监控告警，保障高负载下的稳定运行。",
+    stack: ["分布式消息", "内存缓存", "异步输入输出", "指标监控"],
     color: "#ff784f",
   },
   {
     index: "03",
-    title: "Production AI",
-    type: "AI ENGINEERING",
-    text: "LLM applications with retrieval, tools, evaluation, guardrails, tracing, and deliberate latency and cost controls.",
-    stack: ["LLM", "RAG", "AGENTS", "EVALS"],
+    title: "生产级智能应用",
+    type: "人工智能工程",
+    text: "建设包含检索、工具调用、评测、护栏和链路追踪的智能应用，并控制延迟与成本。",
+    stack: ["大语言模型", "检索增强生成", "智能体", "自动化评测"],
     color: "#7b75ff",
   },
   {
     index: "04",
-    title: "Cloud delivery",
-    type: "PLATFORM & DEVEX",
-    text: "Containerized delivery, automated quality gates, progressive releases, and feedback loops that help teams ship safely.",
-    stack: ["KUBERNETES", "DOCKER", "CI/CD", "OPEN TELEMETRY"],
+    title: "云端交付",
+    type: "平台与研发效能",
+    text: "以容器化、自动化质量门禁、渐进式发布和反馈闭环，帮助团队更安全地交付。",
+    stack: ["容器编排", "容器化", "持续集成与交付", "可观测性"],
     color: "#ffda45",
   },
 ] as const;
 
 const traits = [
-  { label: "INFP", note: "PERSONALITY", className: "trait-one", color: "#b9ff4f" },
-  { label: "双鱼座", note: "PISCES", className: "trait-two", color: "#ffda45" },
-  { label: "AI-NATIVE", note: "MINDSET", className: "trait-three", color: "#7b75ff" },
-  { label: "SYSTEM DESIGN", note: "CRAFT", className: "trait-four", color: "#ff784f" },
-  { label: "BUILDER", note: "ENERGY", className: "trait-five", color: "#f2eee6" },
-  { label: "HIGH CONCURRENCY", note: "SPECIALTY", className: "trait-six", color: "#b9ff4f" },
+  { label: "调停者型人格", note: "性格", className: "trait-one", color: "#b9ff4f" },
+  { label: "双鱼座", note: "星座", className: "trait-two", color: "#ffda45" },
+  { label: "人工智能原生", note: "思维方式", className: "trait-three", color: "#7b75ff" },
+  { label: "系统设计", note: "专业能力", className: "trait-four", color: "#ff784f" },
+  { label: "实干派", note: "行动风格", className: "trait-five", color: "#f2eee6" },
+  { label: "高并发", note: "核心专长", className: "trait-six", color: "#b9ff4f" },
 ] as const;
 
 type AvatarProps = {
@@ -442,18 +442,18 @@ export default function Home() {
     <main>
       <section
         className="hero"
-        aria-label="Interactive portfolio introduction"
+        aria-label="互动式个人简历首页"
       >
         <header className="site-header">
-          <a className="wordmark" href="#top" aria-label="Chunxiang portfolio home">
-            CX<span>°</span>
+          <a className="wordmark" href="#top" aria-label="返回个人简历首页">
+            简历<span>°</span>
           </a>
           <div className="availability">
             <span />
-            SENIOR SOFTWARE ENGINEER · AI & DISTRIBUTED SYSTEMS
+            高级软件开发工程师 · 人工智能与分布式系统
           </div>
           <a className="header-link" href="#work">
-            CAPABILITIES ↓
+            核心能力 ↓
           </a>
         </header>
 
@@ -461,7 +461,7 @@ export default function Home() {
           className="scene-wrap"
           id="top"
           ref={sceneRef}
-          aria-label="Interactive 3D character surrounded by personal and engineering traits"
+          aria-label="被个人特质与工程能力标签环绕的互动三维人物"
         >
           <Canvas
             camera={{ position: [0, 0.12, 7.45], fov: 38 }}
@@ -470,7 +470,7 @@ export default function Home() {
           >
             <Avatar activeIndex={activeIndex} />
           </Canvas>
-          <div className="trait-cloud" aria-label="Personal and engineering traits">
+          <div className="trait-cloud" aria-label="个人特质与工程能力">
             {traits.map((trait) => (
               <div
                 key={trait.label}
@@ -491,7 +491,7 @@ export default function Home() {
         <aside
           ref={panelRef}
           className="chapter-panel"
-          aria-label="Portfolio chapters. Scroll up or down to navigate."
+          aria-label="个人能力章节，可上下滚动切换"
           aria-live="polite"
           tabIndex={0}
           style={
@@ -562,11 +562,11 @@ export default function Home() {
             ))}
           </div>
           <div className="chapter-gesture">
-            <span>SCROLL / SWIPE</span>
+            <span>滚动 / 滑动</span>
             <i />
           </div>
           <div className="panel-controls">
-            <button onClick={() => move(-1)} aria-label="Previous portfolio chapter">
+            <button onClick={() => move(-1)} aria-label="上一项个人能力">
               ↑
             </button>
             <div className="progress">
@@ -577,11 +577,11 @@ export default function Home() {
                   onClick={() =>
                     goToChapter(index, index > activeIndexRef.current ? 1 : -1)
                   }
-                  aria-label={`Show ${item.title} chapter`}
+                  aria-label={`查看“${item.title}”章节`}
                 />
               ))}
             </div>
-            <button onClick={() => move(1)} aria-label="Next portfolio chapter">
+            <button onClick={() => move(1)} aria-label="下一项个人能力">
               ↓
             </button>
           </div>
@@ -590,11 +590,11 @@ export default function Home() {
 
       <section className="work-section" id="work">
         <div className="section-heading">
-          <p>ENGINEERING CAPABILITY MATRIX</p>
+          <p>工程能力矩阵</p>
           <h2>
-            BUILT FOR
+            面向真实
             <br />
-            <span>production.</span>
+            <span>生产环境。</span>
           </h2>
         </div>
         <div className="work-grid">
@@ -616,12 +616,12 @@ export default function Home() {
       </section>
 
       <footer id="contact">
-        <p>HAVE A SYSTEM THAT NEEDS TO SCALE?</p>
-        <h2>LET’S BUILD IT RIGHT.</h2>
+        <p>系统需要扩展？</p>
+        <h2>把它做对，做稳。</h2>
         <div className="footer-row">
-          <span>CHUNXIANG · SENIOR SOFTWARE ENGINEER</span>
-          <span>AI · DISTRIBUTED SYSTEMS · CLOUD</span>
-          <a href="#top">BACK TO TOP ↑</a>
+          <span>高级软件开发工程师</span>
+          <span>人工智能 · 分布式系统 · 云原生</span>
+          <a href="#top">返回顶部 ↑</a>
         </div>
       </footer>
     </main>
