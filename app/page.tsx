@@ -462,7 +462,7 @@ export default function Home() {
           onClick={() => goToSlide(0, -1)}
           aria-label="返回第一屏"
         >
-          春祥<span>°</span>
+          椿襄<span>°</span>
         </button>
         <div className="global-role">高级软件开发工程师 · 人工智能与分布式系统</div>
         <div className="global-count" aria-live="polite">
@@ -485,7 +485,7 @@ export default function Home() {
           工程师
         </div>
         <div className="hero-intro slide-reveal">
-          <span>春祥 / 软件开发工程师</span>
+          <span>椿襄 / 软件开发工程师</span>
           <h1>
             让复杂系统
             <br />
@@ -701,7 +701,7 @@ export default function Home() {
           <em>难而正确的事。</em>
         </h2>
         <p className="final-copy slide-reveal">
-          春祥 · 高级软件开发工程师
+          椿襄 · 高级软件开发工程师
           <br />
           期待参与需要系统思维、工程深度与人工智能能力的长期项目。
         </p>

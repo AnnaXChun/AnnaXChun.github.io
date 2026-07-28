@@ -34,6 +34,8 @@ test("server-renders the interactive portfolio shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>高级软件开发工程师｜三维交互简历<\/title>/i);
+  assert.match(html, /椿襄/);
+  assert.doesNotMatch(html, /春祥/);
   assert.match(html, /高级软件开发工程师/);
   assert.match(html, /高并发/);
   assert.match(html, /人工智能原生/);
