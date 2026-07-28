@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Float, Html, RoundedBox } from "@react-three/drei";
+import { ContactShadows, Float, RoundedBox } from "@react-three/drei";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { useRef, useState } from "react";
@@ -11,74 +11,93 @@ gsap.registerPlugin(useGSAP);
 
 const chapters = [
   {
-    kicker: "01 / SIGNAL",
-    title: "About",
+    kicker: "01 / PROFILE",
+    title: "Senior Engineer",
     accent: "#b9ff4f",
     statement:
-      "I turn ambitious research ideas into systems people can run, measure, and trust.",
+      "I turn complex product requirements into reliable software that teams can evolve with confidence.",
     detail:
-      "My sweet spot sits between learning algorithms, research infrastructure, and interactive product thinking.",
-    meta: ["AGENTIC RL", "SYSTEMS", "PROTOTYPING"],
+      "A senior software engineer with strong product instincts, deep backend experience, and the range to move from architecture to production delivery.",
+    meta: ["BACKEND", "ARCHITECTURE", "PRODUCT THINKING"],
   },
   {
-    kicker: "02 / CURIOSITY",
-    title: "Research",
+    kicker: "02 / SCALE",
+    title: "Systems at Scale",
     accent: "#ff784f",
     statement:
-      "How can agents learn from environments, feedback, and the useful shape of failure?",
+      "I design high-concurrency services that remain observable, resilient, and predictable under pressure.",
     detail:
-      "I care about tool-using agents, reliable evaluation, scalable learning loops, and experiments that reveal why something works.",
-    meta: ["TOOL USE", "EVALUATION", "LEARNING LOOPS"],
+      "From API boundaries and data consistency to queues, caching, rate limiting, and graceful degradation, I build for the failure modes that appear at scale.",
+    meta: ["MICROSERVICES", "KAFKA · REDIS", "PERFORMANCE"],
   },
   {
-    kicker: "03 / CRAFT",
-    title: "Build",
+    kicker: "03 / INTELLIGENCE",
+    title: "AI-Native",
     accent: "#7b75ff",
     statement:
-      "I like research code with product instincts: observable, composable, and made to survive iteration.",
+      "I use AI as an engineering capability—not a demo layer.",
     detail:
-      "From training pipelines to playful 3D interfaces, I build the connective tissue that turns a compelling demo into repeatable progress.",
-    meta: ["RESEARCH INFRA", "3D WEB", "DX"],
+      "I integrate LLMs, RAG, tool-using agents, evaluation pipelines, and AI-assisted development into systems with clear quality, latency, and cost boundaries.",
+    meta: ["LLM · RAG", "AGENTS", "EVALUATION"],
   },
   {
-    kicker: "04 / CURRENT",
-    title: "Now",
+    kicker: "04 / DELIVERY",
+    title: "Ship & Lead",
     accent: "#ffda45",
     statement:
-      "Exploring better ways for agents to plan, act, and improve across long horizons.",
+      "I raise the engineering bar while keeping delivery moving.",
     detail:
-      "Open to thoughtful research collaborations, strange prototypes, and hard problems with clear evidence at the end.",
-    meta: ["OPEN TO COLLAB", "UTC+8", "2026"],
+      "Architecture reviews, pragmatic standards, CI/CD, observability, incident learning, and developer experience are all part of shipping durable software.",
+    meta: ["CLOUD NATIVE", "CI/CD", "TECH LEADERSHIP"],
   },
 ] as const;
 
 const work = [
   {
     index: "01",
-    title: "Learning systems",
-    type: "RESEARCH ENGINEERING",
-    text: "Training loops, reward design, and evaluation surfaces for agents that learn through action.",
+    title: "Distributed backend",
+    type: "SYSTEM ARCHITECTURE",
+    text: "Service boundaries, data consistency, asynchronous workflows, fault isolation, and APIs designed for long-term change.",
+    stack: ["GO / JAVA", "GRPC", "DDD", "SQL / NOSQL"],
     color: "#b9ff4f",
   },
   {
     index: "02",
-    title: "Interactive worlds",
-    type: "EXPERIENCE DESIGN",
-    text: "Interfaces that turn complex technical ideas into something people can see, touch, and remember.",
+    title: "High concurrency",
+    type: "PERFORMANCE ENGINEERING",
+    text: "Caching, message queues, backpressure, rate limiting, profiling, and observability for stable performance under load.",
+    stack: ["KAFKA", "REDIS", "ASYNC I/O", "PROMETHEUS"],
     color: "#ff784f",
   },
   {
     index: "03",
-    title: "Reliable evidence",
-    type: "TOOLS & EVALUATION",
-    text: "Instrumentation and experiments that make progress legible—and failure genuinely useful.",
+    title: "Production AI",
+    type: "AI ENGINEERING",
+    text: "LLM applications with retrieval, tools, evaluation, guardrails, tracing, and deliberate latency and cost controls.",
+    stack: ["LLM", "RAG", "AGENTS", "EVALS"],
     color: "#7b75ff",
   },
+  {
+    index: "04",
+    title: "Cloud delivery",
+    type: "PLATFORM & DEVEX",
+    text: "Containerized delivery, automated quality gates, progressive releases, and feedback loops that help teams ship safely.",
+    stack: ["KUBERNETES", "DOCKER", "CI/CD", "OPEN TELEMETRY"],
+    color: "#ffda45",
+  },
+] as const;
+
+const traits = [
+  { label: "INFP", note: "PERSONALITY", className: "trait-one", color: "#b9ff4f" },
+  { label: "双鱼座", note: "PISCES", className: "trait-two", color: "#ffda45" },
+  { label: "AI-NATIVE", note: "MINDSET", className: "trait-three", color: "#7b75ff" },
+  { label: "SYSTEM DESIGN", note: "CRAFT", className: "trait-four", color: "#ff784f" },
+  { label: "BUILDER", note: "ENERGY", className: "trait-five", color: "#f2eee6" },
+  { label: "HIGH CONCURRENCY", note: "SPECIALTY", className: "trait-six", color: "#b9ff4f" },
 ] as const;
 
 type AvatarProps = {
   activeIndex: number;
-  onSelect: (index: number) => void;
 };
 
 function Eye({
@@ -118,49 +137,7 @@ function Eye({
   );
 }
 
-function Sticker({
-  index,
-  label,
-  position,
-  rotation,
-  activeIndex,
-  onSelect,
-}: {
-  index: number;
-  label: string;
-  position: [number, number, number];
-  rotation: number;
-  activeIndex: number;
-  onSelect: (index: number) => void;
-}) {
-  return (
-    <Html
-      center
-      transform
-      sprite
-      position={position}
-      distanceFactor={6.2}
-      style={{ pointerEvents: "auto" }}
-    >
-      <button
-        className={`mesh-sticker ${activeIndex === index ? "is-active" : ""}`}
-        onClick={() => onSelect(index)}
-        style={
-          {
-            "--sticker-color": chapters[index].accent,
-            "--sticker-rotate": `${rotation}deg`,
-          } as React.CSSProperties
-        }
-        aria-label={`Show ${label} chapter`}
-      >
-        <span>0{index + 1}</span>
-        {label}
-      </button>
-    </Html>
-  );
-}
-
-function Avatar({ activeIndex, onSelect }: AvatarProps) {
+function Avatar({ activeIndex }: AvatarProps) {
   const body = useRef<THREE.Group>(null);
   const head = useRef<THREE.Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
@@ -208,7 +185,7 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
           ref={body}
           position={[0, -0.38, 0]}
           rotation={[0, -0.04, 0]}
-          scale={0.88}
+          scale={0.94}
         >
           <group ref={head}>
             <mesh position={[0, 1.42, 0]}>
@@ -279,38 +256,6 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
             <meshStandardMaterial color="#7b75ff" roughness={0.6} />
           </mesh>
 
-          <Sticker
-            index={0}
-            label="ABOUT"
-            position={[-1.38, 1.15, 0.7]}
-            rotation={-7}
-            activeIndex={activeIndex}
-            onSelect={onSelect}
-          />
-          <Sticker
-            index={1}
-            label="RESEARCH"
-            position={[1.26, 0.66, 0.7]}
-            rotation={6}
-            activeIndex={activeIndex}
-            onSelect={onSelect}
-          />
-          <Sticker
-            index={2}
-            label="BUILD"
-            position={[-1.15, -0.35, 0.68]}
-            rotation={5}
-            activeIndex={activeIndex}
-            onSelect={onSelect}
-          />
-          <Sticker
-            index={3}
-            label="NOW"
-            position={[1.05, -1.22, 0.64]}
-            rotation={-5}
-            activeIndex={activeIndex}
-            onSelect={onSelect}
-          />
         </group>
       </Float>
 
@@ -333,6 +278,7 @@ function Avatar({ activeIndex, onSelect }: AvatarProps) {
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const panelRef = useRef<HTMLElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
   const activeIndexRef = useRef(0);
   const isAnimating = useRef(false);
@@ -447,6 +393,51 @@ export default function Home() {
     goToChapter(activeIndexRef.current + direction, direction);
   });
 
+  useGSAP(
+    () => {
+      const media = gsap.matchMedia();
+
+      media.add(
+        {
+          reduceMotion: "(prefers-reduced-motion: reduce)",
+          desktop: "(min-width: 861px)",
+        },
+        (context) => {
+          const { reduceMotion, desktop } = context.conditions as {
+            reduceMotion: boolean;
+            desktop: boolean;
+          };
+          const tags = gsap.utils.toArray<HTMLElement>(".trait-tag");
+
+          gsap.from(tags, {
+            autoAlpha: 0,
+            y: reduceMotion ? 0 : 24,
+            scale: reduceMotion ? 1 : 0.78,
+            duration: reduceMotion ? 0.01 : 0.72,
+            stagger: reduceMotion ? 0 : 0.08,
+            ease: "back.out(1.7)",
+          });
+
+          if (!reduceMotion) {
+            gsap.to(tags, {
+              y: (index) => (index % 2 === 0 ? -12 : 11),
+              rotation: (index) => (index % 2 === 0 ? "+=2.5" : "-=2"),
+              duration: (index) => 2.8 + (index % 3) * 0.45,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+              stagger: { each: desktop ? 0.16 : 0.1, from: "random" },
+              delay: 0.85,
+            });
+          }
+        },
+      );
+
+      return () => media.revert();
+    },
+    { scope: sceneRef },
+  );
+
   return (
     <main>
       <section
@@ -459,40 +450,40 @@ export default function Home() {
           </a>
           <div className="availability">
             <span />
-            OPEN TO RESEARCH COLLABORATIONS
+            SENIOR SOFTWARE ENGINEER · AI & DISTRIBUTED SYSTEMS
           </div>
           <a className="header-link" href="#work">
-            SELECTED WORK ↓
+            CAPABILITIES ↓
           </a>
         </header>
 
-        <div className="hero-copy" id="top">
-          <p className="eyebrow">AI RESEARCHER · SYSTEM BUILDER · CURIOUS HUMAN</p>
-          <h1>
-            I BUILD
-            <br />
-            LEARNING
-            <br />
-            <em>MACHINES.</em>
-          </h1>
-          <p className="hero-note">
-            Research thinking with builder energy.
-            <br />
-            Drag your cursor across the face.
-          </p>
-        </div>
-
-        <div className="scene-wrap" aria-label="Interactive 3D character with portfolio stickers">
+        <div
+          className="scene-wrap"
+          id="top"
+          ref={sceneRef}
+          aria-label="Interactive 3D character surrounded by personal and engineering traits"
+        >
           <Canvas
-            camera={{ position: [0, 0.15, 7.65], fov: 38 }}
+            camera={{ position: [0, 0.12, 7.45], fov: 38 }}
             dpr={[1, 1.6]}
             gl={{ antialias: true, alpha: true }}
           >
-            <Avatar
-              activeIndex={activeIndex}
-              onSelect={(index) => goToChapter(index)}
-            />
+            <Avatar activeIndex={activeIndex} />
           </Canvas>
+          <div className="trait-cloud" aria-label="Personal and engineering traits">
+            {traits.map((trait) => (
+              <div
+                key={trait.label}
+                className={`trait-tag ${trait.className}`}
+                style={
+                  { "--trait-color": trait.color } as React.CSSProperties
+                }
+              >
+                <span>{trait.note}</span>
+                <strong>{trait.label}</strong>
+              </div>
+            ))}
+          </div>
           <div className="orbit-line orbit-one" />
           <div className="orbit-line orbit-two" />
         </div>
@@ -595,20 +586,15 @@ export default function Home() {
             </button>
           </div>
         </aside>
-
-        <div className="scroll-cue">
-          <span>SCROLL TO EXPLORE</span>
-          <i />
-        </div>
       </section>
 
       <section className="work-section" id="work">
         <div className="section-heading">
-          <p>THREE WAYS I CREATE SIGNAL</p>
+          <p>ENGINEERING CAPABILITY MATRIX</p>
           <h2>
-            SELECTED
+            BUILT FOR
             <br />
-            <span>directions</span>
+            <span>production.</span>
           </h2>
         </div>
         <div className="work-grid">
@@ -618,6 +604,11 @@ export default function Home() {
               <p className="card-type">{item.type}</p>
               <h3>{item.title}</h3>
               <p>{item.text}</p>
+              <div className="card-stack">
+                {item.stack.map((skill) => (
+                  <span key={skill}>{skill}</span>
+                ))}
+              </div>
               <span className="card-arrow">↗</span>
             </article>
           ))}
@@ -625,11 +616,11 @@ export default function Home() {
       </section>
 
       <footer id="contact">
-        <p>HAVE A HARD PROBLEM?</p>
-        <h2>LET’S MAKE IT LEGIBLE.</h2>
+        <p>HAVE A SYSTEM THAT NEEDS TO SCALE?</p>
+        <h2>LET’S BUILD IT RIGHT.</h2>
         <div className="footer-row">
-          <span>CHUNXIANG · RESEARCH & SYSTEMS</span>
-          <span>UTC+8 · AVAILABLE WORLDWIDE</span>
+          <span>CHUNXIANG · SENIOR SOFTWARE ENGINEER</span>
+          <span>AI · DISTRIBUTED SYSTEMS · CLOUD</span>
           <a href="#top">BACK TO TOP ↑</a>
         </div>
       </footer>

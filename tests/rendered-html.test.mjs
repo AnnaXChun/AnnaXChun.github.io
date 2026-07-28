@@ -33,13 +33,13 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Chunxiang — AI Researcher &amp; System Builder<\/title>/i);
-  assert.match(html, /I BUILD/);
-  assert.match(html, /LEARNING/);
-  assert.match(html, /SELECTED WORK/);
-  assert.match(html, /<h2[^>]*>About<\/h2>/);
-  assert.match(html, /Show Research chapter/);
-  assert.match(html, /LET’S MAKE IT LEGIBLE/);
+  assert.match(html, /<title>Chunxiang — Senior Software Engineer<\/title>/i);
+  assert.match(html, /SENIOR SOFTWARE ENGINEER/);
+  assert.match(html, /HIGH CONCURRENCY/);
+  assert.match(html, /AI-NATIVE/);
+  assert.match(html, /<h2[^>]*>Senior Engineer<\/h2>/);
+  assert.match(html, /Show Systems at Scale chapter/);
+  assert.match(html, /LET’S BUILD IT RIGHT/);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });
@@ -53,8 +53,9 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
 
   assert.match(page, /from "@react-three\/fiber"/);
   assert.match(page, /from "@react-three\/drei"/);
-  assert.match(page, /Show \$\{label\} chapter/);
-  assert.match(layout, /Chunxiang — AI Researcher & System Builder/);
+  assert.match(page, /from "@gsap\/react"/);
+  assert.match(page, /双鱼座/);
+  assert.match(layout, /Chunxiang — Senior Software Engineer/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
 

@@ -13,9 +13,9 @@ const display = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Chunxiang — AI Researcher & System Builder",
+  title: "Chunxiang — Senior Software Engineer",
   description:
-    "An interactive 3D portfolio about learning systems, research craft, and ambitious experiments.",
+    "An interactive 3D portfolio for a senior software engineer specializing in AI-native products, distributed systems, and high-concurrency architecture.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
