@@ -335,7 +335,7 @@ button {
 
 .trait-two {
   top: 14%;
-  right: 7%;
+  right: 12%;
   transform: rotate(5deg);
 }
 
@@ -346,7 +346,7 @@ button {
 }
 
 .trait-four {
-  right: 3%;
+  right: 11%;
   bottom: 30%;
   transform: rotate(-5deg);
 }
@@ -365,7 +365,7 @@ button {
 
 .trait-seven {
   top: 43%;
-  right: 1%;
+  right: 11%;
   transform: rotate(3deg);
 }
 
@@ -886,6 +886,7 @@ button {
 }
 
 .scene-nav button {
+  position: relative;
   padding: 0.2rem 0;
   display: flex;
   align-items: center;
@@ -908,10 +909,15 @@ button {
 }
 
 .scene-nav span {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.65rem);
   font-size: 0.66rem;
   font-weight: 900;
+  white-space: nowrap;
   opacity: 0;
-  transform: translateX(8px);
+  pointer-events: none;
+  transform: translate(8px, -50%);
   transition:
     opacity 220ms ease,
     transform 220ms ease;
@@ -928,7 +934,7 @@ button {
 .scene-nav button:hover span,
 .scene-nav button:focus-visible span {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate(0, -50%);
 }
 
 .scene-nav.is-light {
