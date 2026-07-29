@@ -42,9 +42,9 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /高级软件开发工程师沉浸式个人简历/);
   assert.match(html, /查看“国家级项目”/);
   assert.match(html, /武汉大学/);
-  assert.match(html, /GPA 3\.80 \/ 4\.00/);
-  assert.match(html, /专业排名 4 \/ 25/);
-  assert.match(html, /已保研/);
+  assert.doesNotMatch(html, /GPA 3\.80 \/ 4\.00/);
+  assert.doesNotMatch(html, /专业排名 4 \/ 25/);
+  assert.doesNotMatch(html, /已保研/);
   assert.match(html, /中帆协官网开发及维护/);
   assert.match(html, /支付链路稳定性/);
   assert.match(html, /ThinkPHP/);
@@ -56,6 +56,12 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /Skill 技能/);
   assert.match(html, /Tool Agent Loop/);
   assert.match(html, /SOP 工作流/);
+  assert.match(html, /Codex/);
+  assert.match(html, /Claude Code/);
+  assert.match(html, /LangChain/);
+  assert.match(html, /Llama/);
+  assert.match(html, /智能体构建/);
+  assert.match(html, /高并发后端/);
   assert.match(html, /全栈闭环交付/);
   assert.match(html, /复杂问题排障/);
   assert.match(html, /含金量/);

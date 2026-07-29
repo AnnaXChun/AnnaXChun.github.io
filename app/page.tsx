@@ -17,7 +17,7 @@ const slideLabels = [
   "国家级项目",
   "人工智能科研",
   "SOP 工作流",
-  "教育荣誉",
+  "履历成果",
 ] as const;
 
 const slideAccents = [
@@ -32,31 +32,31 @@ const slideAccents = [
 
 const traits = [
   {
-    label: "武汉大学",
-    note: "学校",
+    label: "Codex / Claude Code",
+    note: "人工智能协作",
     className: "trait-one",
     color: "#c7ff4a",
-    meaning: "软件工程专业，接受系统的软件工程训练。",
-    evidence: "GPA 3.80 / 4.00，专业排名 4 / 25。",
-    value: "证明扎实的计算机基础、学习能力与长期稳定投入。",
+    meaning: "熟练使用人工智能编程工具参与真实工程研发。",
+    evidence: "用于代码理解、方案拆分、重构、测试、排障与部署交付。",
+    value: "缩短反馈链路，让研发速度与代码质量同时提升。",
   },
   {
-    label: "已保研",
-    note: "学业",
+    label: "智能体构建",
+    note: "人工智能工程",
     className: "trait-two",
     color: "#f4d84d",
-    meaning: "获得推荐免试研究生资格。",
-    evidence: "专业排名 4 / 25，并持续积累科研与工程项目。",
-    value: "体现自驱力、研究潜力和对复杂问题的长期专注。",
+    meaning: "具备从模型接入到工具调用的智能体研发经验。",
+    evidence: "实践 LangChain、Llama、Agent Loop、工具调用与安全沙箱。",
+    value: "能够把大模型能力转化为可执行、可验证的业务流程。",
   },
   {
-    label: "人工智能原生工程",
-    note: "方法",
+    label: "高并发后端",
+    note: "工程能力",
     className: "trait-three",
     color: "#8a7dff",
-    meaning: "把人工智能嵌入开发全生命周期，而不只是辅助问答。",
-    evidence: "使用提示工程、Skill 技能、智能体与 GSD 协同开发。",
-    value: "个人项目从开发到部署的周期缩短 40% 以上。",
+    meaning: "围绕高流量场景设计稳定的接口、数据与降级策略。",
+    evidence: "实践锁机制、状态机、熔断、MySQL 索引与慢查询治理。",
+    value: "保障关键链路在并发压力下保持一致性和可用性。",
   },
   {
     label: "全国一等奖队长",
@@ -68,13 +68,13 @@ const traits = [
     value: "验证复杂任务拆解、技术决策和团队推进能力。",
   },
   {
-    label: "中级软件设计师",
-    note: "认证",
+    label: "LangChain / Llama",
+    note: "模型应用",
     className: "trait-five",
     color: "#f5f0e7",
-    meaning: "通过国家计算机技术与软件专业技术资格考试。",
-    evidence: "2024 年取得中级软件设计师资格。",
-    value: "软件工程、系统设计与项目管理知识得到标准化验证。",
+    meaning: "具备大模型应用编排、上下文组织与推理链路经验。",
+    evidence: "结合垂直模型、提示工程和工具协议构建智能体应用。",
+    value: "能从模型能力出发设计稳定、可扩展的应用架构。",
   },
   {
     label: "全栈闭环交付",
@@ -107,12 +107,12 @@ const traits = [
 
 const technologyRows = [
   {
-    label: "AI 协同开发",
-    items: "提示工程 · Skill 技能 · 上下文工程 · 任务拆解 · 代码重构 · 单元测试",
+    label: "人工智能协同",
+    items: "Codex · Claude Code · Gemini · Skill 技能 · 上下文工程 · GSD",
   },
   {
     label: "智能体研发",
-    items: "Verl · Tool Agent Loop · 工具调用 · Python Markdown 解析 · Docker 安全沙箱",
+    items: "LangChain · Llama · Verl · Agent Loop · 工具调用 · Docker 安全沙箱",
   },
   {
     label: "后端与数据",
@@ -627,14 +627,14 @@ export default function Home() {
           工程师
         </div>
         <div className="hero-intro slide-reveal">
-          <span>椿襄 / 武汉大学软件工程 · 已保研</span>
+          <span>椿襄 / 高级软件开发工程师 · 人工智能原生工程</span>
           <h1>
             让复杂系统
             <br />
             <em>可靠地运行。</em>
           </h1>
           <p>
-            以 Skill 技能、智能体与 SOP 工作流构建后端系统和可验证的交付闭环。
+            以 Codex、Claude Code、智能体与 SOP 工作流构建可靠系统和可验证的交付闭环。
           </p>
         </div>
 
@@ -660,9 +660,9 @@ export default function Home() {
         </div>
 
         <div className="hero-foot slide-reveal">
-          <span>武汉大学</span>
-          <span>GPA 3.80 / 4.00</span>
-          <span>专业排名 4 / 25</span>
+          <span>人工智能协同研发</span>
+          <span>智能体与工具调用</span>
+          <span>后端全栈闭环</span>
         </div>
       </section>
 
@@ -681,8 +681,8 @@ export default function Home() {
           <em>到价值交付。</em>
         </h2>
         <p className="manifesto-copy slide-reveal">
-          把需求理解、任务计划、Skill 执行、代码验证与部署复盘串成 SOP，让智能体参与
-          脚手架、疑难排障、逻辑重构、单元测试与 API 文档，个人项目周期缩短 40% 以上。
+          以 Codex、Claude Code 和 Skill 技能把需求理解、任务计划、代码验证与部署复盘串成
+          SOP，让智能体参与排障、重构、单元测试与 API 文档，个人项目周期缩短 40% 以上。
         </p>
         <div className="manifesto-principles slide-reveal">
           <span>
@@ -832,16 +832,16 @@ export default function Home() {
         className="resume-slide final-slide"
         aria-hidden={activeSlide !== 6}
       >
-        <div className="scene-kicker slide-reveal">07 / 教育与荣誉</div>
+        <div className="scene-kicker slide-reveal">07 / 工作与成果</div>
         <h2 className="final-title slide-reveal">
           用真实成果
           <br />
           <em>证明能力。</em>
         </h2>
         <p className="final-copy slide-reveal">
-          武汉大学软件工程 · GPA 3.80 / 4.00 · 专业排名 4 / 25 · 已保研
+          武汉大学软件工程毕业 · 后端工程与人工智能原生研发
           <br />
-          拥有后端实习、国家级项目负责人和人工智能科研经历。
+          拥有后端实习、国家级项目负责人、智能体构建和人工智能科研经历。
         </p>
         <div className="final-contact slide-reveal">
           <span>
@@ -850,14 +850,16 @@ export default function Home() {
           </span>
           <span>
             <b>代表荣誉</b>
-            小米杯全国一等奖（队长）· 美赛 F 奖
+            小米杯全国一等奖（队长）· 中级软件设计师
           </span>
           <span>
             <b>联系邮箱</b>
             mshuwhu@whu.edu.cn
           </span>
         </div>
-        <div className="final-signature slide-reveal">椿襄 · 软件工程 · 已保研</div>
+        <div className="final-signature slide-reveal">
+          椿襄 · 高级软件开发工程师 · 人工智能原生工程
+        </div>
       </section>
 
       <nav
