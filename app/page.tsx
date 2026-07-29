@@ -5,19 +5,19 @@ import { ContactShadows, Float, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
-import { Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 gsap.registerPlugin(useGSAP, Observer);
 
 const slideLabels = [
   "个人定位",
-  "工程主张",
+  "工程实践",
   "技术体系",
-  "高并发案例",
-  "人工智能案例",
+  "国家级项目",
+  "人工智能科研",
   "交付方法",
-  "联系方向",
+  "教育荣誉",
 ] as const;
 
 const slideAccents = [
@@ -31,39 +31,39 @@ const slideAccents = [
 ] as const;
 
 const traits = [
-  { label: "调停者型人格", note: "性格", className: "trait-one", color: "#c7ff4a" },
-  { label: "双鱼座", note: "星座", className: "trait-two", color: "#f4d84d" },
-  { label: "人工智能原生", note: "思维", className: "trait-three", color: "#8a7dff" },
-  { label: "系统设计", note: "专长", className: "trait-four", color: "#ff704f" },
-  { label: "实干派", note: "风格", className: "trait-five", color: "#f5f0e7" },
+  { label: "武汉大学", note: "学校", className: "trait-one", color: "#c7ff4a" },
+  { label: "已保研", note: "状态", className: "trait-two", color: "#f4d84d" },
+  { label: "人工智能原生", note: "方法", className: "trait-three", color: "#8a7dff" },
+  { label: "全国一等奖队长", note: "竞赛", className: "trait-four", color: "#ff704f" },
+  { label: "中级软件设计师", note: "认证", className: "trait-five", color: "#f5f0e7" },
 ] as const;
 
 const technologyRows = [
   {
-    label: "服务端",
-    items: "Java 17 · Spring Boot 3 · Spring Cloud · Netty · Go · Python",
+    label: "后端工程",
+    items: "Java · Python · C++ · Spring Boot · ThinkPHP · RESTful API",
   },
   {
-    label: "高并发",
-    items: "Redis 集群 · Kafka · RocketMQ · Nginx · Sentinel · Dubbo",
+    label: "数据与并发",
+    items: "MySQL · Explain · 联合索引 · 慢查询治理 · 锁机制 · 状态机",
   },
   {
-    label: "人工智能",
-    items: "LangChain · LlamaIndex · FastAPI · vLLM · Milvus · 向量检索",
+    label: "智能体工程",
+    items: "Verl · SFT · GRPO · Agent Loop · Tool Calling · Prompt Engineering",
   },
   {
-    label: "云与数据",
-    items: "Kubernetes · Docker · PostgreSQL · Elasticsearch · 可观测性",
+    label: "前端与交付",
+    items: "Vue 3 · Docker · CI/CD · 自动化测试 · 代码审查 · API 文档",
   },
 ] as const;
 
 const deliverySteps = [
-  { index: "01", title: "澄清", text: "把模糊需求变成可验证目标" },
-  { index: "02", title: "权衡", text: "在性能、成本与复杂度间取舍" },
-  { index: "03", title: "构建", text: "把质量门禁放进研发过程" },
-  { index: "04", title: "压测", text: "用数据定位瓶颈与容量边界" },
-  { index: "05", title: "上线", text: "灰度、监控、告警与回滚" },
-  { index: "06", title: "演进", text: "基于运行反馈持续改善系统" },
+  { index: "01", title: "评审", text: "澄清业务目标与需求边界" },
+  { index: "02", title: "设计", text: "完成技术方案与数据库表结构" },
+  { index: "03", title: "研发", text: "独立实现 RESTful API 与业务模块" },
+  { index: "04", title: "联调", text: "覆盖接口测试、自动化测试与代码审查" },
+  { index: "05", title: "上线", text: "完成部署、验证与持续交付" },
+  { index: "06", title: "治理", text: "用 Explain 和索引优化治理慢查询" },
 ] as const;
 
 type AvatarProps = {
@@ -72,6 +72,7 @@ type AvatarProps = {
 
 function Avatar({ accent }: AvatarProps) {
   const body = useRef<THREE.Group>(null);
+  const cursor = useRef({ x: 0, y: 0 });
   const { scene } = useGLTF("/models/chunxiang-avatar.glb");
   const avatar = useMemo(() => scene.clone(true), [scene]);
   const head = useMemo(
@@ -87,30 +88,64 @@ function Avatar({ accent }: AvatarProps) {
     [avatar],
   );
 
+  useEffect(() => {
+    const updateCursor = (event: PointerEvent) => {
+      cursor.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      cursor.current.y = -((event.clientY / window.innerHeight) * 2 - 1);
+    };
+
+    window.addEventListener("pointermove", updateCursor, { passive: true });
+    return () => window.removeEventListener("pointermove", updateCursor);
+  }, []);
+
   useFrame((state) => {
+    const pointerX = cursor.current.x;
+    const pointerY = cursor.current.y;
+
     if (body.current) {
+      const idle = Math.sin(state.clock.elapsedTime * 1.2);
       body.current.rotation.y = THREE.MathUtils.lerp(
         body.current.rotation.y,
-        state.pointer.x * 0.16,
-        0.045,
+        -0.04 + pointerX * 0.28,
+        0.075,
       );
       body.current.rotation.x = THREE.MathUtils.lerp(
         body.current.rotation.x,
-        -state.pointer.y * 0.045,
-        0.045,
+        -pointerY * 0.12,
+        0.075,
+      );
+      body.current.rotation.z = THREE.MathUtils.lerp(
+        body.current.rotation.z,
+        -pointerX * 0.045 + idle * 0.008,
+        0.06,
+      );
+      body.current.position.x = THREE.MathUtils.lerp(
+        body.current.position.x,
+        pointerX * 0.12,
+        0.06,
+      );
+      body.current.position.y = THREE.MathUtils.lerp(
+        body.current.position.y,
+        -0.02 + pointerY * 0.05,
+        0.06,
       );
     }
 
     if (head) {
       head.rotation.y = THREE.MathUtils.lerp(
         head.rotation.y,
-        state.pointer.x * 0.23,
-        0.08,
+        pointerX * 0.38,
+        0.12,
       );
       head.rotation.x = THREE.MathUtils.lerp(
         head.rotation.x,
-        -state.pointer.y * 0.13,
-        0.08,
+        -pointerY * 0.3,
+        0.12,
+      );
+      head.rotation.z = THREE.MathUtils.lerp(
+        head.rotation.z,
+        -pointerX * 0.06,
+        0.1,
       );
     }
 
@@ -118,13 +153,13 @@ function Avatar({ accent }: AvatarProps) {
       if (!eye) continue;
       eye.rotation.y = THREE.MathUtils.lerp(
         eye.rotation.y,
-        state.pointer.x * 0.16,
-        0.14,
+        pointerX * 0.28,
+        0.2,
       );
       eye.rotation.x = THREE.MathUtils.lerp(
         eye.rotation.x,
-        -state.pointer.y * 0.11,
-        0.14,
+        -pointerY * 0.22,
+        0.2,
       );
     }
   });
@@ -136,7 +171,7 @@ function Avatar({ accent }: AvatarProps) {
       <pointLight position={[-4, 1.5, 3]} intensity={18} color="#6f7dff" />
       <pointLight position={[4, -0.5, 2]} intensity={12} color="#c7ff4a" />
 
-      <Float speed={1.15} rotationIntensity={0.045} floatIntensity={0.16}>
+      <Float speed={1.25} rotationIntensity={0.07} floatIntensity={0.22}>
         <group
           ref={body}
           position={[0, -0.02, 0]}
@@ -406,14 +441,14 @@ export default function Home() {
           工程师
         </div>
         <div className="hero-intro slide-reveal">
-          <span>椿襄 / 软件开发工程师</span>
+          <span>椿襄 / 武汉大学软件工程 · 已保研</span>
           <h1>
             让复杂系统
             <br />
             <em>可靠地运行。</em>
           </h1>
           <p>
-            设计高并发后端、人工智能应用与可持续演进的软件架构。
+            用人工智能原生方法构建后端系统、智能体应用与完整交付闭环。
           </p>
         </div>
 
@@ -448,9 +483,9 @@ export default function Home() {
         </div>
 
         <div className="hero-foot slide-reveal">
-          <span>系统设计</span>
-          <span>高并发工程</span>
-          <span>人工智能原生</span>
+          <span>武汉大学</span>
+          <span>GPA 3.80 / 4.00</span>
+          <span>专业排名 4 / 25</span>
         </div>
       </section>
 
@@ -462,30 +497,31 @@ export default function Home() {
         aria-hidden={activeSlide !== 1}
       >
         <div className="manifesto-orb" aria-hidden="true" />
-        <div className="scene-kicker slide-reveal">02 / 工程主张</div>
+        <div className="scene-kicker slide-reveal">02 / 工程实践</div>
         <h2 className="manifesto-title slide-reveal">
-          不炫技。
+          从代码实现。
           <br />
-          <em>解决问题。</em>
+          <em>到价值交付。</em>
         </h2>
         <p className="manifesto-copy slide-reveal">
-          我关注的不是技术名词本身，而是系统在流量、故障、成本和长期演进中，是否依然可控。
+          贯彻 GSD 工程实践，把人工智能用于脚手架、疑难排障、逻辑重构、单元测试与 API
+          文档，让个人项目从开发到部署的周期缩短 40% 以上。
         </p>
         <div className="manifesto-principles slide-reveal">
           <span>
             <b>01</b>
-            <strong>可靠</strong>
-            故障有边界
+            <strong>闭环</strong>
+            从想法到部署
           </span>
           <span>
             <b>02</b>
-            <strong>清晰</strong>
-            复杂有结构
+            <strong>排障</strong>
+            从日志到根因
           </span>
           <span>
             <b>03</b>
-            <strong>演进</strong>
-            变化有路径
+            <strong>效率</strong>
+            人机协同交付
           </span>
         </div>
       </section>
@@ -499,9 +535,9 @@ export default function Home() {
       >
         <div className="scene-kicker slide-reveal">03 / 技术体系</div>
         <h2 className="technology-title slide-reveal">
-          一套能打
+          真实项目的
           <br />
-          <em>硬仗的工具。</em>
+          <em>工程工具链。</em>
         </h2>
         <div className="technology-rows">
           {technologyRows.map((row, index) => (
@@ -524,31 +560,32 @@ export default function Home() {
         className="resume-slide concurrency-slide"
         aria-hidden={activeSlide !== 3}
       >
-        <div className="scene-kicker slide-reveal">04 / 高并发案例</div>
-        <div className="case-number slide-reveal">10万级</div>
+        <div className="scene-kicker slide-reveal">04 / 国家级项目</div>
+        <div className="case-number slide-reveal">2年+</div>
         <div className="case-copy slide-reveal">
-          <span>代表项目类型</span>
-          <h2>高峰值交易服务</h2>
+          <span>中帆协官网开发及维护</span>
+          <h2>支付链路稳定性</h2>
           <p>
-            围绕热点隔离、异步削峰、多级缓存与故障降级，设计面向突发流量的核心交易链路。
+            以 ThinkPHP 与 Vue 3 持续迭代官网，接入支付宝和微信支付，并通过锁机制、状态机与
+            Spring Boot 熔断机制保障关键链路稳定。
           </p>
         </div>
         <div className="case-metrics slide-reveal">
           <span>
-            <strong>百毫秒级</strong>
-            核心链路延迟目标
+            <strong>支付安全</strong>
+            锁机制与状态机
           </span>
           <span>
-            <strong>99.99%</strong>
-            服务可用性目标
+            <strong>熔断降压</strong>
+            高并发场景稳定运行
           </span>
           <span>
-            <strong>全链路</strong>
-            容量压测与故障观测
+            <strong>持续交付</strong>
+            自动化测试与代码审查
           </span>
         </div>
         <div className="case-stack slide-reveal">
-          Java 17 · Spring Boot 3 · Netty · Redis 集群 · Kafka · Sentinel
+          ThinkPHP · Vue 3 · Spring Boot · 支付宝 / 微信支付 · CI/CD
         </div>
       </section>
 
@@ -559,30 +596,31 @@ export default function Home() {
         className="resume-slide intelligence-slide"
         aria-hidden={activeSlide !== 4}
       >
-        <div className="scene-kicker slide-reveal">05 / 人工智能案例</div>
+        <div className="scene-kicker slide-reveal">05 / 人工智能科研</div>
         <div className="intelligence-copy slide-reveal">
-          <span>企业智能知识中台</span>
+          <span>生命科学推理增强型 Agent</span>
           <h2>
-            让模型回答，
+            重构工具调用，
             <br />
-            <em>也让答案可信。</em>
+            <em>训练垂直推理。</em>
           </h2>
           <p>
-            将分散文档、业务系统和工具能力接入统一智能入口，建立可追溯、可评测、可治理的知识服务。
+            基于 Verl 二次开发并重写 tool agent loop，自动识别 Python Markdown
+            代码块并触发工具调用；以 SFT 与 GRPO 联合训练增强多步推理能力。
           </p>
         </div>
-        <div className="ai-orbit slide-reveal" aria-label="人工智能工程链路">
+        <div className="ai-orbit slide-reveal" aria-label="人工智能科研方法">
           <div className="orbit-ring ring-a" />
           <div className="orbit-ring ring-b" />
-          <strong>90%+</strong>
-          <span>引用命中目标</span>
-          <i className="ai-node node-one">检索</i>
-          <i className="ai-node node-two">重排</i>
-          <i className="ai-node node-three">评测</i>
-          <i className="ai-node node-four">护栏</i>
+          <strong>SFT</strong>
+          <span>与 GRPO 联合训练</span>
+          <i className="ai-node node-one">Verl</i>
+          <i className="ai-node node-two">工具调用</i>
+          <i className="ai-node node-three">Docker</i>
+          <i className="ai-node node-four">生命科学</i>
         </div>
         <div className="intelligence-stack slide-reveal">
-          LangChain · LlamaIndex · FastAPI · vLLM · Milvus · 可观测智能体
+          Verl · Tool Agent Loop · Python Markdown · SFT · GRPO · Docker 安全沙箱
         </div>
       </section>
 
@@ -595,9 +633,9 @@ export default function Home() {
       >
         <div className="scene-kicker slide-reveal">06 / 交付方法</div>
         <h2 className="delivery-title slide-reveal">
-          从需求到上线，
+          从需求评审，
           <br />
-          <em>每一步都有依据。</em>
+          <em>到上线与慢查治理。</em>
         </h2>
         <div className="delivery-track slide-reveal">
           {deliverySteps.map((step) => (
@@ -617,32 +655,32 @@ export default function Home() {
         className="resume-slide final-slide"
         aria-hidden={activeSlide !== 6}
       >
-        <div className="scene-kicker slide-reveal">07 / 联系方向</div>
+        <div className="scene-kicker slide-reveal">07 / 教育与荣誉</div>
         <h2 className="final-title slide-reveal">
-          一起做点
+          用真实成果
           <br />
-          <em>难而正确的事。</em>
+          <em>证明能力。</em>
         </h2>
         <p className="final-copy slide-reveal">
-          椿襄 · 高级软件开发工程师
+          武汉大学软件工程 · GPA 3.80 / 4.00 · 专业排名 4 / 25 · 已保研
           <br />
-          期待参与需要系统思维、工程深度与人工智能能力的长期项目。
+          拥有后端实习、国家级项目负责人和人工智能科研经历。
         </p>
         <div className="final-contact slide-reveal">
           <span>
-            <b>求职方向</b>
-            高级软件开发 · 人工智能应用架构
+            <b>实践经历</b>
+            泰康科技后端实习 · 中帆协国家级项目
           </span>
           <span>
-            <b>工作方式</b>
-            可远程协作 · 可深度参与长期项目
+            <b>代表荣誉</b>
+            小米杯全国一等奖（队长）· 美赛 F 奖
           </span>
           <span>
-            <b>联系入口</b>
-            请通过本简历发送渠道联系
+            <b>联系邮箱</b>
+            mshuwhu@whu.edu.cn
           </span>
         </div>
-        <div className="final-signature slide-reveal">可靠 · 清晰 · 可演进</div>
+        <div className="final-signature slide-reveal">椿襄 · 软件工程 · 已保研</div>
       </section>
 
       <nav
