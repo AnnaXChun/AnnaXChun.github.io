@@ -49,10 +49,16 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /支付链路稳定性/);
   assert.match(html, /ThinkPHP/);
   assert.match(html, /MySQL/);
-  assert.match(html, /技术体系/);
+  assert.match(html, /人工智能原生体系/);
   assert.match(html, /Verl/);
   assert.match(html, /SFT/);
   assert.match(html, /GRPO/);
+  assert.match(html, /Skill 技能/);
+  assert.match(html, /Tool Agent Loop/);
+  assert.match(html, /SOP 工作流/);
+  assert.match(html, /全栈闭环交付/);
+  assert.match(html, /复杂问题排障/);
+  assert.match(html, /含金量/);
   assert.match(html, /周期缩短 40% 以上/);
   assert.match(html, /泰康科技后端实习/);
   assert.match(html, /小米杯全国一等奖/);
@@ -74,6 +80,9 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /window\.addEventListener\("pointermove"/);
   assert.match(page, /pointerX \* 0\.38/);
   assert.match(page, /全国一等奖队长/);
+  assert.match(page, /onPointerEnter=\{\(\) => setExpanded\(true\)\}/);
+  assert.match(page, /duration = reduceMotion\.current \? 0\.01 : 0\.68/);
+  assert.match(page, /SOP 工作流设计/);
   assert.match(layout, /高级软件开发工程师｜三维交互简历/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);

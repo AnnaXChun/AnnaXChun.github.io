@@ -13,10 +13,10 @@ gsap.registerPlugin(useGSAP, Observer);
 const slideLabels = [
   "个人定位",
   "工程实践",
-  "技术体系",
+  "人工智能原生体系",
   "国家级项目",
   "人工智能科研",
-  "交付方法",
+  "SOP 工作流",
   "教育荣誉",
 ] as const;
 
@@ -31,40 +31,225 @@ const slideAccents = [
 ] as const;
 
 const traits = [
-  { label: "武汉大学", note: "学校", className: "trait-one", color: "#c7ff4a" },
-  { label: "已保研", note: "状态", className: "trait-two", color: "#f4d84d" },
-  { label: "人工智能原生", note: "方法", className: "trait-three", color: "#8a7dff" },
-  { label: "全国一等奖队长", note: "竞赛", className: "trait-four", color: "#ff704f" },
-  { label: "中级软件设计师", note: "认证", className: "trait-five", color: "#f5f0e7" },
+  {
+    label: "武汉大学",
+    note: "学校",
+    className: "trait-one",
+    color: "#c7ff4a",
+    meaning: "软件工程专业，接受系统的软件工程训练。",
+    evidence: "GPA 3.80 / 4.00，专业排名 4 / 25。",
+    value: "证明扎实的计算机基础、学习能力与长期稳定投入。",
+  },
+  {
+    label: "已保研",
+    note: "学业",
+    className: "trait-two",
+    color: "#f4d84d",
+    meaning: "获得推荐免试研究生资格。",
+    evidence: "专业排名 4 / 25，并持续积累科研与工程项目。",
+    value: "体现自驱力、研究潜力和对复杂问题的长期专注。",
+  },
+  {
+    label: "人工智能原生工程",
+    note: "方法",
+    className: "trait-three",
+    color: "#8a7dff",
+    meaning: "把人工智能嵌入开发全生命周期，而不只是辅助问答。",
+    evidence: "使用提示工程、Skill 技能、智能体与 GSD 协同开发。",
+    value: "个人项目从开发到部署的周期缩短 40% 以上。",
+  },
+  {
+    label: "全国一等奖队长",
+    note: "领导力",
+    className: "trait-four",
+    color: "#ff704f",
+    meaning: "计算机系统能力大赛小米杯全国一等奖团队负责人。",
+    evidence: "以队长身份推进方案设计、协作分工与最终交付。",
+    value: "验证复杂任务拆解、技术决策和团队推进能力。",
+  },
+  {
+    label: "中级软件设计师",
+    note: "认证",
+    className: "trait-five",
+    color: "#f5f0e7",
+    meaning: "通过国家计算机技术与软件专业技术资格考试。",
+    evidence: "2024 年取得中级软件设计师资格。",
+    value: "软件工程、系统设计与项目管理知识得到标准化验证。",
+  },
+  {
+    label: "全栈闭环交付",
+    note: "工作能力",
+    className: "trait-six",
+    color: "#c7ff4a",
+    meaning: "能够从需求、研发、测试到部署独立完成闭环。",
+    evidence: "持续维护国家级官网，并独立交付多个个人项目。",
+    value: "不止完成代码，还能把产品可靠地交付上线。",
+  },
+  {
+    label: "复杂问题排障",
+    note: "工作能力",
+    className: "trait-seven",
+    color: "#f4d84d",
+    meaning: "用证据链定位性能、数据与业务链路问题。",
+    evidence: "实践链路日志复核、疑难缺陷定位和 MySQL 慢查治理。",
+    value: "快速收敛根因，降低线上风险与接口延迟。",
+  },
+  {
+    label: "SOP 工作流设计",
+    note: "工作能力",
+    className: "trait-eight",
+    color: "#ff704f",
+    meaning: "把开发经验沉淀成可重复执行的人机协作流程。",
+    evidence: "串联需求澄清、计划、Skill 执行、验证、部署与复盘。",
+    value: "让个人效率可复制，让交付质量可检查、可追溯。",
+  },
 ] as const;
 
 const technologyRows = [
   {
-    label: "后端工程",
-    items: "Java · Python · C++ · Spring Boot · ThinkPHP · RESTful API",
+    label: "AI 协同开发",
+    items: "提示工程 · Skill 技能 · 上下文工程 · 任务拆解 · 代码重构 · 单元测试",
   },
   {
-    label: "数据与并发",
-    items: "MySQL · Explain · 联合索引 · 慢查询治理 · 锁机制 · 状态机",
+    label: "智能体研发",
+    items: "Verl · Tool Agent Loop · 工具调用 · Python Markdown 解析 · Docker 安全沙箱",
   },
   {
-    label: "智能体工程",
-    items: "Verl · SFT · GRPO · Agent Loop · Tool Calling · Prompt Engineering",
+    label: "后端与数据",
+    items: "Java · Python · C++ · Spring Boot · MySQL · Explain · 锁机制 · 状态机",
   },
   {
-    label: "前端与交付",
-    items: "Vue 3 · Docker · CI/CD · 自动化测试 · 代码审查 · API 文档",
+    label: "SOP 工作流",
+    items: "需求澄清 · 计划拆分 · Skill 执行 · 自动验证 · 部署交付 · 复盘沉淀",
   },
 ] as const;
 
 const deliverySteps = [
-  { index: "01", title: "评审", text: "澄清业务目标与需求边界" },
-  { index: "02", title: "设计", text: "完成技术方案与数据库表结构" },
-  { index: "03", title: "研发", text: "独立实现 RESTful API 与业务模块" },
-  { index: "04", title: "联调", text: "覆盖接口测试、自动化测试与代码审查" },
-  { index: "05", title: "上线", text: "完成部署、验证与持续交付" },
-  { index: "06", title: "治理", text: "用 Explain 和索引优化治理慢查询" },
+  { index: "01", title: "上下文", text: "读取需求、代码图谱与历史决策" },
+  { index: "02", title: "计划", text: "拆分任务并定义验收与风险边界" },
+  { index: "03", title: "执行", text: "调用 Skill 与智能体协同开发" },
+  { index: "04", title: "验证", text: "单测、页面验收与链路日志复核" },
+  { index: "05", title: "交付", text: "完成部署、文档与回滚预案" },
+  { index: "06", title: "沉淀", text: "把经验写回 Skill 与可复用 SOP" },
 ] as const;
+
+type Trait = (typeof traits)[number];
+
+function TraitTag({ trait }: { trait: Trait }) {
+  const shell = useRef<HTMLDivElement>(null);
+  const card = useRef<HTMLButtonElement>(null);
+  const detail = useRef<HTMLDivElement>(null);
+
+  const setExpanded = (expanded: boolean) => {
+    if (!shell.current || !card.current || !detail.current) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    gsap.killTweensOf([card.current, detail.current]);
+    gsap.set(shell.current, { zIndex: expanded ? 40 : 1 });
+
+    if (expanded) {
+      gsap
+        .timeline({ defaults: { overwrite: "auto" } })
+        .to(
+          card.current,
+          {
+            y: reduced ? 0 : -5,
+            scale: reduced ? 1 : 1.055,
+            duration: reduced ? 0.01 : 0.22,
+            ease: "power2.out",
+          },
+          0,
+        )
+        .fromTo(
+          detail.current,
+          { autoAlpha: 0, y: 12, scale: 0.96 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: reduced ? 0.01 : 0.28,
+            ease: "power3.out",
+          },
+          reduced ? 0 : 0.04,
+        );
+      return;
+    }
+
+    gsap
+      .timeline({ defaults: { overwrite: "auto" } })
+      .to(
+        detail.current,
+        {
+          autoAlpha: 0,
+          y: 8,
+          scale: 0.97,
+          duration: reduced ? 0.01 : 0.15,
+          ease: "power2.in",
+        },
+        0,
+      )
+      .to(
+        card.current,
+        {
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotationX: 0,
+          rotationY: 0,
+          duration: reduced ? 0.01 : 0.2,
+          ease: "power2.out",
+        },
+        0,
+      );
+  };
+
+  const followPointer = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!card.current || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+    gsap.to(card.current, {
+      x: x * 5,
+      rotationX: -y * 7,
+      rotationY: x * 8,
+      duration: 0.2,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  return (
+    <div
+      ref={shell}
+      className={`trait-tag ${trait.className}`}
+      style={{ "--trait-color": trait.color } as React.CSSProperties}
+    >
+      <button
+        ref={card}
+        type="button"
+        className="trait-tag-card"
+        aria-label={`${trait.label}：${trait.meaning}`}
+        onPointerEnter={() => setExpanded(true)}
+        onPointerMove={followPointer}
+        onPointerLeave={() => setExpanded(false)}
+        onFocus={() => setExpanded(true)}
+        onBlur={() => setExpanded(false)}
+      >
+        <span>{trait.note}</span>
+        <strong>{trait.label}</strong>
+        <div ref={detail} className="trait-detail">
+          <small>含义</small>
+          <p>{trait.meaning}</p>
+          <small>来源</small>
+          <p>{trait.evidence}</p>
+          <small>含金量</small>
+          <p>{trait.value}</p>
+        </div>
+      </button>
+    </div>
+  );
+}
 
 type AvatarProps = {
   accent: string;
@@ -75,20 +260,18 @@ function Avatar({ accent }: AvatarProps) {
   const cursor = useRef({ x: 0, y: 0 });
   const { scene } = useGLTF("/models/chunxiang-avatar.glb");
   const avatar = useMemo(() => scene.clone(true), [scene]);
-  const head = useMemo(
-    () => avatar.getObjectByName("HeadRoot") as THREE.Group | undefined,
-    [avatar],
-  );
-  const leftEye = useMemo(
-    () => avatar.getObjectByName("LeftEye") as THREE.Group | undefined,
-    [avatar],
-  );
-  const rightEye = useMemo(
-    () => avatar.getObjectByName("RightEye") as THREE.Group | undefined,
-    [avatar],
-  );
+  const head = useRef<THREE.Group | null>(null);
+  const leftEye = useRef<THREE.Group | null>(null);
+  const rightEye = useRef<THREE.Group | null>(null);
 
   useEffect(() => {
+    head.current =
+      (avatar.getObjectByName("HeadRoot") as THREE.Group | undefined) ?? null;
+    leftEye.current =
+      (avatar.getObjectByName("LeftEye") as THREE.Group | undefined) ?? null;
+    rightEye.current =
+      (avatar.getObjectByName("RightEye") as THREE.Group | undefined) ?? null;
+
     const updateCursor = (event: PointerEvent) => {
       cursor.current.x = (event.clientX / window.innerWidth) * 2 - 1;
       cursor.current.y = -((event.clientY / window.innerHeight) * 2 - 1);
@@ -96,7 +279,7 @@ function Avatar({ accent }: AvatarProps) {
 
     window.addEventListener("pointermove", updateCursor, { passive: true });
     return () => window.removeEventListener("pointermove", updateCursor);
-  }, []);
+  }, [avatar]);
 
   useFrame((state) => {
     const pointerX = cursor.current.x;
@@ -131,25 +314,26 @@ function Avatar({ accent }: AvatarProps) {
       );
     }
 
-    if (head) {
-      head.rotation.y = THREE.MathUtils.lerp(
-        head.rotation.y,
+    const headObject = head.current;
+    if (headObject) {
+      headObject.rotation.y = THREE.MathUtils.lerp(
+        headObject.rotation.y,
         pointerX * 0.38,
         0.12,
       );
-      head.rotation.x = THREE.MathUtils.lerp(
-        head.rotation.x,
+      headObject.rotation.x = THREE.MathUtils.lerp(
+        headObject.rotation.x,
         -pointerY * 0.3,
         0.12,
       );
-      head.rotation.z = THREE.MathUtils.lerp(
-        head.rotation.z,
+      headObject.rotation.z = THREE.MathUtils.lerp(
+        headObject.rotation.z,
         -pointerX * 0.06,
         0.1,
       );
     }
 
-    for (const eye of [leftEye, rightEye]) {
+    for (const eye of [leftEye.current, rightEye.current]) {
       if (!eye) continue;
       eye.rotation.y = THREE.MathUtils.lerp(
         eye.rotation.y,
@@ -231,8 +415,8 @@ export default function Home() {
         gsap.from(firstParts, {
           autoAlpha: 0,
           y: reduceMotion.current ? 0 : 46,
-          duration: reduceMotion.current ? 0.01 : 0.9,
-          stagger: reduceMotion.current ? 0 : 0.08,
+          duration: reduceMotion.current ? 0.01 : 0.68,
+          stagger: reduceMotion.current ? 0 : 0.055,
           ease: "power4.out",
         });
       }
@@ -241,6 +425,8 @@ export default function Home() {
   );
 
   const goToSlide = contextSafe(
+    // GSAP 仅创建事件回调包装器，不会在渲染阶段读取这些引用。
+    // eslint-disable-next-line react-hooks/refs
     (requestedIndex: number, directionHint?: number) => {
       if (animating.current) return;
 
@@ -255,7 +441,7 @@ export default function Home() {
 
       const direction =
         directionHint ?? (nextIndex > currentIndex ? 1 : -1);
-      const duration = reduceMotion.current ? 0.01 : 1.05;
+      const duration = reduceMotion.current ? 0.01 : 0.68;
       const currentParts = currentSlide.querySelectorAll(".slide-reveal");
       const nextParts = nextSlide.querySelectorAll(".slide-reveal");
       const closedClip =
@@ -273,7 +459,7 @@ export default function Home() {
       });
       gsap.set(nextParts, {
         autoAlpha: reduceMotion.current ? 1 : 0,
-        y: reduceMotion.current ? 0 : direction * 70,
+        y: reduceMotion.current ? 0 : direction * 50,
       });
 
       gsap
@@ -295,9 +481,9 @@ export default function Home() {
           currentParts,
           {
             autoAlpha: 0.18,
-            y: -direction * 54,
-            duration: reduceMotion.current ? 0.01 : 0.65,
-            stagger: reduceMotion.current ? 0 : 0.02,
+            y: -direction * 40,
+            duration: reduceMotion.current ? 0.01 : 0.36,
+            stagger: reduceMotion.current ? 0 : 0.014,
           },
           0,
         )
@@ -319,11 +505,11 @@ export default function Home() {
           {
             autoAlpha: 1,
             y: 0,
-            duration: reduceMotion.current ? 0.01 : 0.72,
-            stagger: reduceMotion.current ? 0 : 0.065,
+            duration: reduceMotion.current ? 0.01 : 0.46,
+            stagger: reduceMotion.current ? 0 : 0.04,
             ease: "power4.out",
           },
-          reduceMotion.current ? 0 : 0.32,
+          reduceMotion.current ? 0 : 0.14,
         );
     },
   );
@@ -448,7 +634,7 @@ export default function Home() {
             <em>可靠地运行。</em>
           </h1>
           <p>
-            用人工智能原生方法构建后端系统、智能体应用与完整交付闭环。
+            以 Skill 技能、智能体与 SOP 工作流构建后端系统和可验证的交付闭环。
           </p>
         </div>
 
@@ -468,16 +654,7 @@ export default function Home() {
           </Canvas>
           <div className="trait-cloud" aria-label="个人特质">
             {traits.map((trait) => (
-              <div
-                key={trait.label}
-                className={`trait-tag ${trait.className}`}
-                style={
-                  { "--trait-color": trait.color } as React.CSSProperties
-                }
-              >
-                <span>{trait.note}</span>
-                <strong>{trait.label}</strong>
-              </div>
+              <TraitTag key={trait.label} trait={trait} />
             ))}
           </div>
         </div>
@@ -504,8 +681,8 @@ export default function Home() {
           <em>到价值交付。</em>
         </h2>
         <p className="manifesto-copy slide-reveal">
-          贯彻 GSD 工程实践，把人工智能用于脚手架、疑难排障、逻辑重构、单元测试与 API
-          文档，让个人项目从开发到部署的周期缩短 40% 以上。
+          把需求理解、任务计划、Skill 执行、代码验证与部署复盘串成 SOP，让智能体参与
+          脚手架、疑难排障、逻辑重构、单元测试与 API 文档，个人项目周期缩短 40% 以上。
         </p>
         <div className="manifesto-principles slide-reveal">
           <span>
@@ -533,11 +710,11 @@ export default function Home() {
         className="resume-slide technology-slide"
         aria-hidden={activeSlide !== 2}
       >
-        <div className="scene-kicker slide-reveal">03 / 技术体系</div>
+        <div className="scene-kicker slide-reveal">03 / 人工智能原生体系</div>
         <h2 className="technology-title slide-reveal">
-          真实项目的
+          人工智能原生的
           <br />
-          <em>工程工具链。</em>
+          <em>工程工作系统。</em>
         </h2>
         <div className="technology-rows">
           {technologyRows.map((row, index) => (
@@ -631,11 +808,11 @@ export default function Home() {
         className="resume-slide delivery-slide"
         aria-hidden={activeSlide !== 5}
       >
-        <div className="scene-kicker slide-reveal">06 / 交付方法</div>
+        <div className="scene-kicker slide-reveal">06 / SOP 工作流</div>
         <h2 className="delivery-title slide-reveal">
-          从需求评审，
+          把一次成功，
           <br />
-          <em>到上线与慢查治理。</em>
+          <em>变成可复用的 SOP。</em>
         </h2>
         <div className="delivery-track slide-reveal">
           {deliverySteps.map((step) => (
