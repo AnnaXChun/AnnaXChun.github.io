@@ -1,11 +1,11 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { ContactShadows, Float, RoundedBox } from "@react-three/drei";
+import { ContactShadows, Float, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
-import { useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 gsap.registerPlugin(useGSAP, Observer);
@@ -70,171 +70,90 @@ type AvatarProps = {
   accent: string;
 };
 
-function Eye({
-  position,
-  pointer,
-}: {
-  position: [number, number, number];
-  pointer: React.MutableRefObject<{ x: number; y: number }>;
-}) {
-  const pupil = useRef<THREE.Mesh>(null);
-
-  useFrame(() => {
-    if (!pupil.current) return;
-    pupil.current.position.x = THREE.MathUtils.lerp(
-      pupil.current.position.x,
-      pointer.current.x * 0.085,
-      0.16,
-    );
-    pupil.current.position.y = THREE.MathUtils.lerp(
-      pupil.current.position.y,
-      pointer.current.y * 0.065,
-      0.16,
-    );
-  });
-
-  return (
-    <group position={position}>
-      <mesh>
-        <sphereGeometry args={[0.145, 24, 24]} />
-        <meshStandardMaterial color="#f8f5ed" roughness={0.25} />
-      </mesh>
-      <mesh ref={pupil} position={[0, 0, 0.125]}>
-        <sphereGeometry args={[0.058, 20, 20]} />
-        <meshStandardMaterial color="#16151c" roughness={0.15} />
-      </mesh>
-    </group>
-  );
-}
-
 function Avatar({ accent }: AvatarProps) {
   const body = useRef<THREE.Group>(null);
-  const head = useRef<THREE.Group>(null);
-  const pointer = useRef({ x: 0, y: 0 });
+  const { scene } = useGLTF("/models/chunxiang-avatar.glb");
+  const avatar = useMemo(() => scene.clone(true), [scene]);
+  const head = useMemo(
+    () => avatar.getObjectByName("HeadRoot") as THREE.Group | undefined,
+    [avatar],
+  );
+  const leftEye = useMemo(
+    () => avatar.getObjectByName("LeftEye") as THREE.Group | undefined,
+    [avatar],
+  );
+  const rightEye = useMemo(
+    () => avatar.getObjectByName("RightEye") as THREE.Group | undefined,
+    [avatar],
+  );
 
   useFrame((state) => {
-    pointer.current.x = state.pointer.x;
-    pointer.current.y = state.pointer.y;
-
     if (body.current) {
       body.current.rotation.y = THREE.MathUtils.lerp(
         body.current.rotation.y,
-        state.pointer.x * 0.19,
+        state.pointer.x * 0.16,
         0.045,
       );
       body.current.rotation.x = THREE.MathUtils.lerp(
         body.current.rotation.x,
-        -state.pointer.y * 0.055,
+        -state.pointer.y * 0.045,
         0.045,
       );
     }
 
-    if (head.current) {
-      head.current.rotation.y = THREE.MathUtils.lerp(
-        head.current.rotation.y,
-        state.pointer.x * 0.24,
+    if (head) {
+      head.rotation.y = THREE.MathUtils.lerp(
+        head.rotation.y,
+        state.pointer.x * 0.23,
         0.08,
       );
-      head.current.rotation.x = THREE.MathUtils.lerp(
-        head.current.rotation.x,
-        -state.pointer.y * 0.16,
+      head.rotation.x = THREE.MathUtils.lerp(
+        head.rotation.x,
+        -state.pointer.y * 0.13,
         0.08,
+      );
+    }
+
+    for (const eye of [leftEye, rightEye]) {
+      if (!eye) continue;
+      eye.rotation.y = THREE.MathUtils.lerp(
+        eye.rotation.y,
+        state.pointer.x * 0.16,
+        0.14,
+      );
+      eye.rotation.x = THREE.MathUtils.lerp(
+        eye.rotation.x,
+        -state.pointer.y * 0.11,
+        0.14,
       );
     }
   });
 
   return (
     <>
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[4, 6, 5]} intensity={4.2} color="#fff7dc" />
-      <pointLight position={[-4, 1, 3]} intensity={24} color="#817bff" />
-      <pointLight position={[4, -1, 2]} intensity={18} color="#c7ff4a" />
+      <ambientLight intensity={1.35} />
+      <directionalLight position={[4, 6, 5]} intensity={3.6} color="#fff6e7" />
+      <pointLight position={[-4, 1.5, 3]} intensity={18} color="#6f7dff" />
+      <pointLight position={[4, -0.5, 2]} intensity={12} color="#c7ff4a" />
 
-      <Float speed={1.35} rotationIntensity={0.08} floatIntensity={0.22}>
+      <Float speed={1.15} rotationIntensity={0.045} floatIntensity={0.16}>
         <group
           ref={body}
-          position={[0, -0.38, 0]}
+          position={[0, -0.02, 0]}
           rotation={[0, -0.04, 0]}
-          scale={0.94}
+          scale={0.74}
         >
-          <group ref={head}>
-            <mesh position={[0, 1.42, 0]}>
-              <sphereGeometry args={[0.76, 48, 48]} />
-              <meshStandardMaterial color="#c8a4ff" roughness={0.48} />
-            </mesh>
-            <RoundedBox
-              args={[1.25, 0.46, 0.88]}
-              radius={0.18}
-              smoothness={4}
-              position={[0, 1.91, -0.05]}
-              rotation={[0, 0, -0.05]}
-            >
-              <meshStandardMaterial color="#17161d" roughness={0.65} />
-            </RoundedBox>
-            <mesh position={[0, 1.31, 0.72]} rotation={[Math.PI / 2, 0, 0]}>
-              <coneGeometry args={[0.09, 0.24, 20]} />
-              <meshStandardMaterial color="#aa80e1" roughness={0.5} />
-            </mesh>
-            <Eye position={[-0.26, 1.52, 0.63]} pointer={pointer} />
-            <Eye position={[0.26, 1.52, 0.63]} pointer={pointer} />
-            <mesh position={[0, 1.12, 0.68]}>
-              <capsuleGeometry args={[0.035, 0.22, 4, 16]} />
-              <meshStandardMaterial color="#17161d" />
-            </mesh>
-          </group>
-
-          <RoundedBox
-            args={[1.45, 1.55, 0.72]}
-            radius={0.28}
-            smoothness={5}
-            position={[0, 0.02, 0]}
-          >
-            <meshStandardMaterial color="#f2eee6" roughness={0.7} />
-          </RoundedBox>
-          <mesh position={[0, 0.15, 0.39]}>
-            <circleGeometry args={[0.28, 40]} />
-            <meshStandardMaterial color="#17161d" />
-          </mesh>
-          <mesh position={[0, 0.15, 0.405]}>
-            <ringGeometry args={[0.11, 0.18, 32]} />
-            <meshStandardMaterial color={accent} />
-          </mesh>
-
-          <mesh position={[-0.98, 0, 0]} rotation={[0, 0, -0.18]}>
-            <capsuleGeometry args={[0.22, 1.12, 8, 20]} />
-            <meshStandardMaterial color="#c8a4ff" roughness={0.52} />
-          </mesh>
-          <mesh position={[0.98, 0, 0]} rotation={[0, 0, 0.18]}>
-            <capsuleGeometry args={[0.22, 1.12, 8, 20]} />
-            <meshStandardMaterial color="#c8a4ff" roughness={0.52} />
-          </mesh>
-
-          <RoundedBox
-            args={[1.2, 0.55, 0.68]}
-            radius={0.2}
-            smoothness={4}
-            position={[0, -1.02, 0]}
-          >
-            <meshStandardMaterial color="#17161d" roughness={0.6} />
-          </RoundedBox>
-          <mesh position={[-0.36, -1.86, 0]}>
-            <capsuleGeometry args={[0.27, 1.18, 8, 20]} />
-            <meshStandardMaterial color="#7b75ff" roughness={0.6} />
-          </mesh>
-          <mesh position={[0.36, -1.86, 0]}>
-            <capsuleGeometry args={[0.27, 1.18, 8, 20]} />
-            <meshStandardMaterial color="#7b75ff" roughness={0.6} />
-          </mesh>
+          <primitive object={avatar} />
         </group>
       </Float>
 
-      <mesh position={[0, -2.62, -0.1]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -1.86, -0.1]} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.45, 0.035, 16, 90]} />
-        <meshStandardMaterial color={accent} emissiveIntensity={0.5} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.42} />
       </mesh>
       <ContactShadows
-        position={[0, -2.62, 0]}
-        opacity={0.48}
+        position={[0, -1.85, 0]}
+        opacity={0.42}
         scale={7}
         blur={2.5}
         far={4.5}
@@ -243,6 +162,8 @@ function Avatar({ accent }: AvatarProps) {
     </>
   );
 }
+
+useGLTF.preload("/models/chunxiang-avatar.glb");
 
 export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -506,7 +427,9 @@ export default function Home() {
             dpr={[1, 1.6]}
             gl={{ antialias: true, alpha: true }}
           >
-            <Avatar accent={slideAccents[0]} />
+            <Suspense fallback={null}>
+              <Avatar accent={slideAccents[0]} />
+            </Suspense>
           </Canvas>
           <div className="trait-cloud" aria-label="个人特质">
             {traits.map((trait) => (

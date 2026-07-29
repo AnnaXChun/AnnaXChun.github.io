@@ -64,6 +64,7 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /from "@react-three\/fiber"/);
   assert.match(page, /from "@react-three\/drei"/);
   assert.match(page, /from "@gsap\/react"/);
+  assert.match(page, /useGLTF\("\/models\/chunxiang-avatar\.glb"\)/);
   assert.match(page, /双鱼座/);
   assert.match(layout, /高级软件开发工程师｜三维交互简历/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
@@ -72,4 +73,5 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   await assert.rejects(
     access(new URL("../app/_sites-preview/SkeletonPreview.tsx", templateRoot)),
   );
+  await access(new URL("public/models/chunxiang-avatar.glb", templateRoot));
 });
