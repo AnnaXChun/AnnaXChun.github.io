@@ -70,6 +70,8 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /小米杯全国一等奖/);
   assert.match(html, /查看“证书画廊”/);
   assert.match(html, /证书与成果横向画廊/);
+  assert.match(html, /滚轮 \/ 拖动 · 循环浏览/);
+  assert.match(html, /离开证书画廊并查看下一屏/);
   assert.match(html, /MobiCom 论文成果/);
   assert.match(html, /发明专利申请受理/);
   assert.match(html, /数学建模竞赛 Finalist/);
@@ -79,9 +81,10 @@ test("server-renders the interactive portfolio shell", async () => {
 });
 
 test("removes starter preview infrastructure and keeps 3D dependencies", async () => {
-  const [page, layout, packageJson] = await Promise.all([
+  const [page, layout, styles, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
@@ -95,6 +98,10 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /onPointerEnter=\{\(\) => setExpanded\(true\)\}/);
   assert.match(page, /duration = reduceMotion\.current \? 0\.01 : 0\.68/);
   assert.match(page, /SOP 工作流设计/);
+  assert.match(page, /CERTIFICATE_CYCLE_COUNT = 3/);
+  assert.match(page, /normalizeScroll/);
+  assert.match(styles, /scrollbar-width: none/);
+  assert.doesNotMatch(styles, /background: var\(--yellow\)/);
   assert.match(layout, /高级软件开发工程师｜三维交互简历/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);

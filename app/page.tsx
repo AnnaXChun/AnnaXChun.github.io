@@ -22,14 +22,14 @@ const slideLabels = [
 ] as const;
 
 const slideAccents = [
-  "#c7ff4a",
-  "#ff6b49",
-  "#f4d84d",
-  "#ff704f",
-  "#8a7dff",
-  "#c7ff4a",
+  "#b8d97c",
+  "#d97a64",
+  "#c9ae67",
+  "#d97a64",
+  "#8f86c8",
+  "#b8d97c",
   "#caa66b",
-  "#8a7dff",
+  "#8f86c8",
 ] as const;
 
 const traits = [
@@ -37,7 +37,7 @@ const traits = [
     label: "Codex / Claude Code",
     note: "人工智能协作",
     className: "trait-one",
-    color: "#c7ff4a",
+    color: "#b8d97c",
     meaning: "熟练使用人工智能编程工具参与真实工程研发。",
     evidence: "用于代码理解、方案拆分、重构、测试、排障与部署交付。",
     value: "缩短反馈链路，让研发速度与代码质量同时提升。",
@@ -46,7 +46,7 @@ const traits = [
     label: "智能体构建",
     note: "人工智能工程",
     className: "trait-two",
-    color: "#f4d84d",
+    color: "#c9ae67",
     meaning: "具备从模型接入到工具调用的智能体研发经验。",
     evidence: "实践 LangChain、Llama、Agent Loop、工具调用与安全沙箱。",
     value: "能够把大模型能力转化为可执行、可验证的业务流程。",
@@ -55,7 +55,7 @@ const traits = [
     label: "高并发后端",
     note: "工程能力",
     className: "trait-three",
-    color: "#8a7dff",
+    color: "#8f86c8",
     meaning: "围绕高流量场景设计稳定的接口、数据与降级策略。",
     evidence: "实践锁机制、状态机、熔断、MySQL 索引与慢查询治理。",
     value: "保障关键链路在并发压力下保持一致性和可用性。",
@@ -64,7 +64,7 @@ const traits = [
     label: "全国一等奖队长",
     note: "领导力",
     className: "trait-four",
-    color: "#ff704f",
+    color: "#d97a64",
     meaning: "计算机系统能力大赛小米杯全国一等奖团队负责人。",
     evidence: "以队长身份推进方案设计、协作分工与最终交付。",
     value: "验证复杂任务拆解、技术决策和团队推进能力。",
@@ -82,7 +82,7 @@ const traits = [
     label: "全栈闭环交付",
     note: "工作能力",
     className: "trait-six",
-    color: "#c7ff4a",
+    color: "#b8d97c",
     meaning: "能够从需求、研发、测试到部署独立完成闭环。",
     evidence: "持续维护国家级官网，并独立交付多个个人项目。",
     value: "不止完成代码，还能把产品可靠地交付上线。",
@@ -91,7 +91,7 @@ const traits = [
     label: "复杂问题排障",
     note: "工作能力",
     className: "trait-seven",
-    color: "#f4d84d",
+    color: "#c9ae67",
     meaning: "用证据链定位性能、数据与业务链路问题。",
     evidence: "实践链路日志复核、疑难缺陷定位和 MySQL 慢查治理。",
     value: "快速收敛根因，降低线上风险与接口延迟。",
@@ -100,7 +100,7 @@ const traits = [
     label: "SOP 工作流设计",
     note: "工作能力",
     className: "trait-eight",
-    color: "#ff704f",
+    color: "#d97a64",
     meaning: "把开发经验沉淀成可重复执行的人机协作流程。",
     evidence: "串联需求澄清、计划、Skill 执行、验证、部署与复盘。",
     value: "让个人效率可复制，让交付质量可检查、可追溯。",
@@ -187,13 +187,16 @@ const certificates = [
 ] as const;
 
 type Certificate = (typeof certificates)[number];
+const CERTIFICATE_CYCLE_COUNT = 3;
 
 function CertificateCard({
   certificate,
   index,
+  interactive = true,
 }: {
   certificate: Certificate;
   index: number;
+  interactive?: boolean;
 }) {
   const card = useRef<HTMLElement>(null);
   const image = useRef<HTMLImageElement>(null);
@@ -239,7 +242,8 @@ function CertificateCard({
     <article
       ref={card}
       className="certificate-card"
-      tabIndex={0}
+      tabIndex={interactive ? 0 : -1}
+      aria-hidden={interactive ? undefined : true}
       aria-label={`${certificate.title}，${certificate.meta}`}
       onPointerEnter={() => setFocused(true)}
       onPointerLeave={() => setFocused(false)}
@@ -272,12 +276,50 @@ function CertificateCard({
   );
 }
 
-function CertificateGallery() {
+function CertificateGallery({ onExit }: { onExit: () => void }) {
   const viewport = useRef<HTMLDivElement>(null);
+  const cycleWidth = useRef(0);
 
   useEffect(() => {
     const element = viewport.current;
     if (!element) return;
+    let scrollFrame = 0;
+
+    const measureCycle = () => {
+      const cards = element.querySelectorAll<HTMLElement>(".certificate-card");
+      if (cards.length < certificates.length * 2) return 0;
+      return cards[certificates.length].offsetLeft - cards[0].offsetLeft;
+    };
+
+    const placeInMiddleCycle = (preserveProgress = false) => {
+      const previousWidth = cycleWidth.current;
+      const previousProgress =
+        preserveProgress && previousWidth > 0
+          ? (element.scrollLeft - previousWidth) / previousWidth
+          : 0;
+      const measuredWidth = measureCycle();
+      if (!measuredWidth) return;
+
+      cycleWidth.current = measuredWidth;
+      element.scrollLeft =
+        measuredWidth + (preserveProgress ? previousProgress * measuredWidth : 0);
+    };
+
+    const normalizeScroll = () => {
+      const width = cycleWidth.current;
+      if (!width) return;
+
+      if (element.scrollLeft < width * 0.75) {
+        element.scrollLeft += width;
+      } else if (element.scrollLeft > width * 2.25) {
+        element.scrollLeft -= width;
+      }
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(normalizeScroll);
+    };
 
     const onWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -286,17 +328,43 @@ function CertificateGallery() {
       element.scrollLeft += event.deltaY * 1.05;
     };
 
+    const resizeObserver = new ResizeObserver(() => {
+      requestAnimationFrame(() => placeInMiddleCycle(true));
+    });
+
+    requestAnimationFrame(() => placeInMiddleCycle());
+    element.addEventListener("scroll", onScroll, { passive: true });
     element.addEventListener("wheel", onWheel, { passive: false });
-    return () => element.removeEventListener("wheel", onWheel);
+    resizeObserver.observe(element);
+
+    return () => {
+      cancelAnimationFrame(scrollFrame);
+      resizeObserver.disconnect();
+      element.removeEventListener("scroll", onScroll);
+      element.removeEventListener("wheel", onWheel);
+      gsap.killTweensOf(element);
+    };
   }, []);
 
   const scrollGallery = (direction: number) => {
     const element = viewport.current;
     if (!element) return;
+    const width = cycleWidth.current;
+    if (!width) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const distance = Math.min(element.clientWidth * 0.72, width * 0.42);
+    let start = element.scrollLeft;
+
+    if (direction > 0 && start + distance > width * 2.1) {
+      start -= width;
+      element.scrollLeft = start;
+    } else if (direction < 0 && start - distance < width * 0.9) {
+      start += width;
+      element.scrollLeft = start;
+    }
 
     gsap.to(element, {
-      scrollLeft: element.scrollLeft + direction * element.clientWidth * 0.72,
+      scrollLeft: start + direction * distance,
       duration: reduced ? 0.01 : 0.65,
       ease: "power3.inOut",
       overwrite: "auto",
@@ -306,12 +374,19 @@ function CertificateGallery() {
   return (
     <>
       <div className="certificate-controls slide-reveal">
-        <span>滚轮 / 拖动浏览</span>
+        <span>滚轮 / 拖动 · 循环浏览</span>
         <button onClick={() => scrollGallery(-1)} aria-label="向左浏览证书">
           ←
         </button>
         <button onClick={() => scrollGallery(1)} aria-label="向右浏览证书">
           →
+        </button>
+        <button
+          className="certificate-exit"
+          onClick={onExit}
+          aria-label="离开证书画廊并查看下一屏"
+        >
+          下一屏&nbsp; ↓
         </button>
       </div>
       <div
@@ -328,13 +403,16 @@ function CertificateGallery() {
         }}
       >
         <div className="certificate-track">
-          {certificates.map((certificate, index) => (
-            <CertificateCard
-              key={certificate.title}
-              certificate={certificate}
-              index={index}
-            />
-          ))}
+          {Array.from({ length: CERTIFICATE_CYCLE_COUNT }, (_, cycle) =>
+            certificates.map((certificate, index) => (
+              <CertificateCard
+                key={`${cycle}-${certificate.title}`}
+                certificate={certificate}
+                index={index}
+                interactive={cycle === 1}
+              />
+            )),
+          )}
         </div>
       </div>
     </>
@@ -1051,7 +1129,7 @@ export default function Home() {
             学生时代留下的不只是奖项，也是一条从研究、建模到工程落地的成长轨迹。
           </p>
         </div>
-        <CertificateGallery />
+        <CertificateGallery onExit={() => goToSlide(7, 1)} />
       </section>
 
       <section

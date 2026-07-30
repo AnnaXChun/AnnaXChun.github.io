@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #f5f0e7;
-  --ink: #17161d;
-  --acid: #c7ff4a;
-  --coral: #ff704f;
-  --violet: #8a7dff;
-  --yellow: #f4d84d;
+  --paper: #efebe3;
+  --ink: #15171c;
+  --acid: #b8d97c;
+  --coral: #d97a64;
+  --violet: #8f86c8;
+  --yellow: #c9ae67;
 }
 
 * {
@@ -144,8 +144,8 @@ button {
 
 .hero-slide {
   background:
-    radial-gradient(circle at 68% 50%, rgba(138, 125, 255, 0.17), transparent 30%),
-    var(--paper);
+    radial-gradient(circle at 68% 50%, rgba(143, 134, 200, 0.12), transparent 32%),
+    linear-gradient(145deg, #f1eee7, #e8e4dc);
 }
 
 .hero-word {
@@ -255,16 +255,18 @@ button {
 .trait-tag-card {
   position: relative;
   width: 100%;
-  padding: 0.72rem 0.85rem;
-  border: 2px solid var(--ink);
-  border-radius: 0.2rem;
-  background: var(--trait-color);
+  padding: 0.72rem 0.85rem 0.72rem 1rem;
+  border: 1px solid rgba(21, 23, 28, 0.32);
+  border-left: 3px solid var(--trait-color);
+  border-radius: 0.35rem;
+  background: rgba(239, 235, 227, 0.84);
   color: var(--ink);
-  box-shadow: 4px 4px 0 var(--ink);
+  box-shadow: 0 12px 30px rgba(21, 23, 28, 0.12);
   cursor: help;
   text-align: left;
   transform-style: preserve-3d;
   will-change: transform;
+  backdrop-filter: blur(12px);
 }
 
 .trait-tag-card:focus-visible {
@@ -429,10 +431,14 @@ button {
   width: 42vw;
   height: 42vw;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 32%, #ffd7ce, var(--coral) 35%, #7b2d22 72%);
-  filter: saturate(1.1);
-  box-shadow: 0 0 120px rgba(255, 112, 79, 0.28);
+  border: 1px solid rgba(217, 122, 100, 0.24);
+  background: radial-gradient(
+    circle at 42% 42%,
+    rgba(217, 122, 100, 0.18),
+    rgba(217, 122, 100, 0.04) 48%,
+    transparent 70%
+  );
+  box-shadow: 0 0 120px rgba(217, 122, 100, 0.08);
 }
 
 .manifesto-title {
@@ -445,7 +451,7 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(6rem, 12vw, 12rem);
+  font-size: clamp(4.8rem, 8vw, 8.5rem);
   line-height: 0.78;
   letter-spacing: -0.1em;
 }
@@ -496,7 +502,13 @@ button {
 
 .technology-slide {
   padding: 13vh 3.2vw 7vh;
-  background: var(--yellow);
+  background:
+    radial-gradient(circle at 84% 18%, rgba(201, 174, 103, 0.16), transparent 28%),
+    linear-gradient(145deg, #f1eee7, #e8e4dc);
+}
+
+.technology-slide .scene-kicker {
+  color: #8b7440;
 }
 
 .technology-title {
@@ -505,7 +517,7 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(5.5rem, 10vw, 10rem);
+  font-size: clamp(4.8rem, 8vw, 8.5rem);
   line-height: 0.8;
   letter-spacing: -0.1em;
 }
@@ -518,7 +530,7 @@ button {
 .technology-rows {
   position: absolute;
   inset: auto 0 4vh;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid rgba(21, 23, 28, 0.55);
 }
 
 .technology-row {
@@ -528,7 +540,7 @@ button {
   grid-template-columns: minmax(120px, 0.22fr) 1fr;
   align-items: center;
   gap: 2rem;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid rgba(21, 23, 28, 0.32);
   overflow: hidden;
 }
 
@@ -550,15 +562,19 @@ button {
 
 .concurrency-slide {
   background:
-    linear-gradient(115deg, transparent 58%, rgba(245, 240, 231, 0.2) 58%),
-    var(--coral);
+    radial-gradient(circle at 14% 48%, rgba(217, 122, 100, 0.17), transparent 28%),
+    linear-gradient(145deg, #ece8e0, #e4e0d8);
+}
+
+.concurrency-slide .scene-kicker {
+  color: #a55543;
 }
 
 .case-number {
   position: absolute;
   left: 2vw;
   top: 14vh;
-  color: rgba(245, 240, 231, 0.98);
+  color: transparent;
   font-family:
     var(--font-display),
     "PingFang SC",
@@ -567,6 +583,7 @@ button {
   font-weight: 800;
   line-height: 0.78;
   letter-spacing: -0.12em;
+  -webkit-text-stroke: 1px rgba(21, 23, 28, 0.18);
 }
 
 .case-copy {
@@ -632,8 +649,12 @@ button {
 
 .intelligence-slide {
   background:
-    radial-gradient(circle at 78% 48%, rgba(199, 255, 74, 0.26), transparent 26%),
-    var(--violet);
+    radial-gradient(circle at 78% 48%, rgba(143, 134, 200, 0.17), transparent 29%),
+    linear-gradient(145deg, #efebe3, #e6e2da);
+}
+
+.intelligence-slide .scene-kicker {
+  color: #655a9f;
 }
 
 .intelligence-copy {
@@ -649,13 +670,13 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(4.5rem, 7.5vw, 8rem);
+  font-size: clamp(4.4rem, 6.8vw, 7.2rem);
   line-height: 0.82;
   letter-spacing: -0.09em;
 }
 
 .intelligence-copy h2 em {
-  color: var(--paper);
+  color: #655a9f;
   font-style: normal;
 }
 
@@ -710,7 +731,7 @@ button {
   padding: 0.7rem 0.9rem;
   border: 1px solid var(--ink);
   border-radius: 999px;
-  background: var(--acid);
+  background: rgba(239, 235, 227, 0.9);
   font-size: 0.78rem;
   font-style: normal;
   font-weight: 900;
@@ -738,7 +759,13 @@ button {
 
 .delivery-slide {
   padding: 13vh 3.2vw 7vh;
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 78% 28%, rgba(184, 217, 124, 0.13), transparent 26%),
+    linear-gradient(145deg, #f1eee7, #e8e4dc);
+}
+
+.delivery-slide .scene-kicker {
+  color: #58752f;
 }
 
 .delivery-title {
@@ -747,7 +774,7 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(4.8rem, 8.7vw, 9rem);
+  font-size: clamp(4.8rem, 8vw, 8.5rem);
   line-height: 0.82;
   letter-spacing: -0.095em;
 }
@@ -833,7 +860,7 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(3.8rem, 6.6vw, 7rem);
+  font-size: clamp(4.4rem, 6.8vw, 7.2rem);
   line-height: 0.78;
   letter-spacing: -0.09em;
 }
@@ -855,7 +882,7 @@ button {
   position: absolute;
   z-index: 8;
   top: 28vh;
-  right: 4vw;
+  right: clamp(6.5rem, 8vw, 8rem);
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -879,6 +906,16 @@ button {
   cursor: pointer;
 }
 
+.certificate-controls .certificate-exit {
+  width: auto;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  color: rgba(239, 235, 227, 0.72);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
 .certificate-controls button:hover,
 .certificate-controls button:focus-visible {
   border-color: #d7b979;
@@ -889,34 +926,25 @@ button {
 .certificate-gallery {
   position: absolute;
   z-index: 4;
-  inset: 33vh 3.2vw 4.5vh;
+  inset: 33vh clamp(6.5rem, 8vw, 8rem) 4.5vh 3.2vw;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-color: #d7b979 rgba(245, 240, 231, 0.12);
-  scrollbar-width: thin;
+  scroll-snap-type: none;
+  scrollbar-width: none;
   touch-action: pan-x;
   outline: none;
 }
 
 .certificate-gallery::-webkit-scrollbar {
-  height: 4px;
-}
-
-.certificate-gallery::-webkit-scrollbar-track {
-  background: rgba(245, 240, 231, 0.12);
-}
-
-.certificate-gallery::-webkit-scrollbar-thumb {
-  background: #d7b979;
+  display: none;
 }
 
 .certificate-track {
   width: max-content;
   min-width: 100%;
   height: calc(100% - 0.7rem);
-  padding: 0.8rem 16vw 1rem 0;
+  padding: 0.8rem 0 1rem;
   display: flex;
   align-items: flex-start;
   gap: clamp(1.2rem, 2vw, 2.2rem);
@@ -1025,7 +1053,8 @@ button {
 .final-slide {
   padding: 13vh 4vw 7vh;
   background:
-    linear-gradient(90deg, transparent 0 66%, rgba(199, 255, 74, 0.18) 66%),
+    radial-gradient(circle at 82% 34%, rgba(143, 134, 200, 0.14), transparent 27%),
+    radial-gradient(circle at 16% 82%, rgba(184, 217, 124, 0.08), transparent 24%),
     var(--ink);
   color: var(--paper);
 }
@@ -1040,7 +1069,7 @@ button {
     var(--font-display),
     "PingFang SC",
     sans-serif;
-  font-size: clamp(5.7rem, 10vw, 10.5rem);
+  font-size: clamp(4.8rem, 8vw, 8.5rem);
   line-height: 0.78;
   letter-spacing: -0.1em;
 }
@@ -1193,6 +1222,34 @@ button {
   border-color: rgba(245, 240, 231, 0.65);
   background: rgba(23, 22, 29, 0.54);
   color: var(--paper);
+}
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .technology-row strong {
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .delivery-track {
+    bottom: 4vh;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem 0;
+  }
+
+  .delivery-track > div {
+    padding-top: 0.8rem;
+  }
+
+  .delivery-track h3 {
+    margin-top: 1rem;
+    font-size: clamp(1.3rem, 2vw, 1.8rem);
+  }
+
+  .delivery-track p {
+    font-size: 0.78rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1437,11 +1494,11 @@ button {
   }
 
   .certificate-gallery {
-    inset: 29vh 1.25rem 7vh;
+    inset: 29vh 4.75rem 7vh 1.25rem;
   }
 
   .certificate-track {
-    padding-right: 18vw;
+    padding-right: 0;
     gap: 1rem;
   }
 
