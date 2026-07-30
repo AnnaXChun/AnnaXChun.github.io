@@ -17,6 +17,7 @@ const slideLabels = [
   "国家级项目",
   "人工智能科研",
   "SOP 工作流",
+  "证书画廊",
   "履历成果",
 ] as const;
 
@@ -27,6 +28,7 @@ const slideAccents = [
   "#ff704f",
   "#8a7dff",
   "#c7ff4a",
+  "#caa66b",
   "#8a7dff",
 ] as const;
 
@@ -132,6 +134,212 @@ const deliverySteps = [
   { index: "05", title: "交付", text: "完成部署、文档与回滚预案" },
   { index: "06", title: "沉淀", text: "把经验写回 Skill 与可复用 SOP" },
 ] as const;
+
+const certificates = [
+  {
+    title: "小米杯全国一等奖",
+    meta: "队长 · 2025",
+    image: "/certificates/xiaomi-2025-first.webp",
+    description: "全国大学生计算机系统能力大赛智能系统创新设计赛，DeepDog 项目。",
+  },
+  {
+    title: "发明专利申请受理",
+    meta: "国家知识产权局 · 2025",
+    image: "/certificates/patent-acceptance.webp",
+    description: "非接触式货币真伪检测方法、系统、装置及存储介质。",
+  },
+  {
+    title: "MobiCom 论文成果",
+    meta: "CCF-A · 学术研究",
+    image: "/certificates/mobicom-paper.webp",
+    description: "基于眨眼运动学与临床知识蒸馏的居家干眼评估研究。",
+  },
+  {
+    title: "数学建模竞赛 Finalist",
+    meta: "MCM · 2025",
+    image: "/certificates/mcm-finalist.webp",
+    description: "美国大学生数学建模竞赛 Finalist，完成复杂问题建模与协作交付。",
+  },
+  {
+    title: "计算机设计大赛一等奖",
+    meta: "中南地区赛 · 2025",
+    image: "/certificates/design-digital-twin-first.webp",
+    description: "虚实智联：基于数字孪生的三维人体重建系统。",
+  },
+  {
+    title: "计算机设计大赛二等奖",
+    meta: "中南地区赛 · 2025",
+    image: "/certificates/design-poetry-second.webp",
+    description: "诗品：人工智能诗词创作助手。",
+  },
+  {
+    title: "PolarDB 外卡优胜奖",
+    meta: "数据库创新设计赛 · 2024",
+    image: "/certificates/polardb-award.webp",
+    description: "全国大学生计算机系统能力大赛 PolarDB 数据库创新设计赛。",
+  },
+  {
+    title: "小米杯全国三等奖",
+    meta: "智能系统创新设计赛 · 2024",
+    image: "/certificates/xiaomi-2024-third.webp",
+    description: "全国大学生计算机系统能力大赛，持续积累智能系统工程经验。",
+  },
+] as const;
+
+type Certificate = (typeof certificates)[number];
+
+function CertificateCard({
+  certificate,
+  index,
+}: {
+  certificate: Certificate;
+  index: number;
+}) {
+  const card = useRef<HTMLElement>(null);
+  const image = useRef<HTMLImageElement>(null);
+  const overlay = useRef<HTMLDivElement>(null);
+  const rule = useRef<HTMLSpanElement>(null);
+
+  const setFocused = (focused: boolean) => {
+    if (!card.current || !image.current || !overlay.current || !rule.current) {
+      return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.killTweensOf([card.current, image.current, overlay.current, rule.current]);
+    gsap.to(card.current, {
+      y: focused && !reduced ? -12 : 0,
+      scale: focused && !reduced ? 1.025 : 1,
+      duration: reduced ? 0.01 : 0.32,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+    gsap.to(image.current, {
+      scale: focused && !reduced ? 1.045 : 1,
+      duration: reduced ? 0.01 : 0.48,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+    gsap.to(overlay.current, {
+      autoAlpha: focused ? 1 : 0,
+      y: focused || reduced ? 0 : 14,
+      duration: reduced ? 0.01 : 0.28,
+      ease: focused ? "power3.out" : "power2.in",
+      overwrite: "auto",
+    });
+    gsap.to(rule.current, {
+      scaleX: focused ? 1 : 0.18,
+      duration: reduced ? 0.01 : 0.34,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+  };
+
+  return (
+    <article
+      ref={card}
+      className="certificate-card"
+      tabIndex={0}
+      aria-label={`${certificate.title}，${certificate.meta}`}
+      onPointerEnter={() => setFocused(true)}
+      onPointerLeave={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    >
+      <div className="certificate-media">
+        {/* eslint-disable-next-line @next/next/no-img-element -- 证书已预压缩为本地 WebP，保留原生图片以避免画廊滑动时额外的图片布局包装。 */}
+        <img
+          ref={image}
+          src={certificate.image}
+          alt={certificate.title}
+          loading="lazy"
+          decoding="async"
+        />
+        <div ref={overlay} className="certificate-overlay">
+          <span>成果说明</span>
+          <p>{certificate.description}</p>
+        </div>
+      </div>
+      <footer>
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        <div>
+          <small>{certificate.meta}</small>
+          <h3>{certificate.title}</h3>
+        </div>
+      </footer>
+      <span ref={rule} className="certificate-rule" aria-hidden="true" />
+    </article>
+  );
+}
+
+function CertificateGallery() {
+  const viewport = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = viewport.current;
+    if (!element) return;
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      element.scrollLeft += event.deltaY * 1.05;
+    };
+
+    element.addEventListener("wheel", onWheel, { passive: false });
+    return () => element.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const scrollGallery = (direction: number) => {
+    const element = viewport.current;
+    if (!element) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    gsap.to(element, {
+      scrollLeft: element.scrollLeft + direction * element.clientWidth * 0.72,
+      duration: reduced ? 0.01 : 0.65,
+      ease: "power3.inOut",
+      overwrite: "auto",
+    });
+  };
+
+  return (
+    <>
+      <div className="certificate-controls slide-reveal">
+        <span>滚轮 / 拖动浏览</span>
+        <button onClick={() => scrollGallery(-1)} aria-label="向左浏览证书">
+          ←
+        </button>
+        <button onClick={() => scrollGallery(1)} aria-label="向右浏览证书">
+          →
+        </button>
+      </div>
+      <div
+        ref={viewport}
+        className="certificate-gallery slide-reveal"
+        aria-label="证书与成果横向画廊"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            event.stopPropagation();
+            scrollGallery(event.key === "ArrowLeft" ? -1 : 1);
+          }
+        }}
+      >
+        <div className="certificate-track">
+          {certificates.map((certificate, index) => (
+            <CertificateCard
+              key={certificate.title}
+              certificate={certificate}
+              index={index}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
 
 type Trait = (typeof traits)[number];
 
@@ -519,6 +727,7 @@ export default function Home() {
       const observer = Observer.create({
         target: shellRef.current,
         type: "wheel,touch",
+        ignore: ".certificate-gallery",
         wheelSpeed: -1,
         tolerance: 24,
         preventDefault: true,
@@ -564,6 +773,7 @@ export default function Home() {
   const move = (direction: number) => {
     goToSlide(activeSlideRef.current + direction, direction);
   };
+  const useLightChrome = activeSlide === 1 || activeSlide >= 6;
 
   return (
     <main
@@ -595,9 +805,7 @@ export default function Home() {
       }}
     >
       <header
-        className={`global-header ${
-          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
-        }`}
+        className={`global-header ${useLightChrome ? "is-light" : ""}`}
       >
         <button
           className="wordmark"
@@ -829,10 +1037,31 @@ export default function Home() {
         ref={(node) => {
           slideRefs.current[6] = node;
         }}
-        className="resume-slide final-slide"
+        className="resume-slide certificate-slide"
         aria-hidden={activeSlide !== 6}
       >
-        <div className="scene-kicker slide-reveal">07 / 工作与成果</div>
+        <div className="scene-kicker slide-reveal">07 / 证书画廊</div>
+        <div className="certificate-heading slide-reveal">
+          <h2>
+            求索有迹，
+            <br />
+            <em>成果有证。</em>
+          </h2>
+          <p>
+            学生时代留下的不只是奖项，也是一条从研究、建模到工程落地的成长轨迹。
+          </p>
+        </div>
+        <CertificateGallery />
+      </section>
+
+      <section
+        ref={(node) => {
+          slideRefs.current[7] = node;
+        }}
+        className="resume-slide final-slide"
+        aria-hidden={activeSlide !== 7}
+      >
+        <div className="scene-kicker slide-reveal">08 / 工作与成果</div>
         <h2 className="final-title slide-reveal">
           用真实成果
           <br />
@@ -863,9 +1092,7 @@ export default function Home() {
       </section>
 
       <nav
-        className={`scene-nav ${
-          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
-        }`}
+        className={`scene-nav ${useLightChrome ? "is-light" : ""}`}
         aria-label="场景导航"
       >
         {slideLabels.map((label, index) => (
@@ -884,9 +1111,7 @@ export default function Home() {
       </nav>
 
       <div
-        className={`scene-actions ${
-          activeSlide === 1 || activeSlide === 6 ? "is-light" : ""
-        }`}
+        className={`scene-actions ${useLightChrome ? "is-light" : ""}`}
       >
         <button onClick={() => move(-1)} aria-label="上一屏">
           ↑

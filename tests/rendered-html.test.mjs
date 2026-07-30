@@ -68,6 +68,12 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /周期缩短 40% 以上/);
   assert.match(html, /泰康科技后端实习/);
   assert.match(html, /小米杯全国一等奖/);
+  assert.match(html, /查看“证书画廊”/);
+  assert.match(html, /证书与成果横向画廊/);
+  assert.match(html, /MobiCom 论文成果/);
+  assert.match(html, /发明专利申请受理/);
+  assert.match(html, /数学建模竞赛 Finalist/);
+  assert.match(html, /PolarDB 外卡优胜奖/);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });
@@ -97,4 +103,18 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
     access(new URL("../app/_sites-preview/SkeletonPreview.tsx", templateRoot)),
   );
   await access(new URL("public/models/chunxiang-avatar.glb", templateRoot));
+  await Promise.all(
+    [
+      "mobicom-paper.webp",
+      "patent-acceptance.webp",
+      "mcm-finalist.webp",
+      "xiaomi-2025-first.webp",
+      "design-poetry-second.webp",
+      "design-digital-twin-first.webp",
+      "xiaomi-2024-third.webp",
+      "polardb-award.webp",
+    ].map((name) =>
+      access(new URL(`public/certificates/${name}`, templateRoot)),
+    ),
+  );
 });
