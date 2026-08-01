@@ -40,6 +40,11 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /高并发/);
   assert.match(html, /人工智能原生/);
   assert.match(html, /高级软件开发工程师沉浸式个人简历/);
+  assert.match(html, /个人作品集三维开场/);
+  assert.match(html, /蛛网英雄 \/\/ 2099/);
+  assert.match(html, /跳过序章/);
+  assert.match(html, /智能体工作流/);
+  assert.match(html, /数字孪生/);
   assert.match(html, /查看“国家级项目”/);
   assert.match(html, /武汉大学/);
   assert.doesNotMatch(html, /GPA 3\.80 \/ 4\.00/);
@@ -98,9 +103,15 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /onPointerEnter=\{\(\) => setExpanded\(true\)\}/);
   assert.match(page, /duration = reduceMotion\.current \? 0\.01 : 0\.68/);
   assert.match(page, /SOP 工作流设计/);
+  assert.match(page, /function OpeningSequence/);
+  assert.match(page, /const coverScale/);
+  assert.match(page, /timeline\.current\.progress\(1\)/);
+  assert.match(page, /if \(!openingActive\.current\)/);
   assert.match(page, /CERTIFICATE_CYCLE_COUNT = 3/);
   assert.match(page, /normalizeScroll/);
   assert.match(styles, /scrollbar-width: none/);
+  assert.match(styles, /perspective: 1400px/);
+  assert.match(styles, /@keyframes openingHeroSwing/);
   assert.doesNotMatch(styles, /background: var\(--yellow\)/);
   assert.match(layout, /高级软件开发工程师｜三维交互简历/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);

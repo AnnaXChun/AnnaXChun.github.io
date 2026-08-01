@@ -670,13 +670,311 @@ function Avatar({ accent }: AvatarProps) {
 
 useGLTF.preload("/models/chunxiang-avatar.glb");
 
+const openingWorks = [
+  { index: "01", title: "智能体工作流", meta: "工具调用 · SOP" },
+  { index: "02", title: "支付链路", meta: "高并发 · 状态机" },
+  { index: "03", title: "MobiCom 研究", meta: "临床知识蒸馏" },
+  { index: "04", title: "数字孪生", meta: "三维人体重建" },
+  { index: "05", title: "系统能力", meta: "全国一等奖" },
+  { index: "06", title: "人工智能原生", meta: "Codex · Agent" },
+] as const;
+
+function OpeningSequence({ onComplete }: { onComplete: () => void }) {
+  const root = useRef<HTMLElement>(null);
+  const timeline = useRef<gsap.core.Timeline | null>(null);
+  const completed = useRef(false);
+
+  const finish = () => {
+    if (completed.current) return;
+    completed.current = true;
+    onComplete();
+  };
+
+  useGSAP(
+    () => {
+      const container = root.current;
+      const television = container?.querySelector<HTMLElement>(".opening-tv");
+      if (!container || !television) return;
+
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const televisionBounds = television.getBoundingClientRect();
+      const coverScale =
+        Math.max(
+          window.innerWidth / Math.max(televisionBounds.width * 0.72, 1),
+          window.innerHeight / Math.max(televisionBounds.height * 0.58, 1),
+        ) * 1.28;
+
+      if (reduced) {
+        timeline.current = gsap
+          .timeline({ onComplete: finish })
+          .to(container, {
+            autoAlpha: 0,
+            duration: 0.35,
+            delay: 0.25,
+            ease: "power1.out",
+          });
+        return;
+      }
+
+      gsap.set(".opening-work", { autoAlpha: 0, scale: 0.72, z: -420 });
+      gsap.set(".opening-tv", {
+        autoAlpha: 0,
+        scale: 0.56,
+        z: -260,
+        rotationX: -12,
+        rotationY: -28,
+      });
+      gsap.set(".opening-brand, .opening-status", { autoAlpha: 0, y: 12 });
+      gsap.set(".opening-flash", { autoAlpha: 0 });
+
+      timeline.current = gsap
+        .timeline({
+          defaults: { ease: "power3.out" },
+          onComplete: finish,
+        })
+        .addLabel("boot", 0)
+        .to(
+          ".opening-brand, .opening-status",
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.48,
+            stagger: 0.07,
+          },
+          "boot+=0.12",
+        )
+        .to(
+          ".opening-tv",
+          {
+            autoAlpha: 1,
+            scale: 1,
+            z: 0,
+            rotationX: 4,
+            rotationY: 13,
+            duration: 1.25,
+            ease: "power4.out",
+          },
+          "boot+=0.22",
+        )
+        .to(
+          ".opening-work",
+          {
+            autoAlpha: 1,
+            scale: 1,
+            z: 0,
+            duration: 0.95,
+            stagger: { amount: 0.46, from: "random" },
+            ease: "back.out(1.35)",
+          },
+          "boot+=0.52",
+        )
+        .addLabel("orbit", 1.5)
+        .to(
+          ".opening-tv",
+          {
+            rotationX: -2,
+            rotationY: -9,
+            y: -10,
+            duration: 1.35,
+            ease: "sine.inOut",
+          },
+          "orbit",
+        )
+        .to(
+          ".opening-work:nth-child(odd)",
+          {
+            y: "-=12",
+            rotationZ: "+=1.5",
+            duration: 1.25,
+            ease: "sine.inOut",
+          },
+          "orbit",
+        )
+        .to(
+          ".opening-work:nth-child(even)",
+          {
+            y: "+=10",
+            rotationZ: "-=1.5",
+            duration: 1.25,
+            ease: "sine.inOut",
+          },
+          "orbit",
+        )
+        .addLabel("focus", 3.05)
+        .to(
+          ".opening-hud",
+          { autoAlpha: 0, duration: 0.35, ease: "power2.in" },
+          "focus",
+        )
+        .to(
+          ".opening-work",
+          {
+            autoAlpha: 0,
+            scale: 0.68,
+            z: -360,
+            duration: 0.62,
+            stagger: { amount: 0.2, from: "edges" },
+            ease: "power3.in",
+          },
+          "focus",
+        )
+        .to(
+          ".opening-tv",
+          {
+            rotationX: 0,
+            rotationY: 0,
+            y: 0,
+            scale: 1.1,
+            duration: 0.62,
+            ease: "power3.inOut",
+          },
+          "focus+=0.08",
+        )
+        .addLabel("enter", 3.72)
+        .to(
+          ".opening-tv",
+          {
+            scale: coverScale,
+            z: 360,
+            duration: 1.08,
+            ease: "expo.in",
+          },
+          "enter",
+        )
+        .to(
+          ".opening-screen-content",
+          { autoAlpha: 0, duration: 0.24, ease: "power2.in" },
+          "enter+=0.56",
+        )
+        .to(
+          ".opening-flash",
+          { autoAlpha: 1, duration: 0.32, ease: "power2.in" },
+          "enter+=0.68",
+        )
+        .to(
+          container,
+          { autoAlpha: 0, duration: 0.28, ease: "power1.out" },
+          "enter+=1.02",
+        );
+    },
+    { scope: root },
+  );
+
+  const skipOpening = () => {
+    if (timeline.current) {
+      timeline.current.progress(1);
+    } else {
+      finish();
+    }
+  };
+
+  return (
+    <section
+      ref={root}
+      className="opening-sequence"
+      role="dialog"
+      aria-modal="true"
+      aria-label="个人作品集三维开场"
+    >
+      <div className="opening-grid" aria-hidden="true" />
+      <div className="opening-vignette" aria-hidden="true" />
+
+      <div className="opening-hud">
+        <div className="opening-brand">
+          <span>椿襄作品集</span>
+          <strong>场景接入中</strong>
+        </div>
+        <div className="opening-status">
+          <span>影像信号 07</span>
+          <i />
+          <span>空间档案已连接</span>
+        </div>
+        <button type="button" onClick={skipOpening} autoFocus>
+          跳过序章
+        </button>
+      </div>
+
+      <div className="opening-stage" aria-hidden="true">
+        <div className="opening-works">
+          {openingWorks.map((work, index) => (
+            <article
+              className={`opening-work opening-work-${index + 1}`}
+              key={work.title}
+            >
+              <span>{work.index}</span>
+              <strong>{work.title}</strong>
+              <small>{work.meta}</small>
+            </article>
+          ))}
+        </div>
+
+        <div className="opening-tv">
+          <div className="opening-tv-depth" />
+          <div className="opening-tv-body">
+            <div className="opening-tv-bezel">
+              <div className="opening-tv-screen">
+                <div className="opening-screen-content">
+                  <svg
+                    className="opening-web"
+                    viewBox="0 0 420 250"
+                    focusable="false"
+                  >
+                    <path d="M210 125 14 18M210 125 406 18M210 125 410 228M210 125 8 226M210 125V0M210 125v125M210 125H0M210 125h210" />
+                    <ellipse cx="210" cy="125" rx="62" ry="38" />
+                    <ellipse cx="210" cy="125" rx="118" ry="76" />
+                    <ellipse cx="210" cy="125" rx="176" ry="112" />
+                  </svg>
+                  <div className="opening-city" />
+                  <div className="opening-hero">
+                    <i className="opening-hero-head" />
+                    <i className="opening-hero-body" />
+                    <i className="opening-hero-arm" />
+                    <i className="opening-hero-line" />
+                  </div>
+                  <div className="opening-broadcast">
+                    <span>原创影像</span>
+                    <strong>蛛网英雄 // 2099</strong>
+                  </div>
+                  <div className="opening-scanlines" />
+                </div>
+                <div className="opening-flash" />
+              </div>
+            </div>
+            <div className="opening-tv-controls">
+              <span className="opening-dial opening-dial-a" />
+              <span className="opening-dial opening-dial-b" />
+              <i />
+              <i />
+              <i />
+              <small>信号<br />接收</small>
+            </div>
+          </div>
+          <div className="opening-tv-feet">
+            <i />
+            <i />
+          </div>
+        </div>
+      </div>
+
+      <div className="opening-caption">
+        <span>三维作品空间</span>
+        <strong>将视线交给屏幕</strong>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
+  const [showOpening, setShowOpening] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
   const shellRef = useRef<HTMLElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Array<HTMLElement | null>>([]);
   const activeSlideRef = useRef(0);
   const animating = useRef(false);
+  const openingActive = useRef(true);
   const reduceMotion = useRef(false);
 
   const { contextSafe } = useGSAP(
@@ -809,8 +1107,16 @@ export default function Home() {
         wheelSpeed: -1,
         tolerance: 24,
         preventDefault: true,
-        onUp: () => goToSlide(activeSlideRef.current + 1, 1),
-        onDown: () => goToSlide(activeSlideRef.current - 1, -1),
+        onUp: () => {
+          if (!openingActive.current) {
+            goToSlide(activeSlideRef.current + 1, 1);
+          }
+        },
+        onDown: () => {
+          if (!openingActive.current) {
+            goToSlide(activeSlideRef.current - 1, -1);
+          }
+        },
       });
 
       return () => observer.kill();
@@ -851,6 +1157,11 @@ export default function Home() {
   const move = (direction: number) => {
     goToSlide(activeSlideRef.current + direction, direction);
   };
+  const finishOpening = () => {
+    openingActive.current = false;
+    setShowOpening(false);
+    requestAnimationFrame(() => shellRef.current?.focus());
+  };
   const useLightChrome = activeSlide === 1 || activeSlide >= 6;
 
   return (
@@ -860,6 +1171,7 @@ export default function Home() {
       aria-label="高级软件开发工程师沉浸式个人简历"
       tabIndex={0}
       onKeyDown={(event) => {
+        if (openingActive.current) return;
         if (
           event.key === "ArrowDown" ||
           event.key === "PageDown" ||
@@ -1199,6 +1511,7 @@ export default function Home() {
           ↓
         </button>
       </div>
+      {showOpening ? <OpeningSequence onComplete={finishOpening} /> : null}
     </main>
   );
 }
