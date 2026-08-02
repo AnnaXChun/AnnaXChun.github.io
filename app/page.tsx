@@ -5,10 +5,11 @@ import { ContactShadows, Float, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-gsap.registerPlugin(useGSAP, Observer);
+gsap.registerPlugin(useGSAP, Observer, ScrollTrigger);
 
 const slideLabels = [
   "个人定位",
@@ -46,7 +47,7 @@ const traits = [
     label: "智能体构建",
     note: "人工智能工程",
     className: "trait-two",
-    color: "#c9ae67",
+    color: "#d8b66e",
     meaning: "具备从模型接入到工具调用的智能体研发经验。",
     evidence: "实践 LangChain、Llama、Agent Loop、工具调用与安全沙箱。",
     value: "能够把大模型能力转化为可执行、可验证的业务流程。",
@@ -55,7 +56,7 @@ const traits = [
     label: "高并发后端",
     note: "工程能力",
     className: "trait-three",
-    color: "#8f86c8",
+    color: "#9c8fd4",
     meaning: "围绕高流量场景设计稳定的接口、数据与降级策略。",
     evidence: "实践锁机制、状态机、熔断、MySQL 索引与慢查询治理。",
     value: "保障关键链路在并发压力下保持一致性和可用性。",
@@ -64,7 +65,7 @@ const traits = [
     label: "全国一等奖队长",
     note: "领导力",
     className: "trait-four",
-    color: "#d97a64",
+    color: "#e47e6b",
     meaning: "计算机系统能力大赛小米杯全国一等奖团队负责人。",
     evidence: "以队长身份推进方案设计、协作分工与最终交付。",
     value: "验证复杂任务拆解、技术决策和团队推进能力。",
@@ -73,7 +74,7 @@ const traits = [
     label: "LangChain / Llama",
     note: "模型应用",
     className: "trait-five",
-    color: "#f5f0e7",
+    color: "#69b7c8",
     meaning: "具备大模型应用编排、上下文组织与推理链路经验。",
     evidence: "结合垂直模型、提示工程和工具协议构建智能体应用。",
     value: "能从模型能力出发设计稳定、可扩展的应用架构。",
@@ -82,7 +83,7 @@ const traits = [
     label: "全栈闭环交付",
     note: "工作能力",
     className: "trait-six",
-    color: "#b8d97c",
+    color: "#d69a63",
     meaning: "能够从需求、研发、测试到部署独立完成闭环。",
     evidence: "持续维护国家级官网，并独立交付多个个人项目。",
     value: "不止完成代码，还能把产品可靠地交付上线。",
@@ -110,19 +111,19 @@ const traits = [
 const technologyRows = [
   {
     label: "人工智能协同",
-    items: "Codex · Claude Code · Gemini · Skill 技能 · 上下文工程 · GSD",
+    items: "Codex、Claude Code、Gemini、Skill 技能、上下文工程、GSD",
   },
   {
     label: "智能体研发",
-    items: "LangChain · Llama · Verl · Agent Loop · 工具调用 · Docker 安全沙箱",
+    items: "LangChain、Llama、Verl、Agent Loop、工具调用、Docker 安全沙箱",
   },
   {
     label: "后端与数据",
-    items: "Java · Python · C++ · Spring Boot · MySQL · Explain · 锁机制 · 状态机",
+    items: "Java、Python、C++、Spring Boot、MySQL、Explain、锁机制、状态机",
   },
   {
     label: "SOP 工作流",
-    items: "需求澄清 · 计划拆分 · Skill 执行 · 自动验证 · 部署交付 · 复盘沉淀",
+    items: "需求澄清、计划拆分、Skill 执行、自动验证、部署交付、复盘沉淀",
   },
 ] as const;
 
@@ -191,11 +192,9 @@ const CERTIFICATE_CYCLE_COUNT = 3;
 
 function CertificateCard({
   certificate,
-  index,
   interactive = true,
 }: {
   certificate: Certificate;
-  index: number;
   interactive?: boolean;
 }) {
   const card = useRef<HTMLElement>(null);
@@ -265,7 +264,6 @@ function CertificateCard({
         </div>
       </div>
       <footer>
-        <span>{String(index + 1).padStart(2, "0")}</span>
         <div>
           <small>{certificate.meta}</small>
           <h3>{certificate.title}</h3>
@@ -374,7 +372,7 @@ function CertificateGallery({ onExit }: { onExit: () => void }) {
   return (
     <>
       <div className="certificate-controls slide-reveal">
-        <span>滚轮 / 拖动 · 循环浏览</span>
+        <span>滚轮或拖动，循环浏览</span>
         <button onClick={() => scrollGallery(-1)} aria-label="向左浏览证书">
           ←
         </button>
@@ -404,11 +402,10 @@ function CertificateGallery({ onExit }: { onExit: () => void }) {
       >
         <div className="certificate-track">
           {Array.from({ length: CERTIFICATE_CYCLE_COUNT }, (_, cycle) =>
-            certificates.map((certificate, index) => (
+            certificates.map((certificate) => (
               <CertificateCard
                 key={`${cycle}-${certificate.title}`}
                 certificate={certificate}
-                index={index}
                 interactive={cycle === 1}
               />
             )),
@@ -671,18 +668,24 @@ function Avatar({ accent }: AvatarProps) {
 useGLTF.preload("/models/chunxiang-avatar.glb");
 
 const openingWorks = [
-  { index: "01", title: "智能体工作流", meta: "工具调用 · SOP" },
-  { index: "02", title: "支付链路", meta: "高并发 · 状态机" },
-  { index: "03", title: "MobiCom 研究", meta: "临床知识蒸馏" },
-  { index: "04", title: "数字孪生", meta: "三维人体重建" },
-  { index: "05", title: "系统能力", meta: "全国一等奖" },
-  { index: "06", title: "人工智能原生", meta: "Codex · Agent" },
+  { title: "智能体工作流", meta: "工具调用 / SOP" },
+  { title: "支付链路", meta: "高并发 / 状态机" },
+  { title: "MobiCom 研究", meta: "临床知识蒸馏" },
+  { title: "数字孪生", meta: "三维人体重建" },
+  { title: "系统能力", meta: "全国一等奖" },
+  { title: "人工智能原生", meta: "Codex / Agent" },
 ] as const;
 
 function OpeningSequence({ onComplete }: { onComplete: () => void }) {
   const root = useRef<HTMLElement>(null);
-  const timeline = useRef<gsap.core.Timeline | null>(null);
+  const revealTimeline = useRef<gsap.core.Timeline | null>(null);
+  const idleTimeline = useRef<gsap.core.Timeline | null>(null);
+  const enterTimeline = useRef<gsap.core.Timeline | null>(null);
+  const enterHandler = useRef<() => void>(() => undefined);
+  const ready = useRef(false);
+  const entering = useRef(false);
   const completed = useRef(false);
+  const [sceneReady, setSceneReady] = useState(false);
 
   const finish = () => {
     if (completed.current) return;
@@ -691,10 +694,13 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
   };
 
   useGSAP(
-    () => {
+    (_context, contextSafe) => {
       const container = root.current;
       const television = container?.querySelector<HTMLElement>(".opening-tv");
-      if (!container || !television) return;
+      const world = container?.querySelector<HTMLElement>(".opening-world");
+      const works = container?.querySelector<HTMLElement>(".opening-works");
+      const grid = container?.querySelector<HTMLElement>(".opening-grid");
+      if (!container || !television || !world || !works || !grid) return;
 
       const reduced = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -706,16 +712,184 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
           window.innerHeight / Math.max(televisionBounds.height * 0.58, 1),
         ) * 1.28;
 
-      if (reduced) {
-        timeline.current = gsap
-          .timeline({ onComplete: finish })
+      const markReady = () => {
+        if (entering.current || completed.current) return;
+        ready.current = true;
+        setSceneReady(true);
+
+        idleTimeline.current?.kill();
+        idleTimeline.current = gsap
+          .timeline({ repeat: -1, yoyo: true })
+          .to(television, {
+            y: -10,
+            duration: 3.4,
+            ease: "sine.inOut",
+          })
+          .to(
+            ".opening-work:nth-child(odd)",
+            { y: "-=7", duration: 3.1, ease: "sine.inOut" },
+            0,
+          )
+          .to(
+            ".opening-work:nth-child(even)",
+            { y: "+=6", duration: 3.6, ease: "sine.inOut" },
+            0,
+          );
+      };
+
+      const playEnter = contextSafe(() => {
+        if (entering.current || completed.current) return;
+
+        if (!ready.current && revealTimeline.current) {
+          revealTimeline.current.progress(1);
+        }
+
+        entering.current = true;
+        ready.current = false;
+        setSceneReady(false);
+        revealTimeline.current?.kill();
+        idleTimeline.current?.kill();
+        gsap.killTweensOf([world, works, television, grid]);
+
+        enterTimeline.current?.kill();
+        enterTimeline.current = gsap.timeline({ onComplete: finish });
+
+        enterTimeline.current
+          .to(
+            ".opening-enter, .opening-caption, .opening-hud",
+            { autoAlpha: 0, duration: 0.32, ease: "power2.in" },
+            0,
+          )
+          .to(
+            ".opening-work",
+            {
+              autoAlpha: 0,
+              scale: 0.7,
+              z: -360,
+              duration: 0.65,
+              stagger: { amount: 0.22, from: "edges" },
+              ease: "power3.in",
+            },
+            0.08,
+          )
+          .to(
+            world,
+            {
+              rotationX: 0,
+              rotationY: 0,
+              x: 0,
+              y: 0,
+              duration: 0.52,
+              ease: "power3.inOut",
+            },
+            0,
+          )
+          .to(
+            television,
+            {
+              rotationX: 0,
+              rotationY: 0,
+              y: 0,
+              scale: 1.08,
+              duration: 0.58,
+              ease: "power3.inOut",
+            },
+            0.06,
+          )
+          .to(television, {
+            scale: coverScale,
+            z: 360,
+            duration: 1.22,
+            ease: "expo.in",
+          })
+          .to(
+            ".opening-screen-content",
+            { autoAlpha: 0, duration: 0.24, ease: "power2.in" },
+            "<+=0.58",
+          )
+          .to(
+            ".opening-flash",
+            { autoAlpha: 1, duration: 0.34, ease: "power2.in" },
+            "<+=0.1",
+          )
           .to(container, {
             autoAlpha: 0,
-            duration: 0.35,
-            delay: 0.25,
+            duration: 0.32,
             ease: "power1.out",
           });
-        return;
+      });
+
+      enterHandler.current = playEnter;
+
+      const rotateXTo = gsap.quickTo(world, "rotationX", {
+        duration: 0.72,
+        ease: "power3.out",
+      });
+      const rotateYTo = gsap.quickTo(world, "rotationY", {
+        duration: 0.72,
+        ease: "power3.out",
+      });
+      const worksXTo = gsap.quickTo(works, "x", {
+        duration: 0.82,
+        ease: "power3.out",
+      });
+      const worksYTo = gsap.quickTo(works, "y", {
+        duration: 0.82,
+        ease: "power3.out",
+      });
+      const gridXTo = gsap.quickTo(grid, "x", {
+        duration: 0.95,
+        ease: "power2.out",
+      });
+      const gridYTo = gsap.quickTo(grid, "y", {
+        duration: 0.95,
+        ease: "power2.out",
+      });
+
+      const resetView = () => {
+        if (entering.current) return;
+        rotateXTo(0);
+        rotateYTo(0);
+        worksXTo(0);
+        worksYTo(0);
+        gridXTo(0);
+        gridYTo(0);
+      };
+
+      const rotateView = (event: PointerEvent) => {
+        if (entering.current) return;
+        const x = Math.max(-1, Math.min(1, event.clientX / window.innerWidth * 2 - 1));
+        const y = Math.max(-1, Math.min(1, event.clientY / window.innerHeight * 2 - 1));
+        rotateXTo(-y * 7.5);
+        rotateYTo(x * 11);
+        worksXTo(x * -20);
+        worksYTo(y * -13);
+        gridXTo(x * 10);
+        gridYTo(y * 7);
+      };
+
+      container.addEventListener("pointermove", rotateView);
+      container.addEventListener("pointerleave", resetView);
+
+      if (reduced) {
+        gsap.set(
+          ".opening-work, .opening-tv, .opening-brand, .opening-status, .opening-enter",
+          { autoAlpha: 1 },
+        );
+        gsap.set(".opening-tv", {
+          scale: 1,
+          z: 0,
+          rotationX: 0,
+          rotationY: 0,
+        });
+        markReady();
+        return () => {
+          container.removeEventListener("pointermove", rotateView);
+          container.removeEventListener("pointerleave", resetView);
+          idleTimeline.current?.kill();
+          enterTimeline.current?.kill();
+          enterHandler.current = () => undefined;
+        };
       }
 
       gsap.set(".opening-work", { autoAlpha: 0, scale: 0.72, z: -420 });
@@ -727,12 +901,13 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
         rotationY: -28,
       });
       gsap.set(".opening-brand, .opening-status", { autoAlpha: 0, y: 12 });
+      gsap.set(".opening-enter", { autoAlpha: 0, y: 14 });
       gsap.set(".opening-flash", { autoAlpha: 0 });
 
-      timeline.current = gsap
+      revealTimeline.current = gsap
         .timeline({
           defaults: { ease: "power3.out" },
-          onComplete: finish,
+          onComplete: markReady,
         })
         .addLabel("boot", 0)
         .to(
@@ -753,7 +928,7 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
             z: 0,
             rotationX: 4,
             rotationY: 13,
-            duration: 1.25,
+            duration: 1.6,
             ease: "power4.out",
           },
           "boot+=0.22",
@@ -764,116 +939,115 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
             autoAlpha: 1,
             scale: 1,
             z: 0,
-            duration: 0.95,
-            stagger: { amount: 0.46, from: "random" },
+            duration: 1.15,
+            stagger: { amount: 0.62, from: "random" },
             ease: "back.out(1.35)",
           },
           "boot+=0.52",
         )
-        .addLabel("orbit", 1.5)
+        .addLabel("orbit-a", 2.05)
         .to(
           ".opening-tv",
           {
             rotationX: -2,
             rotationY: -9,
             y: -10,
-            duration: 1.35,
+            duration: 1.9,
             ease: "sine.inOut",
           },
-          "orbit",
+          "orbit-a",
         )
         .to(
           ".opening-work:nth-child(odd)",
           {
             y: "-=12",
             rotationZ: "+=1.5",
-            duration: 1.25,
+            duration: 1.9,
             ease: "sine.inOut",
           },
-          "orbit",
+          "orbit-a",
         )
         .to(
           ".opening-work:nth-child(even)",
           {
             y: "+=10",
             rotationZ: "-=1.5",
-            duration: 1.25,
+            duration: 1.9,
             ease: "sine.inOut",
           },
-          "orbit",
+          "orbit-a",
         )
-        .addLabel("focus", 3.05)
+        .addLabel("orbit-b", 4.18)
         .to(
-          ".opening-hud",
-          { autoAlpha: 0, duration: 0.35, ease: "power2.in" },
-          "focus",
-        )
-        .to(
-          ".opening-work",
+          ".opening-tv",
           {
-            autoAlpha: 0,
-            scale: 0.68,
-            z: -360,
-            duration: 0.62,
-            stagger: { amount: 0.2, from: "edges" },
-            ease: "power3.in",
+            rotationX: 3,
+            rotationY: 8,
+            y: 6,
+            duration: 2.05,
+            ease: "sine.inOut",
           },
-          "focus",
+          "orbit-b",
         )
+        .to(
+          ".opening-work:nth-child(odd)",
+          {
+            x: "+=9",
+            duration: 2,
+            ease: "sine.inOut",
+          },
+          "orbit-b",
+        )
+        .to(
+          ".opening-work:nth-child(even)",
+          {
+            x: "-=8",
+            duration: 2,
+            ease: "sine.inOut",
+          },
+          "orbit-b",
+        )
+        .addLabel("settle", 6.38)
         .to(
           ".opening-tv",
           {
             rotationX: 0,
             rotationY: 0,
             y: 0,
-            scale: 1.1,
-            duration: 0.62,
+            duration: 1.32,
             ease: "power3.inOut",
           },
-          "focus+=0.08",
-        )
-        .addLabel("enter", 3.72)
-        .to(
-          ".opening-tv",
-          {
-            scale: coverScale,
-            z: 360,
-            duration: 1.08,
-            ease: "expo.in",
-          },
-          "enter",
+          "settle",
         )
         .to(
-          ".opening-screen-content",
-          { autoAlpha: 0, duration: 0.24, ease: "power2.in" },
-          "enter+=0.56",
+          ".opening-enter",
+          { autoAlpha: 1, y: 0, duration: 0.62, ease: "power3.out" },
+          "settle+=0.58",
         )
         .to(
-          ".opening-flash",
-          { autoAlpha: 1, duration: 0.32, ease: "power2.in" },
-          "enter+=0.68",
-        )
-        .to(
-          container,
-          { autoAlpha: 0, duration: 0.28, ease: "power1.out" },
-          "enter+=1.02",
+          ".opening-status",
+          { color: "#8fffd1", duration: 0.42, ease: "power1.out" },
+          "settle+=0.82",
         );
+
+      return () => {
+        container.removeEventListener("pointermove", rotateView);
+        container.removeEventListener("pointerleave", resetView);
+        revealTimeline.current?.kill();
+        idleTimeline.current?.kill();
+        enterTimeline.current?.kill();
+        enterHandler.current = () => undefined;
+      };
     },
     { scope: root },
   );
 
-  const skipOpening = () => {
-    if (timeline.current) {
-      timeline.current.progress(1);
-    } else {
-      finish();
-    }
-  };
+  const enterHomepage = () => enterHandler.current();
 
   return (
     <section
       ref={root}
-      className="opening-sequence"
+      className={`opening-sequence${sceneReady ? " is-ready" : ""}`}
       role="dialog"
       aria-modal="true"
       aria-label="个人作品集三维开场"
@@ -891,82 +1065,94 @@ function OpeningSequence({ onComplete }: { onComplete: () => void }) {
           <i />
           <span>空间档案已连接</span>
         </div>
-        <button type="button" onClick={skipOpening} autoFocus>
-          跳过序章
-        </button>
       </div>
 
-      <div className="opening-stage" aria-hidden="true">
-        <div className="opening-works">
-          {openingWorks.map((work, index) => (
-            <article
-              className={`opening-work opening-work-${index + 1}`}
-              key={work.title}
-            >
-              <span>{work.index}</span>
-              <strong>{work.title}</strong>
-              <small>{work.meta}</small>
-            </article>
-          ))}
-        </div>
+      <div className="opening-stage">
+        <div className="opening-world">
+          <div className="opening-works" aria-hidden="true">
+            {openingWorks.map((work, index) => (
+              <article
+                className={`opening-work opening-work-${index + 1}`}
+                key={work.title}
+              >
+                <strong>{work.title}</strong>
+                <small>{work.meta}</small>
+              </article>
+            ))}
+          </div>
 
-        <div className="opening-tv">
-          <div className="opening-tv-depth" />
-          <div className="opening-tv-body">
-            <div className="opening-tv-bezel">
-              <div className="opening-tv-screen">
-                <div className="opening-screen-content">
-                  <svg
-                    className="opening-web"
-                    viewBox="0 0 420 250"
-                    focusable="false"
-                  >
-                    <path d="M210 125 14 18M210 125 406 18M210 125 410 228M210 125 8 226M210 125V0M210 125v125M210 125H0M210 125h210" />
-                    <ellipse cx="210" cy="125" rx="62" ry="38" />
-                    <ellipse cx="210" cy="125" rx="118" ry="76" />
-                    <ellipse cx="210" cy="125" rx="176" ry="112" />
-                  </svg>
-                  <div className="opening-city" />
-                  <div className="opening-hero">
-                    <i className="opening-hero-head" />
-                    <i className="opening-hero-body" />
-                    <i className="opening-hero-arm" />
-                    <i className="opening-hero-line" />
+          <button
+            type="button"
+            className="opening-tv"
+            onPointerDown={enterHomepage}
+            onClick={enterHomepage}
+            aria-label="点击电视进入主页"
+          >
+            <div className="opening-tv-depth" />
+            <div className="opening-tv-body">
+              <div className="opening-tv-bezel">
+                <div className="opening-tv-screen">
+                  <div className="opening-screen-content">
+                    <svg
+                      className="opening-web"
+                      viewBox="0 0 420 250"
+                      focusable="false"
+                    >
+                      <path d="M210 125 14 18M210 125 406 18M210 125 410 228M210 125 8 226M210 125V0M210 125v125M210 125H0M210 125h210" />
+                      <ellipse cx="210" cy="125" rx="62" ry="38" />
+                      <ellipse cx="210" cy="125" rx="118" ry="76" />
+                      <ellipse cx="210" cy="125" rx="176" ry="112" />
+                    </svg>
+                    <div className="opening-city" />
+                    <div className="opening-hero">
+                      <i className="opening-hero-head" />
+                      <i className="opening-hero-body" />
+                      <i className="opening-hero-arm" />
+                      <i className="opening-hero-line" />
+                    </div>
+                    <div className="opening-broadcast">
+                      <span>原创影像</span>
+                      <strong>蛛网英雄 // 2099</strong>
+                    </div>
+                    <div className="opening-scanlines" />
                   </div>
-                  <div className="opening-broadcast">
-                    <span>原创影像</span>
-                    <strong>蛛网英雄 // 2099</strong>
-                  </div>
-                  <div className="opening-scanlines" />
+                  <div className="opening-flash" />
                 </div>
-                <div className="opening-flash" />
+              </div>
+              <div className="opening-tv-controls">
+                <span className="opening-dial opening-dial-a" />
+                <span className="opening-dial opening-dial-b" />
+                <i />
+                <i />
+                <i />
+                <small>信号<br />接收</small>
               </div>
             </div>
-            <div className="opening-tv-controls">
-              <span className="opening-dial opening-dial-a" />
-              <span className="opening-dial opening-dial-b" />
+            <div className="opening-tv-feet">
               <i />
               <i />
-              <i />
-              <small>信号<br />接收</small>
             </div>
-          </div>
-          <div className="opening-tv-feet">
-            <i />
-            <i />
-          </div>
+          </button>
         </div>
+      </div>
+
+      <div
+        className="opening-enter"
+        aria-hidden="true"
+      >
+        <span>{sceneReady ? "移动光标 · 旋转视角" : "正在构建三维空间"}</span>
+        <strong>{sceneReady ? "点击电视进入主页" : "请稍候"}</strong>
       </div>
 
       <div className="opening-caption">
         <span>三维作品空间</span>
-        <strong>将视线交给屏幕</strong>
+        <strong>{sceneReady ? "场景已就绪，等待你的选择" : "将视线交给屏幕"}</strong>
       </div>
     </section>
   );
 }
 
-export default function Home() {
+function LegacyHome() {
   const [showOpening, setShowOpening] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
   const shellRef = useRef<HTMLElement>(null);
@@ -1162,7 +1348,7 @@ export default function Home() {
     setShowOpening(false);
     requestAnimationFrame(() => shellRef.current?.focus());
   };
-  const useLightChrome = activeSlide === 1 || activeSlide >= 6;
+  const useLightChrome = false;
 
   return (
     <main
@@ -1204,7 +1390,7 @@ export default function Home() {
         >
           椿襄<span>°</span>
         </button>
-        <div className="global-role">高级软件开发工程师 · 人工智能与分布式系统</div>
+        <div className="global-role">高级软件开发工程师｜人工智能与分布式系统</div>
         <div className="global-count" aria-live="polite">
           {String(activeSlide + 1).padStart(2, "0")}
           <span>/</span>
@@ -1225,7 +1411,7 @@ export default function Home() {
           工程师
         </div>
         <div className="hero-intro slide-reveal">
-          <span>椿襄 / 高级软件开发工程师 · 人工智能原生工程</span>
+          <span>椿襄，高级软件开发工程师</span>
           <h1>
             让复杂系统
             <br />
@@ -1257,11 +1443,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-foot slide-reveal">
-          <span>人工智能协同研发</span>
-          <span>智能体与工具调用</span>
-          <span>后端全栈闭环</span>
-        </div>
       </section>
 
       <section
@@ -1272,7 +1453,6 @@ export default function Home() {
         aria-hidden={activeSlide !== 1}
       >
         <div className="manifesto-orb" aria-hidden="true" />
-        <div className="scene-kicker slide-reveal">02 / 工程实践</div>
         <h2 className="manifesto-title slide-reveal">
           从代码实现。
           <br />
@@ -1280,21 +1460,18 @@ export default function Home() {
         </h2>
         <p className="manifesto-copy slide-reveal">
           以 Codex、Claude Code 和 Skill 技能把需求理解、任务计划、代码验证与部署复盘串成
-          SOP，让智能体参与排障、重构、单元测试与 API 文档，个人项目周期缩短 40% 以上。
+          SOP，让智能体参与排障、重构、单元测试与 API 文档，显著缩短个人项目交付周期。
         </p>
         <div className="manifesto-principles slide-reveal">
           <span>
-            <b>01</b>
             <strong>闭环</strong>
             从想法到部署
           </span>
           <span>
-            <b>02</b>
             <strong>排障</strong>
             从日志到根因
           </span>
           <span>
-            <b>03</b>
             <strong>效率</strong>
             人机协同交付
           </span>
@@ -1308,7 +1485,6 @@ export default function Home() {
         className="resume-slide technology-slide"
         aria-hidden={activeSlide !== 2}
       >
-        <div className="scene-kicker slide-reveal">03 / 人工智能原生体系</div>
         <h2 className="technology-title slide-reveal">
           人工智能原生的
           <br />
@@ -1335,7 +1511,6 @@ export default function Home() {
         className="resume-slide concurrency-slide"
         aria-hidden={activeSlide !== 3}
       >
-        <div className="scene-kicker slide-reveal">04 / 国家级项目</div>
         <div className="case-number slide-reveal">2年+</div>
         <div className="case-copy slide-reveal">
           <span>中帆协官网开发及维护</span>
@@ -1360,7 +1535,7 @@ export default function Home() {
           </span>
         </div>
         <div className="case-stack slide-reveal">
-          ThinkPHP · Vue 3 · Spring Boot · 支付宝 / 微信支付 · CI/CD
+          ThinkPHP、Vue 3、Spring Boot、支付宝 / 微信支付、CI/CD
         </div>
       </section>
 
@@ -1371,7 +1546,6 @@ export default function Home() {
         className="resume-slide intelligence-slide"
         aria-hidden={activeSlide !== 4}
       >
-        <div className="scene-kicker slide-reveal">05 / 人工智能科研</div>
         <div className="intelligence-copy slide-reveal">
           <span>生命科学推理增强型 Agent</span>
           <h2>
@@ -1395,7 +1569,7 @@ export default function Home() {
           <i className="ai-node node-four">生命科学</i>
         </div>
         <div className="intelligence-stack slide-reveal">
-          Verl · Tool Agent Loop · Python Markdown · SFT · GRPO · Docker 安全沙箱
+          Verl、Tool Agent Loop、Python Markdown、SFT、GRPO、Docker 安全沙箱
         </div>
       </section>
 
@@ -1406,7 +1580,6 @@ export default function Home() {
         className="resume-slide delivery-slide"
         aria-hidden={activeSlide !== 5}
       >
-        <div className="scene-kicker slide-reveal">06 / SOP 工作流</div>
         <h2 className="delivery-title slide-reveal">
           把一次成功，
           <br />
@@ -1415,7 +1588,6 @@ export default function Home() {
         <div className="delivery-track slide-reveal">
           {deliverySteps.map((step) => (
             <div key={step.index}>
-              <span>{step.index}</span>
               <h3>{step.title}</h3>
               <p>{step.text}</p>
             </div>
@@ -1430,7 +1602,6 @@ export default function Home() {
         className="resume-slide certificate-slide"
         aria-hidden={activeSlide !== 6}
       >
-        <div className="scene-kicker slide-reveal">07 / 证书画廊</div>
         <div className="certificate-heading slide-reveal">
           <h2>
             求索有迹，
@@ -1451,25 +1622,24 @@ export default function Home() {
         className="resume-slide final-slide"
         aria-hidden={activeSlide !== 7}
       >
-        <div className="scene-kicker slide-reveal">08 / 工作与成果</div>
         <h2 className="final-title slide-reveal">
           用真实成果
           <br />
           <em>证明能力。</em>
         </h2>
         <p className="final-copy slide-reveal">
-          武汉大学软件工程毕业 · 后端工程与人工智能原生研发
+          武汉大学软件工程毕业，专注后端工程与人工智能原生研发
           <br />
           拥有后端实习、国家级项目负责人、智能体构建和人工智能科研经历。
         </p>
         <div className="final-contact slide-reveal">
           <span>
             <b>实践经历</b>
-            泰康科技后端实习 · 中帆协国家级项目
+            泰康科技后端实习，中帆协国家级项目
           </span>
           <span>
             <b>代表荣誉</b>
-            小米杯全国一等奖（队长）· 中级软件设计师
+            小米杯全国一等奖（队长），中级软件设计师
           </span>
           <span>
             <b>联系邮箱</b>
@@ -1477,7 +1647,7 @@ export default function Home() {
           </span>
         </div>
         <div className="final-signature slide-reveal">
-          椿襄 · 高级软件开发工程师 · 人工智能原生工程
+          椿襄，高级软件开发工程师，人工智能原生工程
         </div>
       </section>
 
@@ -1512,6 +1682,603 @@ export default function Home() {
         </button>
       </div>
       {showOpening ? <OpeningSequence onComplete={finishOpening} /> : null}
+    </main>
+  );
+}
+
+const featuredProjects = [
+  {
+    title: "中帆协官网与支付链路",
+    summary:
+      "持续迭代中国帆船帆板运动协会官网，接入支付宝与微信支付，以锁机制、状态机和熔断策略守住关键交易链路。",
+    image: "/projects/chinasailing-site.webp",
+    imageAlt: "中国帆船帆板运动协会官网首页、帆船赛事航拍与通知公告页面",
+    stack: "ThinkPHP / Vue 3 / Spring Boot / MySQL / 支付系统",
+    proof: "真实生产系统，覆盖研发、维护、排障与持续交付",
+  },
+  {
+    title: "生命科学推理智能体",
+    summary:
+      "基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。",
+    image: "/projects/life-science-agent.webp",
+    imageAlt: "生命科学工具调用链与安全执行模块组成的智能体工程视觉",
+    stack: "Verl / Agent Loop / Python / SFT / GRPO / Docker",
+    proof: "从模型训练延伸到工具协议、沙箱执行和推理评估",
+  },
+  {
+    title: "数字孪生三维重建",
+    summary:
+      "围绕三维人体重建完成虚实融合系统，负责技术路线、团队协作与交付推进，以工程实现验证复杂空间计算方案。",
+    image: "/certificates/design-digital-twin-first.webp",
+    imageAlt: "数字孪生三维人体重建项目一等奖证书",
+    stack: "三维重建 / 数字孪生 / 人工智能 / 系统集成",
+    proof: "计算机设计大赛中南地区赛一等奖",
+  },
+] as const;
+
+const capabilityGroups = [
+  {
+    title: "人工智能原生研发",
+    lead: "让模型真正进入工程链路",
+    items: [
+      "Codex 与 Claude Code 协同开发",
+      "LangChain 与 Llama 应用编排",
+      "Skill、MCP 与上下文工程",
+      "工具调用、记忆与安全沙箱",
+    ],
+  },
+  {
+    title: "后端与高并发",
+    lead: "让关键链路在压力下保持确定",
+    items: [
+      "Java、Python、C++ 与 ThinkPHP",
+      "Spring Boot 服务与熔断降级",
+      "锁机制、状态机与幂等设计",
+      "MySQL 索引与慢查询治理",
+    ],
+  },
+  {
+    title: "智能体与模型训练",
+    lead: "把推理能力包装为可执行系统",
+    items: [
+      "Agent Loop 与多工具路由",
+      "Verl、SFT 与 GRPO 联合训练",
+      "提示工程与垂直知识组织",
+      "自动评测与异常回退策略",
+    ],
+  },
+  {
+    title: "交付与工程效能",
+    lead: "把一次成功沉淀为长期能力",
+    items: [
+      "需求澄清与任务边界定义",
+      "单元测试、代码审查与链路复核",
+      "Docker、Linux、CI/CD 与部署",
+      "复盘、Skill 沉淀与 SOP 复用",
+    ],
+  },
+] as const;
+
+const workingMethod = [
+  {
+    title: "定义问题",
+    text: "先核对目标、现状和验收条件，再决定技术路线与风险边界。",
+  },
+  {
+    title: "编排智能体",
+    text: "让 Codex、Claude Code 与专用 Skill 分担代码理解、实现、测试和审查。",
+  },
+  {
+    title: "验证交付",
+    text: "以自动化测试、日志证据、页面验收和回滚预案形成可追溯闭环。",
+  },
+] as const;
+
+const workProof = [
+  ["复杂系统拆解", "把模糊需求转成可执行计划，并为关键决策保留证据。"],
+  ["独立闭环交付", "覆盖需求、研发、测试、部署与复盘，不把上线留给下一环。"],
+  ["复杂问题排障", "从日志、数据与链路行为收敛根因，优先恢复业务确定性。"],
+  ["团队技术推进", "以全国一等奖队长经历验证分工、决策与节点推进能力。"],
+  ["持续学习迁移", "把研究、竞赛与人工智能工具经验快速迁移到真实工程。"],
+] as const;
+
+function SpiderCharm() {
+  const root = useRef<HTMLDivElement>(null);
+  const thread = useRef<HTMLSpanElement>(null);
+  const handle = useRef<HTMLButtonElement>(null);
+
+  useGSAP(
+    (_context, contextSafe) => {
+      const container = root.current;
+      const threadElement = thread.current;
+      const handleElement = handle.current;
+      if (!container || !threadElement || !handleElement) return;
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const threshold = 132;
+      const maximumPull = 190;
+      const threadHeight = Math.max(threadElement.getBoundingClientRect().height, 1);
+      let pointerId = -1;
+      let startY = 0;
+      let pull = 0;
+      let dragging = false;
+
+      const returnToRest = contextSafe((triggered: boolean) => {
+        dragging = false;
+        container.classList.remove("is-dragging", "is-armed");
+
+        if (triggered) {
+          container.classList.add("is-triggered");
+          window.scrollTo({ top: 0, left: 0, behavior: reduced ? "auto" : "smooth" });
+        }
+
+        gsap.timeline({
+          onComplete: () => container.classList.remove("is-triggered"),
+        })
+          .to(
+            handleElement,
+            {
+              y: triggered ? pull + 18 : pull,
+              scale: triggered ? 0.92 : 1.02,
+              duration: triggered && !reduced ? 0.14 : 0,
+              ease: "power2.in",
+            },
+            0,
+          )
+          .to(
+            handleElement,
+            {
+              y: 0,
+              rotation: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.72,
+              ease: triggered ? "elastic.out(1, 0.52)" : "back.out(1.8)",
+            },
+            triggered && !reduced ? 0.12 : 0,
+          );
+
+        gsap.to(threadElement, {
+          scaleY: 1,
+          duration: reduced ? 0 : 0.68,
+          ease: triggered ? "elastic.out(1, 0.52)" : "back.out(1.8)",
+          overwrite: "auto",
+        });
+        gsap.to(container, {
+          "--pull-progress": 0,
+          duration: reduced ? 0 : 0.42,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+        pull = 0;
+      });
+
+      const handlePointerDown = contextSafe((event: PointerEvent) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        pointerId = event.pointerId;
+        startY = event.clientY;
+        pull = 0;
+        dragging = true;
+        handleElement.setPointerCapture(pointerId);
+        container.classList.add("is-dragging", "is-hovered");
+        gsap.killTweensOf([handleElement, threadElement, container]);
+        gsap.to(handleElement, {
+          scale: 1.06,
+          duration: reduced ? 0 : 0.18,
+          ease: "power2.out",
+        });
+      });
+
+      const handlePointerMove = contextSafe((event: PointerEvent) => {
+        if (!dragging || event.pointerId !== pointerId) return;
+        event.preventDefault();
+        pull = Math.max(0, Math.min(maximumPull, event.clientY - startY));
+        const armed = pull >= threshold;
+
+        gsap.set(handleElement, {
+          y: pull,
+          rotation: Math.min(5, pull * 0.026),
+          scale: armed ? 1.09 : 1.06,
+        });
+        gsap.set(threadElement, { scaleY: 1 + pull / threadHeight });
+        gsap.set(container, { "--pull-progress": Math.min(1, pull / threshold) });
+        container.classList.toggle("is-armed", armed);
+      });
+
+      const handlePointerUp = contextSafe((event: PointerEvent) => {
+        if (!dragging || event.pointerId !== pointerId) return;
+        if (handleElement.hasPointerCapture(pointerId)) {
+          handleElement.releasePointerCapture(pointerId);
+        }
+        returnToRest(pull >= threshold);
+      });
+
+      const handlePointerEnter = contextSafe(() => {
+        container.classList.add("is-hovered");
+        if (!dragging) {
+          gsap.to(handleElement, {
+            scale: 1.07,
+            duration: reduced ? 0 : 0.28,
+            ease: "power3.out",
+            overwrite: "auto",
+          });
+        }
+      });
+
+      const handlePointerLeave = contextSafe(() => {
+        if (dragging) return;
+        container.classList.remove("is-hovered");
+        gsap.to(handleElement, {
+          scale: 1,
+          duration: reduced ? 0 : 0.35,
+          ease: "power3.out",
+          overwrite: "auto",
+        });
+      });
+
+      const handleKeyDown = contextSafe((event: KeyboardEvent) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        pull = threshold;
+        returnToRest(true);
+      });
+
+      const preventImageDrag = (event: DragEvent) => event.preventDefault();
+
+      handleElement.addEventListener("pointerdown", handlePointerDown);
+      handleElement.addEventListener("pointermove", handlePointerMove);
+      handleElement.addEventListener("pointerup", handlePointerUp);
+      handleElement.addEventListener("pointercancel", handlePointerUp);
+      handleElement.addEventListener("pointerenter", handlePointerEnter);
+      handleElement.addEventListener("pointerleave", handlePointerLeave);
+      handleElement.addEventListener("keydown", handleKeyDown);
+      handleElement.addEventListener("dragstart", preventImageDrag);
+
+      return () => {
+        handleElement.removeEventListener("pointerdown", handlePointerDown);
+        handleElement.removeEventListener("pointermove", handlePointerMove);
+        handleElement.removeEventListener("pointerup", handlePointerUp);
+        handleElement.removeEventListener("pointercancel", handlePointerUp);
+        handleElement.removeEventListener("pointerenter", handlePointerEnter);
+        handleElement.removeEventListener("pointerleave", handlePointerLeave);
+        handleElement.removeEventListener("keydown", handleKeyDown);
+        handleElement.removeEventListener("dragstart", preventImageDrag);
+      };
+    },
+    { scope: root },
+  );
+
+  return (
+    <div ref={root} className="spider-charm">
+      <span ref={thread} className="spider-thread" aria-hidden="true" />
+      <button
+        ref={handle}
+        type="button"
+        className="spider-charm-handle"
+        aria-label="向下拉动蜘蛛侠挂件，拉过阈值后松开返回页面顶部"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- 本地透明挂件素材需要保留原始透明边缘。 */}
+        <img src="/objects/spider-charm.png" alt="" draggable="false" />
+      </button>
+      <span className="spider-tooltip" aria-hidden="true">
+        <small>蛛丝导航</small>
+        <strong className="spider-idle-copy">向下拉动 · 回到顶部</strong>
+        <strong className="spider-armed-copy">松开 · 返回顶部</strong>
+        <span className="spider-pull-meter"><i /></span>
+      </span>
+    </div>
+  );
+}
+
+export default function Home() {
+  const [showOpening, setShowOpening] = useState(true);
+  const root = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
+  useGSAP(
+    () => {
+      const media = gsap.matchMedia();
+
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.from(".flora-nav", {
+          autoAlpha: 0,
+          y: -20,
+          duration: 0.7,
+          ease: "power3.out",
+        });
+
+        gsap.from(".flora-hero-copy > *", {
+          autoAlpha: 0,
+          y: 52,
+          duration: 0.9,
+          stagger: 0.09,
+          ease: "power4.out",
+          delay: 0.12,
+        });
+
+        gsap.from(".flora-avatar-frame", {
+          autoAlpha: 0,
+          scale: 0.76,
+          y: 80,
+          duration: 1.25,
+          ease: "power4.out",
+          delay: 0.08,
+        });
+
+        gsap.to(".flora-avatar-frame", {
+          yPercent: 13,
+          scale: 0.92,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".flora-hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+
+        gsap.to(".flora-hero-name", {
+          xPercent: -8,
+          autoAlpha: 0.16,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".flora-hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+
+        gsap.utils.toArray<HTMLElement>(".flora-reveal").forEach((element) => {
+          gsap.from(element, {
+            autoAlpha: 0,
+            y: 60,
+            duration: 0.88,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: element,
+              start: "top 84%",
+              once: true,
+            },
+          });
+        });
+
+        gsap.utils
+          .toArray<HTMLElement>(".flora-project:not(:first-child) .flora-project-visual img")
+          .forEach((image) => {
+            gsap.fromTo(
+              image,
+              { scale: 1.08, yPercent: -4 },
+              {
+                scale: 1,
+                yPercent: 5,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: image.closest(".flora-project"),
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 1,
+                },
+              },
+            );
+          });
+      });
+
+      return () => media.revert();
+    },
+    { scope: root },
+  );
+
+  const closeOpening = () => {
+    setShowOpening(false);
+    requestAnimationFrame(() => root.current?.focus());
+  };
+
+  const goToContact = () => {
+    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <main
+      ref={root}
+      className="flora-resume"
+      aria-label="椿襄高级软件开发工程师个人简历"
+      tabIndex={-1}
+    >
+      <div className="flora-background-object" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element -- 本地生成的抽象工程物件用于全站背景景深。 */}
+        <img src="/projects/payment-flow.webp" alt="" fetchPriority="low" />
+      </div>
+
+      <SpiderCharm />
+
+      <header className="flora-nav">
+        <a className="flora-wordmark" href="#home" aria-label="返回首页">
+          椿襄
+        </a>
+        <nav aria-label="简历导航">
+          <a href="#work">代表项目</a>
+          <a href="#method">工作方法</a>
+          <a href="#skills">技术能力</a>
+          <a href="#archive">成果档案</a>
+        </nav>
+        <a className="flora-contact-link" href="mailto:mshuwhu@whu.edu.cn">
+          联系我
+        </a>
+      </header>
+
+      <section className="flora-hero" id="home">
+        <div className="flora-hero-name" aria-hidden="true">
+          椿襄
+        </div>
+        <div className="flora-bloom" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+
+        <div className="flora-hero-copy">
+          <span>高级软件开发工程师，人工智能原生研发</span>
+          <h1>
+            构建智能系统。
+            <br />
+            交付可靠结果。
+          </h1>
+          <p>
+            用后端工程、智能体与可复用 SOP 工作流，把复杂问题变成可验证的产品与生产能力。
+          </p>
+        </div>
+
+        <div className="flora-avatar-frame" aria-label="眼神跟随光标的三维人物">
+          <Canvas
+            camera={{ position: [0, 0.08, 7.6], fov: 34 }}
+            dpr={[1, 1.6]}
+            gl={{ antialias: true, alpha: true }}
+          >
+            <Suspense fallback={null}>
+              <Avatar accent="#b7c39a" />
+            </Suspense>
+          </Canvas>
+        </div>
+
+        <div className="flora-traits" aria-label="能力标签">
+          {traits.slice(0, 6).map((trait) => (
+            <TraitTag key={trait.label} trait={trait} />
+          ))}
+        </div>
+
+        <aside className="flora-hero-note">
+          <strong>工程价值</strong>
+          <span>稳定架构</span>
+          <span>智能协作</span>
+          <span>闭环交付</span>
+        </aside>
+      </section>
+
+      <section className="flora-projects" id="work">
+        <header className="flora-section-heading flora-reveal">
+          <h2>把能力放进真实项目。</h2>
+          <p>选取生产系统、推理智能体与三维重建，呈现从业务交付到前沿研究的完整跨度。</p>
+        </header>
+
+        <div className="flora-project-list">
+          {featuredProjects.map((project, index) => (
+            <article className="flora-project flora-reveal" key={project.title}>
+              <div className="flora-project-visual">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 本地成果图片用于滚动视差，保留原生图像节点。 */}
+                <img src={project.image} alt={project.imageAlt} loading="lazy" />
+              </div>
+              <div className="flora-project-copy">
+                <small>{index === 0 ? "生产工程" : index === 1 ? "人工智能研究" : "空间计算"}</small>
+                <h3>{project.title}</h3>
+                <p>{project.summary}</p>
+                <dl>
+                  <div>
+                    <dt>技术路径</dt>
+                    <dd>{project.stack}</dd>
+                  </div>
+                  <div>
+                    <dt>能力证明</dt>
+                    <dd>{project.proof}</dd>
+                  </div>
+                </dl>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="flora-method" id="method">
+        <div className="flora-method-image flora-reveal">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 本地研究成果图用于方法论章节主视觉。 */}
+          <img
+            src="/certificates/patent-acceptance.webp"
+            alt="国家知识产权局发明专利申请受理成果"
+            loading="lazy"
+          />
+        </div>
+        <div className="flora-method-copy">
+          <div className="flora-reveal">
+            <h2>人工智能不是外挂，而是工作系统。</h2>
+            <p>
+              我把需求理解、任务计划、工具调用、代码验证与交付复盘串成 SOP，显著缩短个人项目交付周期。
+            </p>
+          </div>
+          <ol>
+            {workingMethod.map((step) => (
+              <li className="flora-reveal" key={step.title}>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="flora-capabilities" id="skills">
+        <header className="flora-section-heading flora-reveal">
+          <h2>一套能进入生产环境的技术栈。</h2>
+          <p>不把工具名当装饰，每一组能力都对应设计、实现、验证和维护中的实际职责。</p>
+        </header>
+        <div className="flora-capability-grid">
+          {capabilityGroups.map((group) => (
+            <article className="flora-capability flora-reveal" key={group.title}>
+              <h3>{group.title}</h3>
+              <p>{group.lead}</p>
+              <ul>
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="flora-proof">
+        <div className="flora-proof-statement flora-reveal">
+          <h2>高级工程能力，最终要落在判断与结果上。</h2>
+          <p>
+            从泰康科技后端实习、中帆协国家级项目负责人和竞赛队长，到智能体构建与人工智能科研，我关注同一件事：如何把不确定的问题稳定交付。
+          </p>
+        </div>
+        <div className="flora-proof-list">
+          {workProof.map(([title, text]) => (
+            <article className="flora-reveal" key={title}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="flora-archive" id="archive">
+        <header className="flora-section-heading flora-reveal">
+          <h2>成长留下证据。</h2>
+          <p>研究、专利、竞赛与工程成果，在同一条能力演进线上持续积累。</p>
+        </header>
+        <CertificateGallery onExit={goToContact} />
+      </section>
+
+      <section className="flora-closing" id="contact">
+        <div className="flora-closing-mark" aria-hidden="true">
+          椿襄
+        </div>
+        <div className="flora-closing-copy flora-reveal">
+          <h2>下一段复杂系统，一起做好。</h2>
+          <p>武汉大学软件工程背景，专注后端、人工智能原生研发与可靠交付。</p>
+          <a href="mailto:mshuwhu@whu.edu.cn">mshuwhu@whu.edu.cn</a>
+        </div>
+        <footer>
+          <span>高级软件开发工程师</span>
+          <span>人工智能与分布式系统</span>
+        </footer>
+      </section>
+
+      {showOpening ? <OpeningSequence onComplete={closeOpening} /> : null}
     </main>
   );
 }
