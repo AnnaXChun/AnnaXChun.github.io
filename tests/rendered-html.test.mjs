@@ -57,6 +57,8 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /EXPLAIN/);
   assert.match(html, /联合索引与关联查询重构/);
   assert.match(html, /功能测试、回归测试、部署和问题跟踪/);
+  assert.match(html, /\/projects\/taikang-code-review\.webp/);
+  assert.match(html, /\/projects\/verl-architecture\.webp/);
   assert.match(html, /锁机制、状态机和熔断策略/);
   assert.match(html, /ThinkPHP/);
   assert.match(html, /MySQL/);
@@ -151,6 +153,8 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   );
   await access(new URL("public/models/chunxiang-avatar.glb", templateRoot));
   await access(new URL("public/portrait/chunxiang-professional.webp", templateRoot));
+  await access(new URL("public/projects/taikang-code-review.webp", templateRoot));
+  await access(new URL("public/projects/verl-architecture.webp", templateRoot));
   await Promise.all(
     [
       "mobicom-paper.webp",

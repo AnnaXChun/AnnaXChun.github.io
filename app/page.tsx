@@ -1740,8 +1740,9 @@ const featuredProjects = [
     title: "从数据库设计，到完整上线。",
     summary:
       "作为后端开发实习生，我不只接收零散接口任务，而是参与需求评审、业务表结构与 RESTful API 设计，书写并调优复杂 SQL，再与前端完成页面交互、联调和验收。面对线上慢查询，使用 EXPLAIN 还原执行路径，通过联合索引与关联查询重构收敛核心接口延迟，同时覆盖功能测试、回归测试、部署和问题跟踪，让一个需求真正从设计走到可用。",
-    image: "/projects/payment-flow.webp",
-    imageAlt: "象征数据库、接口与业务链路协作的暗色工程装置",
+    image: "/projects/taikang-code-review.webp",
+    imageAlt: "后端接口代码、MySQL 执行计划与自动化测试结果组成的真实开发现场",
+    imageFit: "cover",
     stack: "MySQL / RESTful API / EXPLAIN / 联合索引 / 前后端联调",
     proof: "覆盖需求评审、技术方案、数据库设计、编码、页面联调、测试与部署的完整研发周期",
   },
@@ -1752,6 +1753,7 @@ const featuredProjects = [
       "持续迭代中国帆船帆板运动协会官网，接入支付宝与微信支付，以锁机制、状态机和熔断策略守住关键交易链路。",
     image: "/projects/chinasailing-site.webp",
     imageAlt: "中国帆船帆板运动协会官网首页、帆船赛事航拍与通知公告页面",
+    imageFit: "cover",
     stack: "ThinkPHP / Vue 3 / Spring Boot / MySQL / 支付系统",
     proof: "真实生产系统，覆盖研发、维护、排障与持续交付",
   },
@@ -1760,8 +1762,9 @@ const featuredProjects = [
     title: "生命科学推理智能体",
     summary:
       "基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。",
-    image: "/projects/life-science-agent.webp",
-    imageAlt: "生命科学工具调用链与安全执行模块组成的智能体工程视觉",
+    image: "/projects/verl-architecture.webp",
+    imageAlt: "VeRL 官方架构图，展示模型引擎、智能体循环、推理服务与训练控制器的协作关系",
+    imageFit: "contain",
     stack: "Verl / Agent Loop / Python / SFT / GRPO / Docker",
     proof: "从模型训练延伸到工具协议、沙箱执行和推理评估",
   },
@@ -1772,6 +1775,7 @@ const featuredProjects = [
       "围绕三维人体重建完成虚实融合系统，负责技术路线、团队协作与交付推进，以工程实现验证复杂空间计算方案。",
     image: "/certificates/design-digital-twin-first.webp",
     imageAlt: "数字孪生三维人体重建项目一等奖证书",
+    imageFit: "cover",
     stack: "三维重建 / 数字孪生 / 人工智能 / 系统集成",
     proof: "计算机设计大赛中南地区赛一等奖",
   },
@@ -2140,10 +2144,9 @@ export default function Home() {
 
         gsap.fromTo(
           ".flora-profile-portrait img",
-          { scale: 1.04, yPercent: -3 },
+          { scale: 1.025 },
           {
-            scale: 1.04,
-            yPercent: 4,
+            scale: 1.005,
             ease: "none",
             scrollTrigger: {
               trigger: ".flora-profile",
@@ -2169,7 +2172,9 @@ export default function Home() {
         });
 
         gsap.utils
-          .toArray<HTMLElement>(".flora-project:not(:first-child) .flora-project-visual img")
+          .toArray<HTMLElement>(
+            ".flora-project:not(:first-child) .flora-project-visual:not(.is-contained) img",
+          )
           .forEach((image) => {
             gsap.fromTo(
               image,
@@ -2341,7 +2346,11 @@ export default function Home() {
         <div className="flora-project-list">
           {featuredProjects.map((project) => (
             <article className="flora-project flora-reveal" key={project.title}>
-              <div className="flora-project-visual">
+              <div
+                className={`flora-project-visual ${
+                  project.imageFit === "contain" ? "is-contained" : ""
+                }`}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element -- 本地成果图片用于滚动视差，保留原生图像节点。 */}
                 <img src={project.image} alt={project.imageAlt} loading="lazy" />
               </div>
