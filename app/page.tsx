@@ -1688,6 +1688,17 @@ function LegacyHome() {
 
 const featuredProjects = [
   {
+    category: "企业实习 / 武汉泰康科技有限公司 / 2025.03 至 2025.07",
+    title: "从数据库设计，到完整上线。",
+    summary:
+      "作为后端开发实习生，我不只接收零散接口任务，而是参与需求评审、业务表结构与 RESTful API 设计，书写并调优复杂 SQL，再与前端完成页面交互、联调和验收。面对线上慢查询，使用 EXPLAIN 还原执行路径，通过联合索引与关联查询重构收敛核心接口延迟，同时覆盖功能测试、回归测试、部署和问题跟踪，让一个需求真正从设计走到可用。",
+    image: "/projects/payment-flow.webp",
+    imageAlt: "象征数据库、接口与业务链路协作的暗色工程装置",
+    stack: "MySQL / RESTful API / EXPLAIN / 联合索引 / 前后端联调",
+    proof: "覆盖需求评审、技术方案、数据库设计、编码、页面联调、测试与部署的完整研发周期",
+  },
+  {
+    category: "国家级生产项目 / 2023.05 至 2025.07",
     title: "中帆协官网与支付链路",
     summary:
       "持续迭代中国帆船帆板运动协会官网，接入支付宝与微信支付，以锁机制、状态机和熔断策略守住关键交易链路。",
@@ -1697,6 +1708,7 @@ const featuredProjects = [
     proof: "真实生产系统，覆盖研发、维护、排障与持续交付",
   },
   {
+    category: "毕业设计 / 人工智能原生工程",
     title: "生命科学推理智能体",
     summary:
       "基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。",
@@ -1706,6 +1718,7 @@ const featuredProjects = [
     proof: "从模型训练延伸到工具协议、沙箱执行和推理评估",
   },
   {
+    category: "团队项目 / 空间计算",
     title: "数字孪生三维重建",
     summary:
       "围绕三维人体重建完成虚实融合系统，负责技术路线、团队协作与交付推进，以工程实现验证复杂空间计算方案。",
@@ -1718,23 +1731,23 @@ const featuredProjects = [
 
 const capabilityGroups = [
   {
-    title: "人工智能原生研发",
-    lead: "让模型真正进入工程链路",
+    title: "人工智能原生与 Vibe Coding",
+    lead: "让模型进入工程链路，也让灵感快速接受真实验证",
     items: [
       "Codex 与 Claude Code 协同开发",
       "LangChain 与 Llama 应用编排",
       "Skill、MCP 与上下文工程",
-      "工具调用、记忆与安全沙箱",
+      "从原型、测试到部署的人工智能协同闭环",
     ],
   },
   {
-    title: "后端与高并发",
-    lead: "让关键链路在压力下保持确定",
+    title: "全栈交付与数据工程",
+    lead: "不把接口当终点，完成用户真正可用的业务闭环",
     items: [
-      "Java、Python、C++ 与 ThinkPHP",
-      "Spring Boot 服务与熔断降级",
-      "锁机制、状态机与幂等设计",
-      "MySQL 索引与慢查询治理",
+      "Java、Python、C++、ThinkPHP 与 Vue 3",
+      "页面信息设计、接口研发与前后端联调",
+      "MySQL 表结构、复杂 SQL 与索引治理",
+      "功能测试、回归测试、部署与问题跟踪",
     ],
   },
   {
@@ -1749,24 +1762,24 @@ const capabilityGroups = [
   },
   {
     title: "表达与团队推进",
-    lead: "把复杂问题讲清楚，也把协作推到结果",
+    lead: "把复杂问题讲清楚，让每个协作者都知道下一步",
     items: [
       "需求澄清、边界定义与任务拆分",
       "演示叙事、视频剪辑与信息取舍",
       "团队分工、节点推进与现场沟通",
-      "复盘、Skill 沉淀与 SOP 工作流复用",
+      "知识星球内容沉淀与 SOP 工作流复用",
     ],
   },
 ] as const;
 
 const workingMethod = [
   {
-    title: "先把问题说人话",
-    text: "先核对谁在什么场景遇到什么阻碍，再写验收条件。避免一开始就被工具名带走。",
+    title: "先拆业务闭环",
+    text: "先核对用户、页面、接口、数据和异常路径，再写验收条件。泰康实习让我形成一个习惯：接口返回成功，不等于业务已经完成。",
   },
   {
-    title: "用样品建立共识",
-    text: "尽快做出可运行的最小版本，让同事对着真实结果讨论，而不是围绕想象争论。",
+    title: "用 Vibe Coding 把想法变成样品",
+    text: "借助 Codex 与 Claude Code 快速调研、搭原型、补测试和排障，但保留技术方案、代码审查与人工验收，让速度建立在可控之上。",
   },
   {
     title: "让证据结束争论",
@@ -1775,11 +1788,12 @@ const workingMethod = [
 ] as const;
 
 const workProof = [
-  ["能把复杂事讲清楚", "先确认场景与边界，再用样品、图示或演示把抽象问题变成共同语言。"],
-  ["复杂问题排障与现场反应", "排障看日志，打球看拍面，剪辑看前后帧。我习惯根据新证据立刻调整。"],
-  ["能独立收尾", "覆盖需求、研发、测试、部署与复盘，不把最后一公里留给下一个人。"],
-  ["能把人组织起来", "全国一等奖队长经历让我学会分工、喊停无效讨论，并守住交付节点。"],
-  ["愿意反复成为新手", "从三维重建到强化学习智能体，再到影像和力量训练，好奇心最终都要落到练习。"],
+  ["能承担完整研发周期", "在泰康从需求评审、表结构和 API 设计做到联调、测试与部署，能理解每一环如何影响最终交付。"],
+  ["复杂问题排障与数据治理", "以 EXPLAIN、联合索引、链路日志和回归结果建立证据，不凭直觉给线上问题下结论。"],
+  ["能与不同角色顺畅协作", "主动对齐页面交互、接口契约和验收边界，让产品、前端、后端和测试围绕同一个结果推进。"],
+  ["能把人工智能变成生产力", "用 Codex、Claude Code 和 Skill 加速原型、重构与测试，同时保留审查、验证和回滚意识。"],
+  ["能把经验写成团队资产", "经营知识星球与个人技术内容，把踩坑记录、工作流和项目复盘整理成别人可以理解和复用的材料。"],
+  ["能在压力下保持团队节奏", "全国一等奖队长经历让我学会分工、及时喊停无效讨论，并在节点前主动暴露风险。"],
 ] as const;
 
 const lifeChapters = [
@@ -1996,11 +2010,31 @@ function SpiderCharm() {
 
 export default function Home() {
   const [showOpening, setShowOpening] = useState(true);
+  const [contactOpen, setContactOpen] = useState(false);
   const root = useRef<HTMLElement>(null);
+  const contactClose = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
+
+  useEffect(() => {
+    if (!contactOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setContactOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    requestAnimationFrame(() => contactClose.current?.focus());
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [contactOpen]);
 
   useGSAP(
     () => {
@@ -2146,9 +2180,15 @@ export default function Home() {
           <a href="#life">生活侧写</a>
           <a href="#archive">成果档案</a>
         </nav>
-        <a className="flora-contact-link" href="mailto:mshuwhu@whu.edu.cn">
+        <button
+          type="button"
+          className="flora-contact-link"
+          aria-haspopup="dialog"
+          aria-expanded={contactOpen}
+          onClick={() => setContactOpen(true)}
+        >
           联系我
-        </a>
+        </button>
       </header>
 
       <section className="flora-hero" id="home">
@@ -2247,18 +2287,18 @@ export default function Home() {
       <section className="flora-projects" id="work">
         <header className="flora-section-heading flora-reveal">
           <h2>热情可以很广，交付必须具体。</h2>
-          <p>三个真实项目覆盖生产系统、推理智能体与三维重建。每个项目都写清我做了什么，以及结果如何被验证。</p>
+          <p>从泰康企业实习到国家级生产项目，再到推理智能体与三维重建。每一段经历都写清业务场景、个人职责和验证方式。</p>
         </header>
 
         <div className="flora-project-list">
-          {featuredProjects.map((project, index) => (
+          {featuredProjects.map((project) => (
             <article className="flora-project flora-reveal" key={project.title}>
               <div className="flora-project-visual">
                 {/* eslint-disable-next-line @next/next/no-img-element -- 本地成果图片用于滚动视差，保留原生图像节点。 */}
                 <img src={project.image} alt={project.imageAlt} loading="lazy" />
               </div>
               <div className="flora-project-copy">
-                <small>{index === 0 ? "生产工程" : index === 1 ? "人工智能研究" : "空间计算"}</small>
+                <small>{project.category}</small>
                 <h3>{project.title}</h3>
                 <p>{project.summary}</p>
                 <dl>
@@ -2301,6 +2341,13 @@ export default function Home() {
               </li>
             ))}
           </ol>
+          <aside className="flora-maker-note flora-reveal">
+            <small>个人实验场 / 内容复利</small>
+            <h3>Vibe Coding 不是省略工程，而是缩短反馈。</h3>
+            <p>
+              我正在用人工智能协作开发一款类似 Carrd 的个人建站产品：从需求拆解、页面设计、全栈实现、自动化测试到部署复盘，先让想法快速成为可操作的产品，再用真实反馈修正方向。与此同时，我持续经营知识星球与个人技术内容，把开发日志、疑难问题、Skill 和 SOP 整理成可复用的内容资产。写给别人看，也迫使我把自己的判断讲清楚。
+            </p>
+          </aside>
         </div>
       </section>
 
@@ -2363,7 +2410,7 @@ export default function Home() {
         <div className="flora-proof-statement flora-reveal">
           <h2>我希望同事记住的，不只是一串技术栈。</h2>
           <p>
-            我能在复杂系统里保持判断，也能在合作里提供能量。从泰康科技后端实习、中帆协项目、竞赛队长到人工智能科研，我始终把沟通、验证和收尾看成工程的一部分。
+            我能在复杂系统里保持判断，也能在合作里提供能量。从泰康科技完整研发周期、中帆协生产项目、竞赛队长到人工智能科研与个人内容创作，我始终把沟通、验证、表达和收尾看成工程的一部分。
           </p>
         </div>
         <div className="flora-proof-list">
@@ -2395,9 +2442,50 @@ export default function Home() {
         </div>
         <footer>
           <span>软件开发工程师 / ENFP</span>
-          <span>人工智能、羽毛球与影像叙事</span>
         </footer>
       </section>
+
+      {contactOpen ? (
+        <div
+          className="flora-contact-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setContactOpen(false);
+          }}
+        >
+          <section
+            className="flora-contact-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-card-title"
+          >
+            <button
+              ref={contactClose}
+              type="button"
+              className="flora-contact-card-close"
+              aria-label="关闭联系卡片"
+              onClick={() => setContactOpen(false)}
+            >
+              关闭
+            </button>
+
+            <small>直接联系</small>
+            <h2 id="contact-card-title">聊聊下一次合作。</h2>
+            <p>工作邀约、项目协作或技术交流，都可以通过下面的方式找到我。</p>
+
+            <div className="flora-contact-methods">
+              <a href="mailto:mshuwhu@whu.edu.cn">
+                <span>邮箱</span>
+                <strong>mshuwhu@whu.edu.cn</strong>
+              </a>
+              <a href="tel:+8618289423880">
+                <span>电话</span>
+                <strong>+86 182 8942 3880</strong>
+              </a>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       {showOpening ? <OpeningSequence onComplete={closeOpening} /> : null}
     </main>

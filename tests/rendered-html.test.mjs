@@ -52,6 +52,11 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.doesNotMatch(html, /专业排名 4 \/ 25/);
   assert.doesNotMatch(html, /已保研/);
   assert.match(html, /中帆协官网与支付链路/);
+  assert.match(html, /武汉泰康科技有限公司/);
+  assert.match(html, /从数据库设计，到完整上线/);
+  assert.match(html, /EXPLAIN/);
+  assert.match(html, /联合索引与关联查询重构/);
+  assert.match(html, /功能测试、回归测试、部署和问题跟踪/);
   assert.match(html, /锁机制、状态机和熔断策略/);
   assert.match(html, /ThinkPHP/);
   assert.match(html, /MySQL/);
@@ -64,6 +69,9 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /SOP 工作流/);
   assert.match(html, /Codex/);
   assert.match(html, /Claude Code/);
+  assert.match(html, /Vibe Coding/);
+  assert.match(html, /知识星球/);
+  assert.match(html, /类似 Carrd 的个人建站产品/);
   assert.match(html, /LangChain/);
   assert.match(html, /Llama/);
   assert.match(html, /智能体与模型训练/);
@@ -72,7 +80,6 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /复杂问题排障/);
   assert.match(html, /含金量/);
   assert.match(html, /好奇心负责打开可能，证据负责关上风险/);
-  assert.match(html, /泰康科技后端实习/);
   assert.match(html, /小米杯全国一等奖/);
   assert.match(html, /学生时代结束了，证据仍然有效/);
   assert.match(html, /ENFP/);
@@ -89,6 +96,7 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /PolarDB 外卡优胜奖/);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
+  assert.doesNotMatch(html, /人工智能、羽毛球与影像叙事/);
 });
 
 test("removes starter preview infrastructure and keeps 3D dependencies", async () => {
@@ -118,9 +126,15 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /if \(!openingActive\.current\)/);
   assert.match(page, /CERTIFICATE_CYCLE_COUNT = 3/);
   assert.match(page, /normalizeScroll/);
+  assert.match(page, /aria-haspopup="dialog"/);
+  assert.match(page, /role="dialog"/);
+  assert.match(page, /\+86 182 8942 3880/);
+  assert.match(page, /tel:\+8618289423880/);
+  assert.doesNotMatch(page, /人工智能、羽毛球与影像叙事/);
   assert.match(styles, /scrollbar-width: none/);
   assert.match(styles, /perspective: 1400px/);
   assert.match(styles, /@keyframes openingHeroSwing/);
+  assert.match(styles, /\.flora-contact-card/);
   assert.doesNotMatch(styles, /background: var\(--yellow\)/);
   assert.match(layout, /椿襄｜软件开发工程师与多面个人档案/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
