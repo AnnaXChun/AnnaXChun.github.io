@@ -115,6 +115,10 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(page, /pointerX \* 0\.38/);
   assert.match(page, /全国一等奖队长/);
   assert.match(page, /onPointerEnter=\{\(\) => setExpanded\(true\)\}/);
+  assert.match(page, /rotationY: trait\.pose\.rotationY/);
+  assert.match(page, /z: reduced \? trait\.pose\.z : compact \? 18 : 92/);
+  assert.match(page, /gsap\.quickTo\(card\.current, "x"/);
+  assert.match(page, /className="trait-face"/);
   assert.match(page, /duration = reduceMotion\.current \? 0\.01 : 0\.68/);
   assert.match(page, /SOP 工作流设计/);
   assert.match(page, /function OpeningSequence/);
@@ -135,6 +139,8 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(styles, /perspective: 1400px/);
   assert.match(styles, /@keyframes openingHeroSwing/);
   assert.match(styles, /\.flora-contact-card/);
+  assert.match(styles, /perspective: 1400px/);
+  assert.match(styles, /clip-path: var\(--trait-shape\)/);
   assert.doesNotMatch(styles, /background: var\(--yellow\)/);
   assert.match(layout, /椿襄｜软件开发工程师与多面个人档案/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);

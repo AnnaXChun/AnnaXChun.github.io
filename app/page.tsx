@@ -38,7 +38,8 @@ const traits = [
     label: "ENFP",
     note: "主动连接",
     className: "trait-one",
-    color: "#b8d97c",
+    color: "#d7ef45",
+    pose: { rotationX: -7, rotationY: 22, rotation: -5, z: -16, layer: 5 },
     meaning: "外向不是热闹，而是愿意主动建立连接，让陌生协作快速进入正题。",
     evidence: "组队时先说清每个人擅长的部分，再把讨论整理成可以行动的计划。",
     value: "适合需要跨角色沟通、快速试错和持续推进的团队环境。",
@@ -47,7 +48,8 @@ const traits = [
     label: "羽毛球",
     note: "预判与节奏",
     className: "trait-two",
-    color: "#d8b66e",
+    color: "#ff8c42",
+    pose: { rotationX: 6, rotationY: -24, rotation: 6, z: -34, layer: 3 },
     meaning: "我喜欢它几乎没有延迟的反馈，判断来球、调整步伐，下一拍立刻验证。",
     evidence: "享受单打的节奏控制，也重视双打里的补位、喊球和默契。",
     value: "让我先读局面再出手，也提醒我任何决策都要为下一拍留位置。",
@@ -56,7 +58,8 @@ const traits = [
     label: "高并发后端",
     note: "工程能力",
     className: "trait-three",
-    color: "#9c8fd4",
+    color: "#587cff",
+    pose: { rotationX: -10, rotationY: 19, rotation: 4, z: 10, layer: 7 },
     meaning: "围绕高流量场景设计稳定的接口、数据与降级策略。",
     evidence: "实践锁机制、状态机、熔断、MySQL 索引与慢查询治理。",
     value: "保障关键链路在并发压力下保持一致性和可用性。",
@@ -65,7 +68,8 @@ const traits = [
     label: "视频剪辑",
     note: "叙事与取舍",
     className: "trait-four",
-    color: "#e47e6b",
+    color: "#f15d58",
+    pose: { rotationX: 8, rotationY: -20, rotation: -7, z: -8, layer: 4 },
     meaning: "剪辑不是堆素材，而是决定观众此刻应该看到什么。",
     evidence: "从素材筛选、节奏点和音乐到字幕，把零散片段整理成有落点的叙事。",
     value: "它直接影响我做演示、写文档和设计产品反馈的方式。",
@@ -74,7 +78,8 @@ const traits = [
     label: "Codex / Claude Code",
     note: "人工智能协作",
     className: "trait-five",
-    color: "#69b7c8",
+    color: "#38c6aa",
+    pose: { rotationX: -5, rotationY: 16, rotation: 3, z: 22, layer: 8 },
     meaning: "把人工智能编程工具当成工程协作者，而不是代码补全器。",
     evidence: "用于代码理解、方案拆分、重构、测试、排障、视觉验收与部署交付。",
     value: "缩短反馈链路，同时保留测试、审查和结果验证。",
@@ -83,7 +88,8 @@ const traits = [
     label: "健身",
     note: "长期状态",
     className: "trait-six",
-    color: "#d69a63",
+    color: "#c47cff",
+    pose: { rotationX: 9, rotationY: -25, rotation: 5, z: -28, layer: 2 },
     meaning: "训练不是证明意志力，而是管理动作质量、恢复和长期状态。",
     evidence: "会根据当天状态调整重量与组数，优先保证动作完成度。",
     value: "不靠短期透支，保持稳定且可持续的工作输出。",
@@ -92,7 +98,8 @@ const traits = [
     label: "复杂问题排障",
     note: "工作能力",
     className: "trait-seven",
-    color: "#c9ae67",
+    color: "#27b9d1",
+    pose: { rotationX: -8, rotationY: 21, rotation: -4, z: 14, layer: 6 },
     meaning: "用证据链定位性能、数据与业务链路问题。",
     evidence: "实践链路日志复核、疑难缺陷定位和 MySQL 慢查治理。",
     value: "快速收敛根因，降低线上风险与接口延迟。",
@@ -101,7 +108,8 @@ const traits = [
     label: "SOP 工作流设计",
     note: "工作能力",
     className: "trait-eight",
-    color: "#d97a64",
+    color: "#ff6f91",
+    pose: { rotationX: 7, rotationY: -18, rotation: 4, z: -12, layer: 4 },
     meaning: "把开发经验沉淀成可重复执行的人机协作流程。",
     evidence: "串联需求澄清、计划、Skill 执行、验证、部署与复盘。",
     value: "让个人效率可复制，让交付质量可检查、可追溯。",
@@ -422,13 +430,44 @@ function TraitTag({ trait }: { trait: Trait }) {
   const shell = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLButtonElement>(null);
   const detail = useRef<HTMLDivElement>(null);
+  const moveX = useRef<((value: number) => void) | null>(null);
+  const moveY = useRef<((value: number) => void) | null>(null);
+
+  useGSAP(
+    () => {
+      if (!card.current || !detail.current) return;
+
+      gsap.set(card.current, {
+        rotationX: trait.pose.rotationX,
+        rotationY: trait.pose.rotationY,
+        rotation: trait.pose.rotation,
+        z: trait.pose.z,
+        transformPerspective: 1000,
+        transformOrigin: "50% 50%",
+      });
+      gsap.set(detail.current, { autoAlpha: 0 });
+
+      moveX.current = gsap.quickTo(card.current, "x", {
+        duration: 0.32,
+        ease: "power3.out",
+      });
+      moveY.current = gsap.quickTo(card.current, "y", {
+        duration: 0.32,
+        ease: "power3.out",
+      });
+
+      return () => gsap.killTweensOf([card.current, detail.current]);
+    },
+    { scope: shell },
+  );
 
   const setExpanded = (expanded: boolean) => {
     if (!shell.current || !card.current || !detail.current) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const compact = window.matchMedia("(max-width: 900px)").matches;
 
     gsap.killTweensOf([card.current, detail.current]);
-    gsap.set(shell.current, { zIndex: expanded ? 40 : 1 });
+    gsap.set(shell.current, { zIndex: expanded ? 40 : trait.pose.layer });
 
     if (expanded) {
       gsap
@@ -436,22 +475,28 @@ function TraitTag({ trait }: { trait: Trait }) {
         .to(
           card.current,
           {
-            y: reduced ? 0 : -5,
-            scale: reduced ? 1 : 1.055,
-            duration: reduced ? 0.01 : 0.22,
-            ease: "power2.out",
+            x: 0,
+            y: reduced ? 0 : compact ? -3 : -10,
+            z: reduced ? trait.pose.z : compact ? 18 : 92,
+            scale: reduced ? 1 : compact ? 1.025 : 1.075,
+            rotationX: 0,
+            rotationY: 0,
+            rotation: 0,
+            duration: reduced ? 0.01 : 0.46,
+            ease: "power4.out",
           },
           0,
         )
         .fromTo(
           detail.current,
-          { autoAlpha: 0, y: 12, scale: 0.96 },
+          { autoAlpha: 0, y: 16, z: -28, scale: 0.94 },
           {
             autoAlpha: 1,
             y: 0,
+            z: 26,
             scale: 1,
-            duration: reduced ? 0.01 : 0.28,
-            ease: "power3.out",
+            duration: reduced ? 0.01 : 0.4,
+            ease: "power4.out",
           },
           reduced ? 0 : 0.04,
         );
@@ -476,37 +521,38 @@ function TraitTag({ trait }: { trait: Trait }) {
         {
           x: 0,
           y: 0,
+          z: trait.pose.z,
           scale: 1,
-          rotationX: 0,
-          rotationY: 0,
-          duration: reduced ? 0.01 : 0.2,
-          ease: "power2.out",
+          rotationX: trait.pose.rotationX,
+          rotationY: trait.pose.rotationY,
+          rotation: trait.pose.rotation,
+          duration: reduced ? 0.01 : 0.42,
+          ease: "power3.out",
         },
         0,
       );
   };
 
   const followPointer = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!card.current || event.pointerType === "touch") return;
+    if (!card.current || event.pointerType === "touch" || !moveX.current || !moveY.current) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width - 0.5;
     const y = (event.clientY - bounds.top) / bounds.height - 0.5;
 
-    gsap.to(card.current, {
-      x: x * 5,
-      rotationX: -y * 7,
-      rotationY: x * 8,
-      duration: 0.2,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
+    moveX.current(x * 7);
+    moveY.current(-10 + y * 5);
+    card.current.style.setProperty("--pointer-x", `${(x + 0.5) * 100}%`);
+    card.current.style.setProperty("--pointer-y", `${(y + 0.5) * 100}%`);
   };
 
   return (
     <div
       ref={shell}
       className={`trait-tag ${trait.className}`}
-      style={{ "--trait-color": trait.color } as React.CSSProperties}
+      style={{
+        "--trait-color": trait.color,
+        zIndex: trait.pose.layer,
+      } as React.CSSProperties}
     >
       <button
         ref={card}
@@ -519,8 +565,10 @@ function TraitTag({ trait }: { trait: Trait }) {
         onFocus={() => setExpanded(true)}
         onBlur={() => setExpanded(false)}
       >
-        <span>{trait.note}</span>
-        <strong>{trait.label}</strong>
+        <span className="trait-face">
+          <span>{trait.note}</span>
+          <strong>{trait.label}</strong>
+        </span>
         <div ref={detail} className="trait-detail">
           <small>含义</small>
           <p>{trait.meaning}</p>

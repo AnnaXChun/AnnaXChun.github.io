@@ -274,12 +274,12 @@ button {
   outline-offset: 4px;
 }
 
-.trait-tag-card > span,
-.trait-tag-card > strong {
+.trait-face > span,
+.trait-face > strong {
   display: block;
 }
 
-.trait-tag-card > span {
+.trait-face > span {
   margin-bottom: 0.22rem;
   font-size: 0.55rem;
   font-weight: 800;
@@ -287,7 +287,7 @@ button {
   opacity: 0.6;
 }
 
-.trait-tag-card > strong {
+.trait-face > strong {
   font-size: clamp(0.82rem, 1vw, 1rem);
 }
 
@@ -3242,71 +3242,157 @@ body {
   z-index: 7;
   inset: 72px 0 0;
   pointer-events: none;
+  perspective: 1400px;
+  perspective-origin: 64% 46%;
+  transform-style: preserve-3d;
 }
 
 .flora-traits .trait-tag {
-  min-width: clamp(9.6rem, 12vw, 11.25rem);
+  --trait-shape: polygon(0 14px, 14px 0, calc(100% - 24px) 0, 100% 22px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  min-width: var(--trait-width, clamp(9.6rem, 12vw, 11.25rem));
   pointer-events: auto;
   transform: none;
+  transform-style: preserve-3d;
   will-change: transform;
 }
 
 .flora-traits .trait-tag-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: relative;
+  width: 100%;
+  min-height: 4.5rem;
   isolation: isolate;
-  padding: 0.7rem 0.82rem 0.72rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--trait-color) 43%, transparent);
-  border-radius: 3px;
-  background-color: color-mix(in srgb, var(--trait-color) 11%, #171c16);
-  background-image: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--trait-color) 16%, transparent),
-    rgba(20, 25, 18, 0.3) 56%,
-    rgba(8, 11, 8, 0.12)
-  );
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--flora-paper);
-  box-shadow:
-    inset 0 1px 0 rgba(233, 229, 217, 0.1),
-    inset 3px 0 0 color-mix(in srgb, var(--trait-color) 88%, transparent),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 15px 34px rgba(4, 7, 3, 0.2);
-  backdrop-filter: blur(14px) saturate(112%);
-  -webkit-backdrop-filter: blur(14px) saturate(112%);
-  transition:
-    border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: none;
+  cursor: help;
+  transform-style: preserve-3d;
+  will-change: transform;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.flora-traits .trait-tag-card:hover,
 .flora-traits .trait-tag-card:focus-visible {
-  border-color: color-mix(in srgb, var(--trait-color) 78%, #e9e5d9);
-  background-color: color-mix(in srgb, var(--trait-color) 17%, #1b2119);
-  box-shadow:
-    inset 0 1px 0 rgba(233, 229, 217, 0.16),
-    inset 3px 0 0 var(--trait-color),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
-    0 19px 42px color-mix(in srgb, var(--trait-color) 16%, rgba(4, 7, 3, 0.28));
+  outline: none;
 }
 
-.flora-traits .trait-tag-card > span {
+.flora-traits .trait-tag-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  clip-path: var(--trait-shape);
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--trait-color) 52%, #10130f), #080a08 72%);
+  opacity: 0.84;
+  transform: translate3d(8px, 10px, -22px);
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 20px 22px rgba(0, 0, 0, 0.28));
+}
+
+.flora-traits .trait-face {
+  position: relative;
+  min-height: 4.5rem;
+  padding: 0.82rem 1.2rem 0.92rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  clip-path: var(--trait-shape);
+  background:
+    radial-gradient(circle at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--trait-color) 34%, transparent), transparent 35%),
+    linear-gradient(128deg, color-mix(in srgb, var(--trait-color) 28%, #222920), #111510 58%, color-mix(in srgb, var(--trait-color) 13%, #070907));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 color-mix(in srgb, var(--trait-color) 54%, transparent);
+  transform: translateZ(1px);
+  transition:
+    background 260ms ease,
+    filter 260ms ease;
+  filter: saturate(0.92) contrast(1.04);
+}
+
+.flora-traits .trait-face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(105deg, transparent 18%, rgba(255, 255, 255, 0.13) 34%, transparent 49%),
+    repeating-linear-gradient(102deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 5px);
+  transform: translateX(-34%);
+  transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.flora-traits .trait-face::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-top: 2px solid var(--trait-color);
+  border-right: 2px solid var(--trait-color);
+  opacity: 0.8;
+}
+
+.flora-traits .trait-tag-card:hover::before,
+.flora-traits .trait-tag-card:focus-visible::before {
+  opacity: 1;
+  transform: translate3d(5px, 7px, -18px);
+}
+
+.flora-traits .trait-tag-card:hover .trait-face,
+.flora-traits .trait-tag-card:focus-visible .trait-face {
+  filter: saturate(1.12) contrast(1.06);
+}
+
+.flora-traits .trait-tag-card:focus-visible .trait-face {
+  filter: saturate(1.12) contrast(1.06) drop-shadow(0 0 1px rgba(233, 229, 217, 0.95));
+}
+
+.flora-traits .trait-tag-card:hover .trait-face::before,
+.flora-traits .trait-tag-card:focus-visible .trait-face::before {
+  transform: translateX(42%);
+}
+
+.flora-traits .trait-face > span,
+.flora-traits .trait-face > strong {
+  position: relative;
+  z-index: 1;
+}
+
+.flora-traits .trait-face > span {
   color: var(--trait-color);
   opacity: 1;
 }
 
-.flora-traits .trait-tag-card > strong {
+.flora-traits .trait-face > strong {
   font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-  font-size: clamp(0.78rem, 0.95vw, 1rem);
-  font-weight: 600;
+  font-size: clamp(0.88rem, 1vw, 1.08rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
 }
 
 .flora-traits .trait-detail {
   width: min(20rem, 28vw);
-  padding: 1.15rem;
-  border: 0;
-  border-radius: 2px;
-  background: var(--flora-paper);
+  padding: 1.25rem 1.35rem 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--trait-color) 38%, rgba(23, 26, 21, 0.18));
+  border-radius: 1.4rem 1.4rem 1.4rem 0.3rem;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--trait-color) 20%, transparent), transparent 34%),
+    var(--flora-paper);
   color: #171a15;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 32px 80px rgba(0, 0, 0, 0.42);
+  transform-style: preserve-3d;
   backdrop-filter: none;
 }
 
@@ -3335,18 +3421,24 @@ body {
 }
 
 .flora-traits .trait-one {
+  --trait-width: clamp(9rem, 11vw, 10.5rem);
+  --trait-shape: polygon(0 18px, 18px 0, 78% 0, 100% 24px, 100% 100%, 12% 100%, 0 78%);
   top: 10.5%;
   left: 43%;
   animation: trait-float-a 5.2s ease-in-out infinite;
 }
 
 .flora-traits .trait-two {
+  --trait-width: clamp(10.5rem, 13vw, 12.5rem);
+  --trait-shape: polygon(9% 0, 100% 0, 100% 72%, 88% 100%, 0 100%, 0 22%);
   top: 26%;
   right: 14%;
   animation: trait-float-b 6.1s ease-in-out -1.4s infinite;
 }
 
 .flora-traits .trait-three {
+  --trait-width: clamp(11.5rem, 14vw, 13.6rem);
+  --trait-shape: polygon(0 0, 91% 0, 100% 25%, 92% 100%, 7% 100%, 0 74%);
   top: 57%;
   bottom: auto;
   left: 44%;
@@ -3354,6 +3446,8 @@ body {
 }
 
 .flora-traits .trait-four {
+  --trait-width: clamp(9.8rem, 12vw, 11.5rem);
+  --trait-shape: polygon(0 0, 100% 0, 100% 100%, 22% 100%, 0 70%, 8% 43%, 0 18%);
   top: 54%;
   right: 13.5%;
   bottom: auto;
@@ -3361,6 +3455,8 @@ body {
 }
 
 .flora-traits .trait-five {
+  --trait-width: clamp(13.8rem, 17vw, 16.5rem);
+  --trait-shape: polygon(7% 0, 93% 0, 100% 27%, 96% 82%, 84% 100%, 0 100%, 0 20%);
   display: block;
   right: auto;
   bottom: 12%;
@@ -3369,6 +3465,8 @@ body {
 }
 
 .flora-traits .trait-six {
+  --trait-width: clamp(8.8rem, 10.5vw, 10rem);
+  --trait-shape: polygon(16% 0, 100% 0, 100% 78%, 82% 100%, 0 100%, 0 20%);
   top: auto;
   right: 14%;
   bottom: 13.5%;
@@ -4317,30 +4415,25 @@ body {
 
   .flora-traits .trait-tag-card {
     width: auto;
-    padding: 0.54rem 0.62rem 0.58rem;
     white-space: nowrap;
   }
 
-  .flora-traits .trait-tag-card > span {
+  .flora-traits .trait-face {
+    min-height: 2.75rem;
+    padding: 0.56rem 0.76rem 0.62rem;
+  }
+
+  .flora-traits .trait-face > span {
     display: none;
   }
 
-  .flora-traits .trait-tag-card > strong {
+  .flora-traits .trait-face > strong {
     font-size: 0.66rem;
   }
 
   .flora-traits .trait-one {
     top: 35%;
     left: 3%;
-  }
-
-  .flora-traits .trait-one .trait-tag-card > strong {
-    font-size: 0;
-  }
-
-  .flora-traits .trait-one .trait-tag-card > strong::after {
-    content: "ENFP";
-    font-size: 0.66rem;
   }
 
   .flora-traits .trait-two {
@@ -4706,14 +4799,13 @@ body {
 
 @media (prefers-reduced-transparency: reduce) {
   .flora-nav,
-  .flora-traits .trait-tag-card,
   .flora-contact-overlay {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
-  .flora-traits .trait-tag-card {
-    background: color-mix(in srgb, var(--trait-color) 10%, #1b2119);
+  .flora-traits .trait-face {
+    background: color-mix(in srgb, var(--trait-color) 18%, #121611);
   }
 
   .flora-contact-overlay {
