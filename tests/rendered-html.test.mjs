@@ -33,7 +33,7 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>高级软件开发工程师｜三维交互简历<\/title>/i);
+  assert.match(html, /<title>椿襄｜软件开发工程师与多面个人档案<\/title>/i);
   assert.match(html, /椿襄/);
   assert.doesNotMatch(html, /春祥/);
   assert.match(html, /高级软件开发工程师/);
@@ -66,15 +66,20 @@ test("server-renders the interactive portfolio shell", async () => {
   assert.match(html, /Claude Code/);
   assert.match(html, /LangChain/);
   assert.match(html, /Llama/);
-  assert.match(html, /智能体构建/);
+  assert.match(html, /智能体与模型训练/);
   assert.match(html, /高并发后端/);
-  assert.match(html, /全栈闭环交付/);
+  assert.match(html, /表达与团队推进/);
   assert.match(html, /复杂问题排障/);
   assert.match(html, /含金量/);
-  assert.match(html, /显著缩短个人项目交付周期/);
+  assert.match(html, /好奇心负责打开可能，证据负责关上风险/);
   assert.match(html, /泰康科技后端实习/);
   assert.match(html, /小米杯全国一等奖/);
-  assert.match(html, /成长留下证据/);
+  assert.match(html, /学生时代结束了，证据仍然有效/);
+  assert.match(html, /ENFP/);
+  assert.match(html, /羽毛球/);
+  assert.match(html, /视频剪辑/);
+  assert.match(html, /健身/);
+  assert.match(html, /\/portrait\/chunxiang-professional\.webp/);
   assert.match(html, /证书与成果横向画廊/);
   assert.match(html, /滚轮或拖动，循环浏览/);
   assert.match(html, /离开证书画廊并查看下一屏/);
@@ -117,7 +122,7 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
   assert.match(styles, /perspective: 1400px/);
   assert.match(styles, /@keyframes openingHeroSwing/);
   assert.doesNotMatch(styles, /background: var\(--yellow\)/);
-  assert.match(layout, /高级软件开发工程师｜三维交互简历/);
+  assert.match(layout, /椿襄｜软件开发工程师与多面个人档案/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
 
@@ -125,6 +130,7 @@ test("removes starter preview infrastructure and keeps 3D dependencies", async (
     access(new URL("../app/_sites-preview/SkeletonPreview.tsx", templateRoot)),
   );
   await access(new URL("public/models/chunxiang-avatar.glb", templateRoot));
+  await access(new URL("public/portrait/chunxiang-professional.webp", templateRoot));
   await Promise.all(
     [
       "mobicom-paper.webp",

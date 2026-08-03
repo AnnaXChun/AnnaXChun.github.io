@@ -3829,6 +3829,227 @@ body {
   letter-spacing: 0.08em;
 }
 
+.flora-profile {
+  min-height: 118dvh;
+  padding: clamp(8rem, 14vw, 14rem) clamp(1.5rem, 6vw, 7rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  gap: clamp(3rem, 8vw, 10rem);
+  align-items: start;
+}
+
+.flora-profile-portrait {
+  position: sticky;
+  top: 13vh;
+  height: 76vh;
+  overflow: hidden;
+  background: #eeeee9;
+  box-shadow: 0 2rem 5rem rgba(3, 6, 4, 0.26);
+}
+
+.flora-profile-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(16, 19, 15, 0.16), transparent 24%);
+  pointer-events: none;
+}
+
+.flora-profile-portrait img {
+  width: 100%;
+  height: 108%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 43%;
+  filter: saturate(0.82) contrast(1.025);
+  will-change: transform;
+}
+
+.flora-profile-copy {
+  position: relative;
+  isolation: isolate;
+  padding-top: 8vh;
+}
+
+.flora-profile-monogram {
+  position: absolute;
+  z-index: -1;
+  top: -5rem;
+  right: -2vw;
+  color: rgba(233, 229, 217, 0.045);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(8rem, 15vw, 17rem);
+  font-weight: 700;
+  letter-spacing: -0.1em;
+  line-height: 0.8;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.flora-profile-copy h2,
+.flora-life-heading h2 {
+  margin: 0;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.flora-profile-copy h2 {
+  font-size: clamp(3.2rem, 5.2vw, 5.8rem);
+}
+
+.flora-life-heading h2 {
+  font-size: clamp(3.8rem, 6.4vw, 7rem);
+}
+
+.flora-profile-intro {
+  max-width: 38ch;
+  margin: 2rem 0 0;
+  color: var(--flora-muted);
+  font-size: clamp(1.05rem, 1.22vw, 1.28rem);
+  line-height: 1.85;
+}
+
+.flora-profile-notes {
+  margin-top: clamp(5rem, 9vw, 9rem);
+}
+
+.flora-profile-notes article {
+  padding: 1.8rem 0 2.5rem;
+  border-top: 1px solid var(--flora-line);
+}
+
+.flora-profile-notes span,
+.flora-life-title span {
+  display: block;
+  margin-bottom: 0.8rem;
+  color: var(--flora-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.flora-profile-notes h3 {
+  margin: 0;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: clamp(1.8rem, 2.9vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.flora-profile-notes p {
+  max-width: 40ch;
+  margin: 1rem 0 0;
+  color: var(--flora-muted);
+  line-height: 1.78;
+}
+
+.flora-life {
+  padding: clamp(10rem, 16vw, 17rem) clamp(1.5rem, 6vw, 7rem) clamp(8rem, 13vw, 14rem);
+}
+
+.flora-life-heading {
+  width: min(76vw, 1040px);
+  margin-bottom: clamp(6rem, 11vw, 12rem);
+}
+
+.flora-life-heading p {
+  max-width: 32ch;
+  margin: 2rem 0 0;
+  color: var(--flora-muted);
+  font-size: clamp(1rem, 1.18vw, 1.24rem);
+  line-height: 1.75;
+}
+
+.flora-life-chapters {
+  border-top: 1px solid var(--flora-line);
+}
+
+.flora-life-chapter {
+  min-height: 72vh;
+  padding: clamp(3rem, 6vw, 6rem) 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: clamp(3rem, 8vw, 10rem);
+  align-items: center;
+  border-bottom: 1px solid var(--flora-line);
+}
+
+.flora-life-chapter:nth-child(even) {
+  grid-template-columns: minmax(360px, 0.88fr) minmax(0, 1.12fr);
+}
+
+.flora-life-chapter:nth-child(even) .flora-life-title {
+  order: 2;
+}
+
+.flora-life-chapter:nth-child(even) .flora-life-story {
+  order: 1;
+}
+
+.flora-life-title h3 {
+  margin: 0;
+  color: transparent;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: clamp(7rem, 15vw, 17rem);
+  font-weight: 700;
+  letter-spacing: -0.12em;
+  line-height: 0.8;
+  -webkit-text-stroke: 1px rgba(233, 229, 217, 0.36);
+  transition:
+    color 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flora-life-chapter:hover .flora-life-title h3 {
+  color: rgba(183, 195, 154, 0.14);
+  transform: translate3d(0.04em, 0, 0);
+}
+
+.flora-life-story > strong {
+  display: block;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: clamp(1.7rem, 2.8vw, 3.15rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+
+.flora-life-story {
+  padding-right: clamp(1.5rem, 4vw, 4rem);
+}
+
+.flora-life-chapter:nth-child(even) .flora-life-story {
+  padding-right: 0;
+}
+
+.flora-life-story dl {
+  margin: 3rem 0 0;
+}
+
+.flora-life-story dl > div {
+  padding: 1.25rem 0 1.5rem;
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1.5rem;
+  border-top: 1px solid var(--flora-line);
+}
+
+.flora-life-story dt {
+  color: var(--flora-accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.flora-life-story dd {
+  margin: 0;
+  color: var(--flora-muted);
+  line-height: 1.75;
+}
+
 @media (max-width: 900px) {
   .flora-background-object {
     top: 25vh;
@@ -3901,7 +4122,7 @@ body {
   }
 
   .flora-hero-copy h1 {
-    font-size: 11.8vw;
+    font-size: 10.2vw;
     line-height: 0.98;
   }
 
@@ -3952,7 +4173,7 @@ body {
   }
 
   .flora-traits .trait-one .trait-tag-card > strong::after {
-    content: "人工智能协作";
+    content: "ENFP";
     font-size: 0.66rem;
   }
 
@@ -3993,8 +4214,10 @@ body {
   }
 
   .flora-projects,
+  .flora-profile,
   .flora-method,
   .flora-capabilities,
+  .flora-life,
   .flora-proof,
   .flora-archive {
     padding: 7rem 1.25rem;
@@ -4006,13 +4229,25 @@ body {
   }
 
   .flora-section-heading h2,
+  .flora-life-heading h2,
   .flora-method-copy h2,
   .flora-proof-statement h2 {
     font-size: 12vw;
     line-height: 1;
   }
 
+  .flora-profile-copy h2 {
+    font-size: 10vw;
+    line-height: 1;
+  }
+
+  .flora-life-heading h2 {
+    font-size: 8.2vw;
+  }
+
   .flora-section-heading p,
+  .flora-profile-intro,
+  .flora-life-heading p,
   .flora-method-copy > div > p,
   .flora-proof-statement > p {
     margin-top: 1.25rem;
@@ -4022,6 +4257,38 @@ body {
 
   .flora-project-list {
     gap: 6rem;
+  }
+
+  .flora-profile {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .flora-profile-portrait {
+    position: relative;
+    top: auto;
+    width: 100%;
+    height: 68vh;
+  }
+
+  .flora-profile-copy {
+    padding-top: 0;
+  }
+
+  .flora-profile-monogram {
+    top: -1rem;
+    right: -7vw;
+    font-size: 31vw;
+  }
+
+  .flora-profile-notes {
+    margin-top: 4rem;
+  }
+
+  .flora-profile-notes h3 {
+    font-size: 8vw;
   }
 
   .flora-project,
@@ -4106,6 +4373,44 @@ body {
     columns: 1;
   }
 
+  .flora-life-heading {
+    width: 100%;
+    margin-bottom: 4rem;
+  }
+
+  .flora-life-chapter,
+  .flora-life-chapter:nth-child(even) {
+    min-height: auto;
+    padding: 4rem 0 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3rem;
+  }
+
+  .flora-life-chapter:nth-child(even) .flora-life-title,
+  .flora-life-chapter:nth-child(even) .flora-life-story {
+    order: initial;
+  }
+
+  .flora-life-title h3 {
+    font-size: 31vw;
+  }
+
+  .flora-life-story > strong {
+    font-size: 7vw;
+  }
+
+  .flora-life-story,
+  .flora-life-chapter:nth-child(even) .flora-life-story {
+    padding-right: 0;
+  }
+
+  .flora-life-story dl > div {
+    grid-template-columns: 6rem 1fr;
+    gap: 1rem;
+  }
+
   .flora-proof-statement {
     position: relative;
     top: auto;
@@ -4172,6 +4477,7 @@ body {
   }
 
   .flora-avatar-frame,
+  .flora-profile-portrait img,
   .flora-project-visual img {
     transform: none !important;
   }

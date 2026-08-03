@@ -13,9 +13,9 @@ const display = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "高级软件开发工程师｜三维交互简历",
+  title: "椿襄｜软件开发工程师与多面个人档案",
   description:
-    "一份面向高级软件开发工程师的三维交互简历，重点展示人工智能工程、分布式系统、高并发架构与云原生交付能力。",
+    "椿襄的三维互动个人档案，展示人工智能原生研发、高并发后端与智能体工程，也记录 ENFP、羽毛球、健身和视频剪辑构成的多面生活。",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

@@ -35,22 +35,22 @@ const slideAccents = [
 
 const traits = [
   {
-    label: "Codex / Claude Code",
-    note: "人工智能协作",
+    label: "ENFP",
+    note: "主动连接",
     className: "trait-one",
     color: "#b8d97c",
-    meaning: "熟练使用人工智能编程工具参与真实工程研发。",
-    evidence: "用于代码理解、方案拆分、重构、测试、排障与部署交付。",
-    value: "缩短反馈链路，让研发速度与代码质量同时提升。",
+    meaning: "外向不是热闹，而是愿意主动建立连接，让陌生协作快速进入正题。",
+    evidence: "组队时先说清每个人擅长的部分，再把讨论整理成可以行动的计划。",
+    value: "适合需要跨角色沟通、快速试错和持续推进的团队环境。",
   },
   {
-    label: "智能体构建",
-    note: "人工智能工程",
+    label: "羽毛球",
+    note: "预判与节奏",
     className: "trait-two",
     color: "#d8b66e",
-    meaning: "具备从模型接入到工具调用的智能体研发经验。",
-    evidence: "实践 LangChain、Llama、Agent Loop、工具调用与安全沙箱。",
-    value: "能够把大模型能力转化为可执行、可验证的业务流程。",
+    meaning: "我喜欢它几乎没有延迟的反馈，判断来球、调整步伐，下一拍立刻验证。",
+    evidence: "享受单打的节奏控制，也重视双打里的补位、喊球和默契。",
+    value: "让我先读局面再出手，也提醒我任何决策都要为下一拍留位置。",
   },
   {
     label: "高并发后端",
@@ -62,31 +62,31 @@ const traits = [
     value: "保障关键链路在并发压力下保持一致性和可用性。",
   },
   {
-    label: "全国一等奖队长",
-    note: "领导力",
+    label: "视频剪辑",
+    note: "叙事与取舍",
     className: "trait-four",
     color: "#e47e6b",
-    meaning: "计算机系统能力大赛小米杯全国一等奖团队负责人。",
-    evidence: "以队长身份推进方案设计、协作分工与最终交付。",
-    value: "验证复杂任务拆解、技术决策和团队推进能力。",
+    meaning: "剪辑不是堆素材，而是决定观众此刻应该看到什么。",
+    evidence: "从素材筛选、节奏点和音乐到字幕，把零散片段整理成有落点的叙事。",
+    value: "它直接影响我做演示、写文档和设计产品反馈的方式。",
   },
   {
-    label: "LangChain / Llama",
-    note: "模型应用",
+    label: "Codex / Claude Code",
+    note: "人工智能协作",
     className: "trait-five",
     color: "#69b7c8",
-    meaning: "具备大模型应用编排、上下文组织与推理链路经验。",
-    evidence: "结合垂直模型、提示工程和工具协议构建智能体应用。",
-    value: "能从模型能力出发设计稳定、可扩展的应用架构。",
+    meaning: "把人工智能编程工具当成工程协作者，而不是代码补全器。",
+    evidence: "用于代码理解、方案拆分、重构、测试、排障、视觉验收与部署交付。",
+    value: "缩短反馈链路，同时保留测试、审查和结果验证。",
   },
   {
-    label: "全栈闭环交付",
-    note: "工作能力",
+    label: "健身",
+    note: "长期状态",
     className: "trait-six",
     color: "#d69a63",
-    meaning: "能够从需求、研发、测试到部署独立完成闭环。",
-    evidence: "持续维护国家级官网，并独立交付多个个人项目。",
-    value: "不止完成代码，还能把产品可靠地交付上线。",
+    meaning: "训练不是证明意志力，而是管理动作质量、恢复和长期状态。",
+    evidence: "会根据当天状态调整重量与组数，优先保证动作完成度。",
+    value: "不靠短期透支，保持稳定且可持续的工作输出。",
   },
   {
     label: "复杂问题排障",
@@ -669,11 +669,11 @@ useGLTF.preload("/models/chunxiang-avatar.glb");
 
 const openingWorks = [
   { title: "智能体工作流", meta: "工具调用 / SOP" },
+  { title: "羽毛球", meta: "预判 / 节奏" },
   { title: "支付链路", meta: "高并发 / 状态机" },
-  { title: "MobiCom 研究", meta: "临床知识蒸馏" },
-  { title: "数字孪生", meta: "三维人体重建" },
-  { title: "系统能力", meta: "全国一等奖" },
-  { title: "人工智能原生", meta: "Codex / Agent" },
+  { title: "视频剪辑", meta: "镜头 / 叙事" },
+  { title: "ENFP", meta: "连接 / 好奇" },
+  { title: "力量训练", meta: "状态 / 坚持" },
 ] as const;
 
 function OpeningSequence({ onComplete }: { onComplete: () => void }) {
@@ -1748,38 +1748,62 @@ const capabilityGroups = [
     ],
   },
   {
-    title: "交付与工程效能",
-    lead: "把一次成功沉淀为长期能力",
+    title: "表达与团队推进",
+    lead: "把复杂问题讲清楚，也把协作推到结果",
     items: [
-      "需求澄清与任务边界定义",
-      "单元测试、代码审查与链路复核",
-      "Docker、Linux、CI/CD 与部署",
-      "复盘、Skill 沉淀与 SOP 复用",
+      "需求澄清、边界定义与任务拆分",
+      "演示叙事、视频剪辑与信息取舍",
+      "团队分工、节点推进与现场沟通",
+      "复盘、Skill 沉淀与 SOP 工作流复用",
     ],
   },
 ] as const;
 
 const workingMethod = [
   {
-    title: "定义问题",
-    text: "先核对目标、现状和验收条件，再决定技术路线与风险边界。",
+    title: "先把问题说人话",
+    text: "先核对谁在什么场景遇到什么阻碍，再写验收条件。避免一开始就被工具名带走。",
   },
   {
-    title: "编排智能体",
-    text: "让 Codex、Claude Code 与专用 Skill 分担代码理解、实现、测试和审查。",
+    title: "用样品建立共识",
+    text: "尽快做出可运行的最小版本，让同事对着真实结果讨论，而不是围绕想象争论。",
   },
   {
-    title: "验证交付",
-    text: "以自动化测试、日志证据、页面验收和回滚预案形成可追溯闭环。",
+    title: "让证据结束争论",
+    text: "用自动化测试、日志、页面验收与回滚预案复核结果，交付之后再把经验写进 SOP。",
   },
 ] as const;
 
 const workProof = [
-  ["复杂系统拆解", "把模糊需求转成可执行计划，并为关键决策保留证据。"],
-  ["独立闭环交付", "覆盖需求、研发、测试、部署与复盘，不把上线留给下一环。"],
-  ["复杂问题排障", "从日志、数据与链路行为收敛根因，优先恢复业务确定性。"],
-  ["团队技术推进", "以全国一等奖队长经历验证分工、决策与节点推进能力。"],
-  ["持续学习迁移", "把研究、竞赛与人工智能工具经验快速迁移到真实工程。"],
+  ["能把复杂事讲清楚", "先确认场景与边界，再用样品、图示或演示把抽象问题变成共同语言。"],
+  ["复杂问题排障与现场反应", "排障看日志，打球看拍面，剪辑看前后帧。我习惯根据新证据立刻调整。"],
+  ["能独立收尾", "覆盖需求、研发、测试、部署与复盘，不把最后一公里留给下一个人。"],
+  ["能把人组织起来", "全国一等奖队长经历让我学会分工、喊停无效讨论，并守住交付节点。"],
+  ["愿意反复成为新手", "从三维重建到强化学习智能体，再到影像和力量训练，好奇心最终都要落到练习。"],
+] as const;
+
+const lifeChapters = [
+  {
+    title: "羽毛球",
+    focus: "预判",
+    statement: "我喜欢不到一秒的判断。对方的拍面、重心和空档，决定下一步往哪里移动。",
+    practice: "单打时控制回合节奏，双打时主动补位和喊球。输掉一分就复盘落点，不把情绪带进下一拍。",
+    transfer: "它让我在工程现场先读局面，再选择动作，同时始终为下一步保留空间。",
+  },
+  {
+    title: "健身",
+    focus: "状态",
+    statement: "训练计划允许状态波动，但不允许动作失真。稳定出勤比偶尔把自己练到极限更重要。",
+    practice: "根据当天恢复调整重量与组数，记录动作感受，把疼痛、疲劳和偷懒区分开。",
+    transfer: "它教会我管理长期产出。高强度阶段敢冲，普通日子也能维持可靠的基本盘。",
+  },
+  {
+    title: "视频剪辑",
+    focus: "取舍",
+    statement: "我会为了一个转场反复比较前后两帧，也会删掉自己喜欢但破坏节奏的素材。",
+    practice: "先找故事落点，再筛素材、定音乐、卡节奏和做字幕，让每个镜头都有存在的理由。",
+    transfer: "它让我写文档和做演示时少堆信息，更在意顺序、停顿，以及对方真正记住什么。",
+  },
 ] as const;
 
 function SpiderCharm() {
@@ -2032,6 +2056,22 @@ export default function Home() {
           },
         });
 
+        gsap.fromTo(
+          ".flora-profile-portrait img",
+          { scale: 1.04, yPercent: -3 },
+          {
+            scale: 1.04,
+            yPercent: 4,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".flora-profile",
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          },
+        );
+
         gsap.utils.toArray<HTMLElement>(".flora-reveal").forEach((element) => {
           gsap.from(element, {
             autoAlpha: 0,
@@ -2100,9 +2140,10 @@ export default function Home() {
           椿襄
         </a>
         <nav aria-label="简历导航">
+          <a href="#profile">关于我</a>
           <a href="#work">代表项目</a>
-          <a href="#method">工作方法</a>
           <a href="#skills">技术能力</a>
+          <a href="#life">生活侧写</a>
           <a href="#archive">成果档案</a>
         </nav>
         <a className="flora-contact-link" href="mailto:mshuwhu@whu.edu.cn">
@@ -2121,14 +2162,14 @@ export default function Home() {
         </div>
 
         <div className="flora-hero-copy">
-          <span>高级软件开发工程师，人工智能原生研发</span>
+          <span>软件开发工程师 / ENFP / 运动与影像爱好者</span>
           <h1>
-            构建智能系统。
+            把系统做稳，
             <br />
-            交付可靠结果。
+            把生活过出镜头感。
           </h1>
           <p>
-            用后端工程、智能体与可复用 SOP 工作流，把复杂问题变成可验证的产品与生产能力。
+            白天拆解支付链路、智能体和后端系统，下班后去球场找节奏、在训练里管理状态，再把日常剪成有起承转合的短片。
           </p>
         </div>
 
@@ -2144,24 +2185,69 @@ export default function Home() {
           </Canvas>
         </div>
 
-        <div className="flora-traits" aria-label="能力标签">
+        <div className="flora-traits" aria-label="个性与能力标签">
           {traits.slice(0, 6).map((trait) => (
             <TraitTag key={trait.label} trait={trait} />
           ))}
         </div>
 
         <aside className="flora-hero-note">
-          <strong>工程价值</strong>
-          <span>稳定架构</span>
-          <span>智能协作</span>
-          <span>闭环交付</span>
+          <strong>它们如何汇合</strong>
+          <span>工程判断</span>
+          <span>主动连接</span>
+          <span>身体感知</span>
         </aside>
+      </section>
+
+      <section className="flora-profile" id="profile">
+        <div className="flora-profile-portrait flora-reveal">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 用户提供的本人职业肖像是本章节的核心内容。 */}
+          <img
+            src="/portrait/chunxiang-professional.webp"
+            alt="椿襄身着深蓝衬衫的职业肖像"
+            loading="lazy"
+          />
+        </div>
+
+        <div className="flora-profile-copy">
+          <div className="flora-profile-monogram" aria-hidden="true">ENFP</div>
+          <div className="flora-reveal">
+            <h2>
+              不只写代码，
+              <br />
+              也训练判断、表达
+              <br />
+              与长期状态。
+            </h2>
+            <p className="flora-profile-intro">
+              我喜欢有反馈的事情。代码会报错，球会落地，镜头会告诉你哪里拖沓。它们都逼人诚实，也让我习惯观察、调整，然后再试一次。
+            </p>
+          </div>
+
+          <div className="flora-profile-notes">
+            <article className="flora-reveal">
+              <span>作为 ENFP</span>
+              <h3>先让人愿意一起做事。</h3>
+              <p>我会主动接住冷场、说清各自擅长的部分，再把脑暴收束成谁来做、做到什么程度、什么时候一起验收。</p>
+            </article>
+            <article className="flora-reveal">
+              <span>作为工程师</span>
+              <h3>兴奋地开始，冷静地收尾。</h3>
+              <p>新工具让我兴奋，但生产交付仍要靠边界、测试、日志和回滚。好奇心负责打开可能，证据负责关上风险。</p>
+            </article>
+            <article className="flora-reveal">
+              <span>作为创作者</span>
+              <h3>删掉无效信息，留下真正的重点。</h3>
+              <p>剪辑训练了我的叙事顺序。做演示、写方案或解释技术时，我会先决定对方最后应该记住哪一句。</p>
+            </article>
+          </div>
+        </div>
       </section>
 
       <section className="flora-projects" id="work">
         <header className="flora-section-heading flora-reveal">
-          <h2>把能力放进真实项目。</h2>
-          <p>选取生产系统、推理智能体与三维重建，呈现从业务交付到前沿研究的完整跨度。</p>
+          <h2>热情可以很广，交付必须具体。</h2>
+          <p>三个真实项目覆盖生产系统、推理智能体与三维重建。每个项目都写清我做了什么，以及结果如何被验证。</p>
         </header>
 
         <div className="flora-project-list">
@@ -2202,9 +2288,9 @@ export default function Home() {
         </div>
         <div className="flora-method-copy">
           <div className="flora-reveal">
-            <h2>人工智能不是外挂，而是工作系统。</h2>
+            <h2>我怎么把热情变成可靠交付。</h2>
             <p>
-              我把需求理解、任务计划、工具调用、代码验证与交付复盘串成 SOP，显著缩短个人项目交付周期。
+              ENFP 让我愿意打开局面，工程训练让我把局面收好。人工智能工具参与调研、编码、测试和审查，但最终结果仍由证据验收。
             </p>
           </div>
           <ol>
@@ -2220,8 +2306,8 @@ export default function Home() {
 
       <section className="flora-capabilities" id="skills">
         <header className="flora-section-heading flora-reveal">
-          <h2>一套能进入生产环境的技术栈。</h2>
-          <p>不把工具名当装饰，每一组能力都对应设计、实现、验证和维护中的实际职责。</p>
+          <h2>技术是我的主业，但不是我的全部。</h2>
+          <p>这套技术栈服务于四件事：理解复杂问题、构建可靠系统、让智能体真正执行任务，以及把团队推进到结果。</p>
         </header>
         <div className="flora-capability-grid">
           {capabilityGroups.map((group) => (
@@ -2238,11 +2324,46 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="flora-life" id="life">
+        <header className="flora-life-heading flora-reveal">
+          <h2>
+            工作之外，
+            <br />
+            我仍在练习同一件事。
+          </h2>
+          <p>观察反馈，做出判断，然后愿意为下一次表现重新调整。</p>
+        </header>
+
+        <div className="flora-life-chapters">
+          {lifeChapters.map((chapter) => (
+            <article className="flora-life-chapter flora-reveal" key={chapter.title}>
+              <div className="flora-life-title">
+                <span>{chapter.focus}</span>
+                <h3>{chapter.title}</h3>
+              </div>
+              <div className="flora-life-story">
+                <strong>{chapter.statement}</strong>
+                <dl>
+                  <div>
+                    <dt>我怎么练</dt>
+                    <dd>{chapter.practice}</dd>
+                  </div>
+                  <div>
+                    <dt>它如何影响工作</dt>
+                    <dd>{chapter.transfer}</dd>
+                  </div>
+                </dl>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="flora-proof">
         <div className="flora-proof-statement flora-reveal">
-          <h2>高级工程能力，最终要落在判断与结果上。</h2>
+          <h2>我希望同事记住的，不只是一串技术栈。</h2>
           <p>
-            从泰康科技后端实习、中帆协国家级项目负责人和竞赛队长，到智能体构建与人工智能科研，我关注同一件事：如何把不确定的问题稳定交付。
+            我能在复杂系统里保持判断，也能在合作里提供能量。从泰康科技后端实习、中帆协项目、竞赛队长到人工智能科研，我始终把沟通、验证和收尾看成工程的一部分。
           </p>
         </div>
         <div className="flora-proof-list">
@@ -2257,8 +2378,8 @@ export default function Home() {
 
       <section className="flora-archive" id="archive">
         <header className="flora-section-heading flora-reveal">
-          <h2>成长留下证据。</h2>
-          <p>研究、专利、竞赛与工程成果，在同一条能力演进线上持续积累。</p>
+          <h2>学生时代结束了，证据仍然有效。</h2>
+          <p>这些研究、专利和竞赛不再代表排名，而是记录我如何主动组队、解决陌生问题，并把想法做成可验收的成果。</p>
         </header>
         <CertificateGallery onExit={goToContact} />
       </section>
@@ -2268,13 +2389,13 @@ export default function Home() {
           椿襄
         </div>
         <div className="flora-closing-copy flora-reveal">
-          <h2>下一段复杂系统，一起做好。</h2>
-          <p>武汉大学软件工程背景，专注后端、人工智能原生研发与可靠交付。</p>
+          <h2>可以先聊系统，也可以先约一场球。</h2>
+          <p>武汉大学软件工程背景。如果你在找一个能写后端、搭智能体、推进协作，也愿意为表达和体验多走一步的人，欢迎联系。</p>
           <a href="mailto:mshuwhu@whu.edu.cn">mshuwhu@whu.edu.cn</a>
         </div>
         <footer>
-          <span>高级软件开发工程师</span>
-          <span>人工智能与分布式系统</span>
+          <span>软件开发工程师 / ENFP</span>
+          <span>人工智能、羽毛球与影像叙事</span>
         </footer>
       </section>
 
