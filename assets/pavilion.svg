@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" fill="none" role="img" aria-labelledby="title description">
+  <title id="title">亭阁：原创等轴测结构图</title>
+  <desc id="description">纸白色悬挑屋顶、细立柱、玻璃墙与架空平台组成的现代亭阁，配有建筑尺寸线和剖面标记。</desc>
+  <defs>
+    <pattern id="concrete" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(26.565)">
+      <path d="M0 0V9" stroke="#282b28" stroke-opacity=".13" stroke-width=".55"/>
+    </pattern>
+    <pattern id="fine-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-26.565)">
+      <path d="M0 0V5" stroke="#282b28" stroke-opacity=".24" stroke-width=".5"/>
+    </pattern>
+    <marker id="tick" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1 7L7 1" stroke="#b8422f" stroke-width="1"/>
+    </marker>
+    <style>
+      .solid{fill:#f4f1e9;stroke:#282b28;stroke-width:1.25;stroke-linejoin:round}
+      .line{stroke:#282b28;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round}
+      .light{stroke:#84867f;stroke-width:.55}
+      .ghost{stroke:#a7a89f;stroke-width:.55;stroke-dasharray:4 5}
+      .red{stroke:#b8422f;stroke-width:.7}
+      .label{fill:#74776e;font:8px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1.3px}
+      .red-label{fill:#b8422f;font:9px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1.4px}
+      #roof,#structure,#base{transition:transform 1.1s cubic-bezier(.22,.7,.2,1)}
+      .exploded #roof{transform:translateY(-45px)}
+      .exploded #structure{transform:translateY(-15px)}
+      @media(prefers-reduced-motion:reduce){#roof,#structure,#base{transition:none}}
+    </style>
+  </defs>
+
+  <!-- Construction axes, deliberately lighter than the object. -->
+  <g class="ghost" aria-hidden="true">
+    <path d="M75 366L616 637M56 462L656 162M330 45V582"/>
+    <path d="M138 396V138M602 436V150M410 532V268"/>
+    <path d="M93 244L610 502M146 578L672 315"/>
+    <path d="M168 380L330 299L588 428"/>
+    <ellipse cx="369" cy="409" rx="267" ry="133.5"/>
+  </g>
+
+  <g id="base">
+    <!-- Thin ground raft, with material section exposed along the rim. -->
+    <path class="solid" d="M138 396L330 300L602 436L410 532Z"/>
+    <path class="solid" d="M138 396V406L410 542V532Z"/>
+    <path d="M138 396V406L410 542V532Z" fill="url(#fine-hatch)"/>
+    <path class="solid" d="M410 532V542L602 446V436Z"/>
+    <g class="light">
+      <path d="M163 408L355 312M191 422L383 326M219 436L411 340M247 450L439 354M275 464L467 368M303 478L495 382M331 492L523 396M359 506L551 410M387 520L579 424"/>
+      <path d="M170 380L442 516M202 364L474 500M234 348L506 484M266 332L538 468M298 316L570 452"/>
+    </g>
+    <!-- Offset approach steps. -->
+    <path class="solid" d="M252 475L282 460L354 496L324 511Z"/>
+    <path class="solid" d="M252 475V481L324 517V511Z"/>
+    <path class="solid" d="M324 511V517L354 502V496Z"/>
+    <path class="solid" d="M264 465L294 450L366 486L336 501Z"/>
+    <path class="solid" d="M264 465V471L336 507V501Z"/>
+    <path class="solid" d="M336 501V507L366 492V486Z"/>
+    <path class="solid" d="M276 455L306 440L378 476L348 491Z"/>
+    <path class="solid" d="M276 455V461L348 497V491Z"/>
+    <path class="solid" d="M348 491V497L378 482V476Z"/>
+    <path class="solid" d="M288 445L318 430L390 466L360 481Z"/>
+    <path class="solid" d="M288 445V451L360 487V481Z"/>
+    <path class="solid" d="M360 481V487L390 472V466Z"/>
+    <path class="solid" d="M300 435L330 420L402 456L372 471Z"/>
+    <path class="solid" d="M300 435V441L372 477V471Z"/>
+    <path class="solid" d="M372 471V477L402 462V456Z"/>
+    <!-- Pedestals beneath the raised floor. -->
+    <g class="solid">
+      <path d="M199 350L207 346L215 350V401L207 405L199 401Z"/>
+      <path d="M397 447L405 443L413 447V498L405 502L397 498Z"/>
+      <path d="M537 377L545 373L553 377V428L545 432L537 428Z"/>
+    </g>
+    <g class="line"><path d="M207 354V405M405 451V502M545 381V432"/></g>
+  </g>
+
+  <g id="structure">
+    <!-- Raised terrace: asymmetric to the upper canopy. -->
+    <path class="solid" d="M170 335L330 255L570 375L410 455Z"/>
+    <path class="solid" d="M170 335V345L410 465V455Z"/>
+    <path d="M170 335V345L410 465V455Z" fill="url(#fine-hatch)"/>
+    <path class="solid" d="M410 455V465L570 385V375Z"/>
+    <g class="light">
+      <path d="M190 345L350 265M222 361L382 281M254 377L414 297M286 393L446 313M318 409L478 329M350 425L510 345M382 441L542 361"/>
+      <path d="M202 319L442 439M234 303L474 423M266 287L506 407M298 271L538 391"/>
+    </g>
+    <!-- Rear wall and solid service core. -->
+    <path class="solid" d="M238 301V164L330 118L486 196V333L330 255Z"/>
+    <path d="M238 301V164L330 118V255Z" fill="url(#concrete)" stroke="#282b28" stroke-width=".8"/>
+    <path class="line" d="M330 118V255M238 174L330 128L486 206"/>
+    <!-- Vertical timber/metal screen at the back. -->
+    <g stroke="#64685e" stroke-width="1.6">
+      <path d="M342 137V261M354 143V267M366 149V273M378 155V279M390 161V285M402 167V291M414 173V297M426 179V303M438 185V309M450 191V315M462 197V321M474 203V327"/>
+    </g>
+    <g class="light"><path d="M330 227L486 305M330 157L486 235"/></g>
+    <!-- Opening through the core and framed inner doorway. -->
+    <path d="M264 288V204L305 183V267" fill="#e5e3d9" stroke="#282b28" stroke-width="1"/>
+    <path class="line" d="M271 284V208L305 191M271 208L264 204"/>
+    <path class="light" d="M296 231L296 249"/>
+    <!-- A low bench makes the scale legible without introducing a figure. -->
+    <path class="solid" d="M315 292L342 278L444 329L417 343Z"/>
+    <path class="solid" d="M315 292V298L417 349V343Z"/>
+    <path class="solid" d="M417 343V349L444 335V329Z"/>
+    <path class="line" d="M326 303V323M337 308V328M420 351V369M432 345V363"/>
+    <!-- Glass corner, thin mullions, double bottom channels. -->
+    <path d="M208 209L410 310L548 241V384L410 453L208 352Z" fill="#f4f1e9" fill-opacity=".28" stroke="#282b28" stroke-width=".9"/>
+    <g class="line">
+      <path d="M208 216L410 317L548 248M208 343L410 444L548 375"/>
+      <path d="M259 235V377M309 260V402M360 285V428M410 310V453M456 287V430M502 264V407"/>
+    </g>
+    <g class="light">
+      <path d="M213 222L213 339M264 247V370M314 272V395M365 297V420M415 322V439M461 298V416M507 276V393M543 258V374"/>
+      <path d="M272 293L284 269M279 307L302 261M427 375L443 344M431 388L453 344"/>
+    </g>
+    <!-- Structural columns remain visually distinct from mullions. -->
+    <g class="solid">
+      <path d="M201 205L207 202L213 205V351L207 354L201 351Z"/>
+      <path d="M404 307L410 304L416 307V452L410 455L404 452Z"/>
+      <path d="M542 238L548 235L554 238V383L548 386L542 383Z"/>
+    </g>
+    <g class="line"><path d="M207 208V354M410 310V455M548 241V386"/></g>
+    <!-- A cantilevered side fin catches the material hatch. -->
+    <path class="solid" d="M486 225L501 217L501 357L486 365Z"/>
+    <path d="M486 225L501 217L501 357L486 365Z" fill="url(#concrete)"/>
+  </g>
+
+  <g id="roof">
+    <!-- Broad floating canopy with an inset linear skylight. -->
+    <path class="solid" d="M162 177L330 93L586 221L418 305Z"/>
+    <path class="solid" d="M162 177V189L418 317V305Z"/>
+    <path d="M162 177V189L418 317V305Z" fill="url(#fine-hatch)"/>
+    <path class="solid" d="M418 305V317L586 233V221Z"/>
+    <path class="line" d="M177 177L330 101L571 221L418 298Z"/>
+    <g class="light">
+      <path d="M198 195L366 111M234 213L402 129M270 231L438 147M306 249L474 165M342 267L510 183M378 285L546 201"/>
+      <path d="M198 159L454 287M234 141L490 269M270 123L526 251M306 105L562 233"/>
+    </g>
+    <!-- Long aperture above the inner room; interior lines visible through it. -->
+    <path d="M292 147L322 132L466 204L436 219Z" fill="#dddcd1" stroke="#282b28" stroke-width="1"/>
+    <path d="M292 147V154L436 226V219Z" fill="#e9e6dc" stroke="#282b28" stroke-width=".7"/>
+    <path d="M436 219V226L466 211V204Z" fill="#cfcec2" stroke="#282b28" stroke-width=".7"/>
+    <path class="line" d="M310 156L340 141M334 168L364 153M358 180L388 165M382 192L412 177M406 204L436 189M430 216L460 201"/>
+    <path class="light" d="M169 184L418 308L579 228"/>
+  </g>
+
+  <!-- Dimension strings and small red drafting interventions. -->
+  <g class="red" aria-hidden="true">
+    <path d="M136 177L110 164M330 93L304 80M120 169L314 72" marker-start="url(#tick)" marker-end="url(#tick)"/>
+    <path d="M336 77L353 59M586 209L612 196M350 65L606 193" marker-start="url(#tick)" marker-end="url(#tick)"/>
+    <path d="M608 436L645 436M592 221L645 221M633 221V436" marker-start="url(#tick)" marker-end="url(#tick)"/>
+    <path d="M143 417L126 435M409 550L395 568M128 440L398 575" marker-start="url(#tick)" marker-end="url(#tick)"/>
+    <path d="M579 233L669 188H699M238 261L97 261H71M416 455L526 510H595"/>
+    <circle cx="579" cy="233" r="3" fill="#b8422f"/>
+    <circle cx="238" cy="261" r="3" fill="#b8422f"/>
+    <circle cx="416" cy="455" r="3" fill="#b8422f"/>
+    <path d="M115 335L117 321L131 328M608 352L606 366L592 359" stroke-width="1.2"/>
+    <path d="M119 326L603 361" stroke-dasharray="16 5 2 5" stroke-opacity=".6"/>
+  </g>
+  <g class="red-label" aria-hidden="true">
+    <text x="204" y="112" transform="rotate(-26.565 204 112)">L / 02</text>
+    <text x="452" y="109" transform="rotate(26.565 452 109)">L / 03</text>
+    <text x="648" y="322" transform="rotate(90 648 322)">H / 01</text>
+    <text x="242" y="493" transform="rotate(26.565 242 493)">STRUCTURAL GRID</text>
+    <text x="678" y="180">01</text>
+    <text x="58" y="253">02</text>
+    <text x="582" y="502">03</text>
+    <text x="103" y="320">A</text>
+    <text x="612" y="376">A</text>
+  </g>
+  <g class="label" aria-hidden="true">
+    <text x="632" y="205">CANOPY</text>
+    <text x="57" y="278">FRAME</text>
+    <text x="527" y="527">FOUNDATION</text>
+    <text x="537" y="578">AXONOMETRIC / A–A</text>
+    <text x="537" y="592">CONCEPT STUDY</text>
+  </g>
+  <!-- Survey origin and orientation glyph. -->
+  <g transform="translate(84 526)" aria-hidden="true">
+    <circle r="21" stroke="#a7a89f" stroke-width=".6"/>
+    <path d="M-27 0H27M0-27V27" class="light"/>
+    <path d="M0 15V-20L-4-10M0-20L4-10" class="red"/>
+    <text x="-3" y="-32" class="red-label">N</text>
+    <circle r="2" fill="#b8422f"/>
+  </g>
+</svg>
