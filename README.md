@@ -1,4 +1,59 @@
-# vinext-starter
+# Chunxiang's portfolio
+
+Live site: https://annaxchun.github.io/
+
+The current GitHub Pages website lives in `pages-site/`. It uses React,
+Remotion and Three.js for a cream-and-blue architectural desk, a camera move
+into a notebook portrait, and a scroll-controlled personal story. A complete
+static profile is also available at `/profile.html`.
+
+## Develop and build the current website
+
+Use Node.js 22.12+ or a newer supported LTS release. The Pages site has its own
+lockfile; it does not require installing the legacy app's dependencies.
+
+```bash
+npm --prefix pages-site ci
+npm run dev:pages
+npm run build:pages
+npm run preview:pages
+```
+
+The build output is `dist-pages/`, including `.nojekyll`. Personal content is in
+`pages-site/src/data.js`; the illustrated portrait and supporting images are in
+`pages-site/public/assets/`.
+
+## Publish to GitHub Pages
+
+Pages serves the root of the `gh-pages` branch. Pushing `main` alone does not
+publish a new version. After committing source changes on `main`, build and
+update a separate clean checkout of the publishing branch:
+
+```bash
+npm run build:pages
+git push origin main
+git fetch origin gh-pages
+git worktree add --detach ../chunxiang-pages-publish origin/gh-pages
+rsync -a --delete --exclude=.git dist-pages/ ../chunxiang-pages-publish/
+git -C ../chunxiang-pages-publish add -A
+git -C ../chunxiang-pages-publish commit -m "deploy: update portfolio"
+git -C ../chunxiang-pages-publish push origin HEAD:gh-pages
+git worktree remove ../chunxiang-pages-publish
+```
+
+Use a new checkout path if that directory already exists. Push without force;
+if someone publishes concurrently, fetch the new head and rebuild the release
+on top of it. Confirm the Pages deployment succeeds before announcing it live.
+
+The current design was synchronized from Sites source commit
+`30b6c43fc057835db268dbbbe75e760f23e30030`.
+
+## Legacy application reference
+
+The original `app/`, root dependencies and supporting tools remain available
+for reference. The following notes describe that earlier Vinext application.
+
+### vinext-starter
 
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and

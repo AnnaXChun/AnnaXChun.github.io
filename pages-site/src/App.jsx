@@ -1,0 +1,253 @@
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Player} from '@remotion/player';
+import Film, {CHAPTERS, FPS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
+import Dossier from './Dossier';
+
+const LAST_FRAME = TOTAL_FRAMES - 1;
+const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
+const getChapter = frame => Math.max(0,STARTS.findLastIndex(start=>frame>=start));
+const contentHash = () => Boolean(window.location.hash && !['#top','#story'].includes(window.location.hash));
+
+function Story() {
+  const [initial] = useState(()=>({intro:!contentHash() && window.scrollY<8}));
+  const initialFrame=initial.intro?0:INTRO_END_FRAME;
+  const story=useRef(null),stage=useRef(null),viewport=useRef(null),player=useRef(null);
+  const progress=useRef(null),progressTrack=useRef(null),expectedScroll=useRef(null);
+  const driverRef=useRef(initial.intro?'intro':'scroll'),isPlaying=useRef(false);
+  const pendingIntroRef=useRef(initial.intro);
+  const lastFrame=useRef(initialFrame),currentChapter=useRef(0);
+  const [driver,setDriverState]=useState(driverRef.current);
+  const [playing,setPlaying]=useState(false),[chapter,setChapter]=useState(0);
+  const [size,setSize]=useState(()=>{
+    const width=window.innerWidth<760?720:1440;
+    return {width,height:Math.max(1,Math.round(width*window.innerHeight/window.innerWidth))};
+  });
+
+  const setDriver=useCallback(value=>{driverRef.current=value;setDriverState(value);},[]);
+  const pause=useCallback(()=>{
+    isPlaying.current=false;
+    player.current?.pause();
+    setPlaying(false);
+  },[]);
+  const scrollTopForFrame=useCallback(frame=>{
+    const element=story.current;
+    if(!element) return window.scrollY;
+    const top=element.getBoundingClientRect().top+window.scrollY;
+    const height=stage.current?.getBoundingClientRect().height || window.innerHeight;
+    const travel=Math.max(1,element.offsetHeight-height);
+    const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1);
+    return top+travel*fraction;
+  },[]);
+  const scrollToFrame=useCallback((frame,behavior='instant')=>{
+    const top=scrollTopForFrame(frame);
+    expectedScroll.current=top;
+    window.scrollTo({top,behavior});
+  },[scrollTopForFrame]);
+  const finishIntro=useCallback(()=>{
+    pendingIntroRef.current=false;
+    pause();
+    setDriver('scroll');
+    lastFrame.current=INTRO_END_FRAME;
+    player.current?.seekTo(INTRO_END_FRAME);
+  },[pause,setDriver]);
+  const takeOver=useCallback(()=>{
+    pendingIntroRef.current=false;
+    if(driverRef.current==='scroll') return;
+    if(driverRef.current==='intro'){finishIntro();return;}
+    pause();
+    setDriver('scroll');
+    if(lastFrame.current<INTRO_END_FRAME){
+      lastFrame.current=INTRO_END_FRAME;
+      player.current?.seekTo(INTRO_END_FRAME);
+    }
+  },[finishIntro,pause,setDriver]);
+  const leaveStory=useCallback(()=>{pendingIntroRef.current=false;pause();setDriver('scroll');},[pause,setDriver]);
+
+  useEffect(()=>{
+    const element=viewport.current;
+    if(!element) return;
+    const observer=new ResizeObserver(entries=>{
+      const rect=entries[0].contentRect;
+      if(rect.width<=0 || rect.height<=0) return;
+      const width=rect.width<760?720:1440;
+      const height=Math.max(1,Math.round(width*rect.height/rect.width));
+      setSize(previous=>previous.width===width&&previous.height===height?previous:{width,height});
+    });
+    observer.observe(element);
+    return ()=>observer.disconnect();
+  },[]);
+
+  useEffect(()=>{
+    const p=player.current;
+    if(!p) return;
+    let scrollRaf=0,startRaf=0;
+    const report=frame=>{
+      lastFrame.current=frame;
+      const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1);
+      if(progress.current) progress.current.style.width=`${fraction*100}%`;
+      const next=getChapter(frame);
+      if(progressTrack.current){
+        progressTrack.current.setAttribute('aria-valuenow',String(Math.round(fraction*100)));
+        progressTrack.current.setAttribute('aria-valuetext',CHAPTERS[next].title);
+      }
+      if(next!==currentChapter.current){currentChapter.current=next;setChapter(next);}
+      if(story.current){story.current.dataset.chapter=String(next);story.current.dataset.opening=String(frame<INTRO_END_FRAME);}
+    };
+    const updateFromScroll=()=>{
+      scrollRaf=0;
+      if(driverRef.current!=='scroll' || !story.current) return;
+      const rect=story.current.getBoundingClientRect();
+      const height=stage.current?.getBoundingClientRect().height || window.innerHeight;
+      const fraction=clamp(-rect.top/Math.max(1,rect.height-height),0,1);
+      const frame=Math.round(INTRO_END_FRAME+fraction*(LAST_FRAME-INTRO_END_FRAME));
+      if(frame!==lastFrame.current) p.seekTo(frame);
+    };
+    const scheduleScroll=()=>{if(!scrollRaf) scrollRaf=requestAnimationFrame(updateFromScroll);};
+    const tryStartPendingIntro=()=>{
+      if(!pendingIntroRef.current) return;
+      if(driverRef.current!=='intro' || contentHash() || window.scrollY>=8){
+        pendingIntroRef.current=false;
+        setDriver('scroll');
+        updateFromScroll();
+        return;
+      }
+      if(document.hidden) return;
+      pendingIntroRef.current=false;
+      p.play();
+    };
+    const onFrame=event=>{
+      const frame=event.detail.frame;
+      report(frame);
+      if(driverRef.current==='intro' && frame>=INTRO_END_FRAME){finishIntro();return;}
+      if(driverRef.current==='journey' && isPlaying.current && frame>=INTRO_END_FRAME) scrollToFrame(frame);
+    };
+    const onPlay=()=>{pendingIntroRef.current=false;isPlaying.current=true;setPlaying(true);};
+    const onPause=()=>{isPlaying.current=false;setPlaying(false);};
+    const onEnded=()=>{onPause();setDriver('scroll');report(LAST_FRAME);};
+    const onScroll=()=>{
+      if(driverRef.current==='intro' && Math.abs(window.scrollY-scrollTopForFrame(INTRO_END_FRAME))>3) takeOver();
+      if(driverRef.current==='journey' && expectedScroll.current!==null && Math.abs(window.scrollY-expectedScroll.current)>3) takeOver();
+      scheduleScroll();
+    };
+    const onUserScroll=()=>{takeOver();scheduleScroll();};
+    const onKeyScroll=event=>{
+      if(event.altKey || event.ctrlKey || event.metaKey) return;
+      if(!['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)) return;
+      if(event.target instanceof Element){
+        if(event.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+        if(event.key===' ' && event.target.closest('button,a,[role="button"]')) return;
+      }
+      onUserScroll();
+    };
+    const onNavigate=event=>{
+      if(event.target instanceof Element && event.target.closest('a[href]')) leaveStory();
+    };
+    const onHashChange=()=>{leaveStory();scheduleScroll();};
+    const onVisibility=()=>{if(document.hidden) pause();else tryStartPendingIntro();};
+    p.addEventListener('frameupdate',onFrame);
+    p.addEventListener('play',onPlay);
+    p.addEventListener('pause',onPause);
+    p.addEventListener('ended',onEnded);
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.addEventListener('resize',scheduleScroll,{passive:true});
+    window.addEventListener('wheel',onUserScroll,{passive:true});
+    window.addEventListener('touchmove',onUserScroll,{passive:true});
+    window.addEventListener('keydown',onKeyScroll);
+    window.addEventListener('hashchange',onHashChange);
+    document.addEventListener('click',onNavigate,true);
+    document.addEventListener('visibilitychange',onVisibility);
+    report(initialFrame);
+    startRaf=requestAnimationFrame(()=>{
+      if(pendingIntroRef.current) tryStartPendingIntro();
+      else if(driverRef.current==='scroll') updateFromScroll();
+    });
+    return ()=>{
+      cancelAnimationFrame(scrollRaf);cancelAnimationFrame(startRaf);
+      p.removeEventListener('frameupdate',onFrame);p.removeEventListener('play',onPlay);
+      p.removeEventListener('pause',onPause);p.removeEventListener('ended',onEnded);
+      window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',scheduleScroll);
+      window.removeEventListener('wheel',onUserScroll);window.removeEventListener('touchmove',onUserScroll);
+      window.removeEventListener('keydown',onKeyScroll);window.removeEventListener('hashchange',onHashChange);
+      document.removeEventListener('click',onNavigate,true);
+      document.removeEventListener('visibilitychange',onVisibility);
+      p.pause();
+    };
+  },[finishIntro,initial,initialFrame,leaveStory,pause,scrollToFrame,scrollTopForFrame,setDriver,takeOver]);
+
+  const startPlayback=(kind,event)=>{
+    const p=player.current;
+    if(!p) return;
+    pendingIntroRef.current=false;
+    pause();
+    scrollToFrame(INTRO_END_FRAME);
+    setDriver(kind);
+    lastFrame.current=0;
+    p.seekTo(0);
+    p.play(event);
+  };
+  const togglePlayback=event=>{
+    pendingIntroRef.current=false;
+    if(isPlaying.current){pause();return;}
+    if(driverRef.current==='intro' || driverRef.current==='journey'){
+      player.current?.play(event);
+    }else startPlayback('journey',event);
+  };
+  const seekChapter=index=>{
+    pendingIntroRef.current=false;
+    pause();setDriver('scroll');
+    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+45,INTRO_END_FRAME,LAST_FRAME);
+    const top=scrollTopForFrame(target);
+    if(Math.abs(window.scrollY-top)<1) player.current?.seekTo(target);
+    scrollToFrame(target,window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth');
+  };
+  const primaryLabel=driver==='intro'?(playing?'暂停开场':'继续开场'):driver==='journey'?(playing?'暂停旅程':'继续旅程'):'播放完整旅程';
+
+  return <section id="story" className="story-scroll" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver={driver}>
+    <div className={`story-stage ${chapter===2?'story-dark':''}`} ref={stage}>
+      <div className="film-viewport" ref={viewport} aria-hidden="true">
+        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请通过顶部导航阅读完整档案。</div>}/>
+      </div>
+      <div className="film-accessible sr-only"><h1>椿襄 · 下一步</h1><p>软件开发工程师，武汉大学软件工程背景。这里讲述后端与支付系统、生命科学推理智能体、团队成果，以及羽毛球、健身和视频剪辑。可以跳过开场、暂停播放、切换章节，或直接阅读下方完整资料。</p></div>
+      <div className="story-controls">
+        <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
+        <div className="story-actions">
+          <button type="button" className="journey-toggle" onClick={togglePlayback}>{primaryLabel}</button>
+          {driver==='intro'?<button type="button" className="skip-intro" onClick={finishIntro}>跳过开场 ↗</button>:<button type="button" className="replay-intro" onClick={event=>startPlayback('intro',event)}>重播开场 ↺</button>}
+        </div>
+      </div>
+      <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress}/></div>
+      <div className="scroll-direction" aria-hidden="true">{driver==='intro'?'滚动，进入故事':'向下探索'} <span>↓</span></div>
+    </div>
+  </section>;
+}
+
+function Contact(){
+  const [copied,setCopied]=useState('');
+  const copy=async()=>{try{await navigator.clipboard.writeText('mshuwhu@whu.edu.cn');setCopied('已复制');}catch{setCopied('请直接选择邮箱复制');}};
+  return <section id="contact" className="contact-end"><div className="contact-rule"><span>NEXT / TO BE CONTINUED</span><span>继续下一步</span><i>+</i></div><div className="contact-grid"><div><p>从一次连接开始。</p><h2>下一个想法，<br/>一起做出来。</h2></div><div className="contact-methods"><a href="mailto:mshuwhu@whu.edu.cn"><small>写封邮件</small><strong>mshuwhu@whu.edu.cn</strong><span>↗</span></a><a href="tel:+8618289423880"><small>打个电话</small><strong>+86 182 8942 3880</strong><span>↗</span></a><button onClick={copy}>复制邮箱 ⧉</button><span role="status">{copied}</span></div></div><footer><a href="#top">椿襄 <small>CHUNXIANG</small></a><span>工程、探索与生活，还在继续。</span><a href="#top">回到起点 ↑</a></footer></section>;
+}
+
+export default function App(){
+  const [motion,setMotion]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(()=>{
+    const preference=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let raf=0;
+    const onChange=event=>{
+      if(!event.matches) return;
+      setMotion(false);
+      raf=requestAnimationFrame(()=>document.getElementById('dossier')?.scrollIntoView({behavior:'instant'}));
+    };
+    preference.addEventListener('change',onChange);
+    return ()=>{preference.removeEventListener('change',onChange);cancelAnimationFrame(raf);};
+  },[]);
+  useEffect(()=>{
+    if(!['#dossier','#contact'].includes(window.location.hash)) return;
+    const raf=requestAnimationFrame(()=>document.getElementById(window.location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));
+    return ()=>cancelAnimationFrame(raf);
+  },[]);
+  const changeMode=()=>{
+    if(motion){setMotion(false);requestAnimationFrame(()=>document.getElementById('dossier')?.scrollIntoView({behavior:'instant'}));}
+    else{window.history.replaceState(null,'',window.location.pathname+window.location.search);window.scrollTo({top:0,behavior:'instant'});setMotion(true);}
+  };
+  return <><a className="skip-link" href="#dossier">跳到完整资料</a><div id="top"/><header className="site-header"><a className="brand" href="#top"><span>椿襄<small>CHUNXIANG</small></span></a><nav aria-label="主导航"><a href={motion?'#story':'#dossier'}>故事</a><a href="#dossier">档案</a><a href="#contact">联系</a></nav><button className="motion-toggle" onClick={changeMode}>{motion?'静态阅读':'开启动画故事'}<span>{motion?'↗':'▷'}</span></button></header><main>{motion?<Story/>:<div className="static-intro"><span>THE NEXT MOVE</span><h1>把想法，<br/>一层层建成。</h1><p>我是椿襄，软件开发工程师。这里记录我的项目、方法，以及工作之外的生活。</p><button onClick={changeMode}>观看交互式故事 ↗</button><a href="./profile.html">打开完整静态页面 ↗</a></div>}<Dossier/><Contact/></main></>;
+}

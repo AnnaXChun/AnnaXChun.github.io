@@ -1,0 +1,20 @@
+{
+  "name": "chunxiang-next-move",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173"
+  },
+  "dependencies": {
+    "@remotion/player": "4.0.538",
+    "@remotion/transitions": "4.0.538",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.538",
+    "three": "0.180.0"
+  },
+  "devDependencies": { "vite": "8.3.5" }
+}
