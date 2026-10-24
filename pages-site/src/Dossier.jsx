@@ -4,7 +4,6 @@ import './dossier.css';
 
 const tabs = [
   { id: 'work', label: '研究与经历', count: String(projects.length).padStart(2, '0') },
-  { id: 'life', label: '关于与生活', count: '03' },
   { id: 'archive', label: '成果档案', count: '08' },
 ];
 
@@ -51,18 +50,23 @@ function ProjectIndex() {
 }
 
 function PersonalIndex() {
-  return (
-    <div className="dossier-personal-layout">
-      <div className="dossier-profile">
-        <figure className="dossier-portrait"><img src={profile.portrait} alt="椿襄的手绘风格肖像" width="1122" height="1402" loading="lazy" /><figcaption>{profile.romanizedName}<span>{profile.personality}</span></figcaption></figure>
-        <div className="dossier-biography"><p className="dossier-meta">{profile.role} · {profile.education}</p><h3>兴奋地开始，冷静地收尾。</h3><p>{profile.introduction}</p><p>{profile.biography}</p><div className="dossier-personal-contact"><a href={`mailto:${profile.email}`}>{profile.email} ↗</a><a href={profile.phoneHref}>{profile.phone} ↗</a></div></div>
-      </div>
-      <div className="dossier-personal-notes">
-        <div className="dossier-interests">{interests.map(interest => <article className="dossier-interest" key={interest.id}><h4>{interest.title}<span>{interest.note}</span></h4><p>{interest.description}</p></article>)}</div>
-        <aside className="dossier-experiment"><span className="dossier-meta">个人实验场 / {experiment.status}</span><h4>{experiment.title}</h4><p>{experiment.description}</p></aside>
-      </div>
+  return <section className="personal-overview" id="about" aria-labelledby="about-title">
+    <figure className="personal-portrait"><img src={profile.portrait} alt="椿襄的手绘风格肖像" width="1122" height="1402" loading="lazy"/><figcaption><span>{profile.romanizedName}</span><span>{profile.personality}</span></figcaption></figure>
+    <div className="personal-introduction">
+      <header className="personal-title"><span className="dossier-eyebrow">ABOUT / 认识我</span><h2 id="about-title">我是椿襄。</h2>
+      <p className="personal-role">Agent 开发、<br/>后训练算法工程师</p></header>
+      <p className="personal-voice">{profile.introduction}</p>
+      <dl className="personal-facts"><div><dt>研究</dt><dd>OPD + RL 后训练<span>开源 benchmark · SOTA</span></dd></div><div><dt>现在</dt><dd>字节跳动 · 国际商业化<span>Agent 开发实习 · 2026.09.20 — 至今</span></dd></div><div><dt>背景</dt><dd>{profile.education}</dd></div></dl>
+      <div className="personal-links"><a href={`mailto:${profile.email}`}>邮件联系 ↗</a><a href="https://github.com/AnnaXChun" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="#work-index">研究与经历 ↓</a></div>
     </div>
-  );
+  </section>;
+}
+
+function InterestsSection() {
+  return <section className="personal-life" aria-labelledby="personal-life-title"><header><span className="dossier-eyebrow">OFF THE CLOCK</span><h3 id="personal-life-title">还有这些日常。</h3></header>
+    <div className="personal-interest-grid">{interests.map((interest,index)=><article key={interest.id}><span className="interest-number">0{index+1}</span><h4>{interest.title}</h4><strong>{interest.note}</strong><p>{interest.description}</p></article>)}</div>
+    <aside className="personal-experiment"><span className="dossier-meta">个人实验 / {experiment.status}</span><h4>{experiment.title}</h4><p>{experiment.description}</p></aside>
+  </section>;
 }
 
 export default function Dossier() {
@@ -114,17 +118,18 @@ export default function Dossier() {
 
   return (
     <section className="dossier-root" id="dossier" aria-labelledby="dossier-title">
-      <header className="dossier-header"><div><span className="dossier-eyebrow">RESEARCH & PRACTICE</span><h2 id="dossier-title">研究与经历</h2></div><p>从后训练到 Agent 开发，<br />以及工作之外的日常。</p><span className="dossier-header-mark" aria-hidden="true">+</span></header>
+      <PersonalIndex/>
+      <header className="dossier-header" id="work-index"><div><span className="dossier-eyebrow">RESEARCH & PRACTICE</span><h2 id="dossier-title">研究与经历</h2></div><p>从后训练到 Agent 开发，<br />以及工作之外的日常。</p><span className="dossier-header-mark" aria-hidden="true">+</span></header>
       <div className="dossier-tablist" role="tablist" aria-label="个人资料分类">
         {tabs.map((tab, index) => <button className="dossier-tab" type="button" role="tab" id={`dossier-tab-${tab.id}`} aria-controls={`dossier-panel-${tab.id}`} aria-selected={activeTab === tab.id} tabIndex={activeTab === tab.id ? 0 : -1} key={tab.id} ref={node => { tabRefs.current[index] = node; }} onClick={() => setActiveTab(tab.id)} onKeyDown={event => changeTabWithKey(event, index)}>{tab.label}<span>{tab.count}</span></button>)}
       </div>
       <div className="dossier-panel" id="dossier-panel-work" role="tabpanel" aria-labelledby="dossier-tab-work" hidden={activeTab !== 'work'} tabIndex={0}><ProjectIndex /></div>
-      <div className="dossier-panel" id="dossier-panel-life" role="tabpanel" aria-labelledby="dossier-tab-life" hidden={activeTab !== 'life'} tabIndex={0}><PersonalIndex /></div>
       <div className="dossier-panel" id="dossier-panel-archive" role="tabpanel" aria-labelledby="dossier-tab-archive" hidden={activeTab !== 'archive'} tabIndex={0}>
         <div className="dossier-archive-heading"><p>研究、竞赛与成果原件。</p><span>08 RECORDS</span></div>
         <ul className="dossier-awards">{awards.map(award => <li className="dossier-award" key={award.id}><span className="dossier-award-year">{award.year || '研究'}</span><a className="dossier-award-title" href={award.image} onClick={event => openAward(event, award)} aria-haspopup="dialog"><span>{award.title}</span><small>{award.meta}</small></a><a className="dossier-award-original" href={award.image} target="_blank" rel="noopener noreferrer" aria-label={`在新窗口打开${award.title}原图`}>原图 <span aria-hidden="true">↗</span></a></li>)}</ul>
         <p className="dossier-archive-note">点击标题预览材料，或在新窗口打开原图。</p>
       </div>
+      <InterestsSection/>
       <dialog className="dossier-dialog" ref={dialogRef} aria-labelledby="dossier-dialog-title" aria-describedby="dossier-dialog-description" onClose={onDialogClose} onClick={closeOnBackdrop}>
         <div className="dossier-dialog-top"><span className="dossier-eyebrow">ARCHIVE / 原始材料</span><button className="dossier-dialog-close" type="button" onClick={() => dialogRef.current.close()} autoFocus>关闭 <span aria-hidden="true">×</span></button></div>
         {selectedAward && <div className="dossier-dialog-content"><figure className="dossier-dialog-image"><img src={selectedAward.image} alt={`${selectedAward.title}原始材料`} /></figure><div className="dossier-dialog-caption"><span className="dossier-meta">{[selectedAward.year, selectedAward.meta].filter(Boolean).join(' · ')}</span><h3 id="dossier-dialog-title">{selectedAward.title}</h3><p id="dossier-dialog-description">{selectedAward.description}</p><a className="dossier-inline-link" href={selectedAward.image} target="_blank" rel="noopener noreferrer">打开原图 ↗</a></div></div>}

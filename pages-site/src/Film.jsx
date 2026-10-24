@@ -1,6 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Img, useCurrentFrame} from 'remotion';
 import MinnanScene from './MinnanScene';
+import BadmintonScene from './BadmintonScene';
 
 export const FPS = 30;
 export const INTRO_END_FRAME = 90;
@@ -30,14 +31,15 @@ const STORIES = [
   {eyebrow: '01 / POST-TRAINING', title: ['OPD + RL，', '让能力进阶。'], body: '围绕 OPD + RL 开展智能体后训练研究，在开源 benchmark 上取得 SOTA。从训练方法，到可比较的评测结果。', note: 'OPD + RL / Agent Post-training / Open Benchmark'},
   {eyebrow: '02 / AGENT ENGINEERING', title: ['在字节跳动，', '开发 Agent。'], body: '将 Claude Code 内核接入内部 Agent，适配国际商业化业务，开展 Skill 优化与 Bad Case Studio 开发。', note: '2026.09.20 — 至今 · 字节跳动国际商业化'},
   {eyebrow: '03 / SELECTED WORK', title: ['一起探索，', '一起成形。'], body: '从 DeepDog 到数字孪生三维人体重建，技术路线、团队协作与验证，最终落在看得见的成果上。', note: '小米杯全国一等奖队长 / 中南地区计算机设计一等奖'},
-  {eyebrow: '04 / OFF THE CLOCK', title: ['留一点时间，', '给生活。'], body: '羽毛球、健身、视频剪辑。球场上的预判、训练中的调整、镜头里的取舍，也是我认识世界的方式。', note: '观察，调整，再试一次。'},
+  {eyebrow: '04 / OFF THE CLOCK', title: ['球场见。'], body: '读拍面、看重心，再决定下一步。享受单打的节奏，也重视双打里的补位、喊球和默契。', note: '羽毛球 / 健身 / 视频剪辑'},
 ];
 
 function InkLandscape({frame}) {
   const research = chapterOpacity(frame, 1);
   const evidence = chapterOpacity(frame, 3);
+  const life = range(frame,1020,1080);
   const travel = range(frame,440,485) * (1-range(frame,535,585));
-  return <div className="ink-landscape" style={{'--travel':travel, '--research':research, opacity: (0.3 + 0.7 * range(frame, 0, 72)) * (1 - evidence * .9)}}>
+  return <div className="ink-landscape" style={{'--travel':travel, '--research':research, opacity: (0.3 + 0.7 * range(frame, 0, 72)) * (1 - evidence * .9) * (1-life)}}>
     <MinnanScene frame={frame} />
   </div>;
 }
@@ -87,6 +89,7 @@ export default function Film() {
   const frame = useCurrentFrame();
   return <AbsoluteFill className="ink-film">
     <InkLandscape frame={frame} />
+    {frame>1020&&<div className="life-visual" style={{opacity:range(frame,1020,1080),transform:`translateY(${(1-range(frame,1020,1080))*70}px)`}}><BadmintonScene frame={frame}/></div>}
     {STORIES.map((_, index) => <StoryPanel key={index} index={index} frame={frame} />)}
     <TrainingStudy frame={frame} />
     <EvidenceCards frame={frame} />
