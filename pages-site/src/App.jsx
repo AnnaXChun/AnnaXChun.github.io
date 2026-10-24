@@ -191,7 +191,7 @@ function Story() {
       <div className="film-viewport" ref={viewport} aria-hidden="true">
         <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请向下阅读完整档案。</div>}/>
       </div>
-      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。三维闽南古厝随滚动切换视角；也可切换章节或直接阅读下方完整资料。</p></div>
+      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。三维水墨古厝随滚动切换视角，穿门后进入放有研究手记、开发笔记本和 Agent 流程板的庭院工作台；也可切换章节或直接阅读下方完整资料。</p></div>
       <div className="story-controls">
         <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
         {driver==='intro'&&<div className="story-actions">

@@ -37,7 +37,7 @@ function InkLandscape({frame}) {
   const research = chapterOpacity(frame, 1);
   const evidence = chapterOpacity(frame, 3);
   const travel = range(frame,440,485) * (1-range(frame,535,585));
-  return <div className="ink-landscape" style={{'--travel':travel, opacity: (0.3 + 0.7 * range(frame, 0, 72)) * (1 - research * .93) * (1 - evidence * .9)}}>
+  return <div className="ink-landscape" style={{'--travel':travel, '--research':research, opacity: (0.3 + 0.7 * range(frame, 0, 72)) * (1 - evidence * .9)}}>
     <MinnanScene frame={frame} />
   </div>;
 }
@@ -59,14 +59,12 @@ function TrainingStudy({frame}) {
   const alpha = chapterOpacity(frame, 1);
   if (alpha <= 0) return null;
   return <div className="training-study" style={{opacity: alpha, transform: 'translateY(' + ((1 - alpha) * 20) + 'px)'}}>
-    <div className="study-heading"><span>后训练研究</span><span className="study-seal">研</span></div>
-    <h3>OPD + RL<br />智能体后训练</h3>
+    <div className="study-heading"><span>研究手记 · 院中工作台</span><span className="study-seal">研</span></div>
     <ol>
       <li><span>一</span><div><strong>OPD + RL</strong><p>后训练方法研究</p></div></li>
-      <li><span>二</span><div><strong>Agent</strong><p>面向智能体能力提升</p></div></li>
+      <li><span>二</span><div><strong>Agent</strong><p>智能体能力提升</p></div></li>
       <li className="study-result"><span>三</span><div><strong>SOTA</strong><p>开源 benchmark 评测成果</p></div></li>
     </ol>
-    <div className="study-caption">POST-TRAINING / OPEN BENCHMARK</div>
   </div>;
 }
 
