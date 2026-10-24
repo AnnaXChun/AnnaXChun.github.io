@@ -1,75 +1,73 @@
 # 椿襄个人网站 · Design taste
 
-确认日期：2026-10-24。适用：`pages-site/`，当前 GitHub Pages 站点。
+更新：2026-10-24。本轮用户的新要求覆盖同日较早的蓝白 3D 方案与顶部导航尺寸决策。
 
-## 网站的目的
+## 当前定位与内容顺序
 
-这是有设计感、有创新的个人展示页。访客应先记住人物、作品和真实成果，再感知交互的精细程度。蓝白建筑工作台、纸张、手绘肖像和镜头叙事构成已有辨识度，继续沿用。
+这是个人展示页，重点是设计感、创新和真实工作。职业定位固定为 **Agent 开发、后训练算法工程师**。
 
-本轮用户明确要求：成果要成为主体；顶部 banner 和字号要符合正常网站比例；删除“静态阅读”；不要为展示页随意添加无关功能。效果验收使用 **Chrome 实际窗口**，不能只看应用内的窄侧栏预览。
+1. 个人姓名与职业定位。
+2. 后训练：现有 SFT / GRPO、veRL 与生命科学推理智能体项目。
+3. 字节跳动国际商业化部门的 Agent 开发实习。
+4. 竞赛与团队成果，保留大幅真实材料。
+5. 生活与联系。
 
-## 判断顺序
+项目详录同样把后训练项目排第一并默认展开，字节实习第二。未经用户提供，不编造实习日期、具体业务、团队、性能指标、论文录用或成果提升数字；已有代码库中的项目描述与用户确认的事实分开核对。当前只确认字节部门与 Agent 开发实习岗位。
 
-1. 先问本章最重要的内容是什么，再分配面积、对比度、字号和停留时间。
-2. 成果章节以真实证书为主视觉，建筑退到背景。标题说明与图片分别占位，不互相覆盖。
-3. 先保证 100% 浏览器缩放下可读，再做动效。普通中文正文不能用 9–12px 来制造“精致”。
-4. 每个控件必须服务于认识本人、查阅作品或联系。导航、真实材料预览和开场暂停有明确作用；阅读模式切换、播放完整旅程、重播工具栏不是这个页面的核心。
-5. 不因参考库有某个组件就添加它。创新来自构图、节奏、材质和真实内容的结合。
+## 视觉方向
 
-## 本项目的尺寸基线
+- **删除顶部 banner 整个容器。** 不再恢复品牌导航条，也不添加阅读模式、播放完整旅程等无关功能。
+- 用闽南古厝水墨插画替代蓝白 3D 建模：燕尾脊、红砖、白石、淡墨、宣纸留白。
+- 纸白 `#f7f4eb`、墨色 `#2c302c`、低饱和砖红 `#a34f3e`；辅助色保持同一暖灰体系。
+- 大标题以宋体类衬线字体呈现，正文用清晰的无衬线字体。姓名有独立尺寸，不套用所有章节。
+- 插画与页面通过渐隐遮罩连接，不露出硬矩形背景。插画不能压到正文。
+- 以轻微移景、墨色淡入组织叙事；不重新搭建旋转积木、办公楼或模型底座。
+- 参考图、素材出处和生成提示词见 [minnan-art-direction.md](./minnan-art-direction.md)。插画不冒充本人的建筑作品。
 
-以下是项目设计决策，不是所有网站都必须遵守的规范。
+## 尺寸与层级
+
+以下是本项目基线，不是通用强制标准。
 
 | 元素 | 桌面 | 手机 |
 | --- | --- | --- |
-| 导航容器 | 最小高度 88px，上边距 24px，最大宽 1600px | 高度至少 68–72px，边距 16–20px |
-| 品牌中文 | 32px | 24–26px |
-| 主要导航 | 18px，点击区域至少 44px 高 | 15–16px，点击区域至少 44px 高 |
-| 故事大标题 | 44–88px，随视口有界变化 | 32–48px；竖向短屏 30px，横向短屏重排时 28px |
-| 正文 | 16–20px，行高 1.7–1.85 | 16px，不随画布一起缩小 |
-| 次级说明 | 通常 14px | 13–14px，次要装饰标识可 12px |
-| 项目标题 / 章节标题 | 22–30px / 36–60px | 保留清晰层级，不整体缩小 |
-| 成果图组 | 约占 52% 视口宽，主辅宽度约 1.65:1 | 约占 84% 视口宽，位于文字上方 |
+| 姓名 | 88–144px | 60–80px |
+| 章节标题 | 44–80px | 30–48px；横向短屏可 28px |
+| 职业定位 | 20–28px | 18px |
+| 正文 | 16–20px，行高约 1.75–1.9 | 16px，不随画布缩小 |
+| 次级信息 | 14px 为主 | 13–14px，非核心标注可 12px |
+| 主要控件 | 至少 44px 高 | 至少 44px 高 |
+| 成果图组 | 接近半屏，主辅宽度约 1.65:1 | 约占 84% 视口宽，位于正文上方 |
 
-Logo 的英文字标属于图形细节，可以低于正文下限。其小尺寸不能推广到导航、介绍、项目说明或关键获奖信息。
+优先给核心内容面积与对比度，不用整体缩小来适配。短屏可以隐藏重复说明，关键职业定位、正文和成果名称必须可读。真实证书使用 contain，禁止裁切或生成替代品。
 
-在约 1470 CSS px 宽的 Chrome 桌面中，原先两张固定 210 / 120px 的证书，改为约 450 / 270px 的版面宽度，具体随视口变化。保留原件比例，禁止裁切证书来填满容器。必要时为窄屏删去重复说明；不能缩小整页来塞进同一构图。
+## 技术约束
 
-## 实现约束
+- 当前站点入口是 `pages-site/`。根目录 `app/` 是旧站，不用于当前视觉修改。
+- Remotion composition 尺寸等于容器真实 CSS 视口，不回到固定 1440/720px 画布缩放。
+- 已移除 Film 对 Three.js 建筑、相机和 WebGL 的使用。旧模块暂存但不进入当前站点 bundle。
+- 资料事实集中于 `src/data.js`；无 JavaScript 备用页由 `scripts/build-profile.mjs` 在构建时同步，避免职业与经历存在两套旧文案。
+- `prefers-reduced-motion` 自动提供静态介绍与完整资料，不增加模式按钮。
+- 保留证书预览、Escape 关闭及焦点返回。
 
-- Remotion 的 compositionWidth/Height 等于容器真实 CSS 尺寸。不要把所有 HTML 放入固定 1440/720px 画布再缩放，否则正文、导航和图片比例会失控。
-- WebGL 可以独立限制栅格分辨率；该预算不能作用到 DOM 字体。
-- 文字层级集中在 `style.css` 的 `--type-*` tokens；故事文字用 CSS 布局，与镜头坐标分离。
-- 桌面成果区域使用主辅图组、轻微旋转、留白和投影；手机上下排列视觉与文案。
-- 章节导航到“成形”时应能看到证书入场，不需要额外继续滚动才能发现主体。
-- 自动跟随系统 `prefers-reduced-motion`：呈现简洁介绍和全部资料，不提供额外模式切换按钮。
-- 现有真实资料与原图预览保持可用。用户原件不裁切、不调色、不生成替代品。
+## 参考调研的可复用判断
 
-## 参考调研与取舍
+- [React Bits](https://reactbits.dev/)、[Aceternity Hero Parallax](https://ui.aceternity.com/components/hero-parallax)：借鉴空间层次与节奏，不能因为组件可用就堆叠功能。
+- [Uiverse](https://uiverse.io/)、[Anime.js](https://animejs.com/documentation/)、[MotionSites](https://motionsites.ai/)：局部视觉与动效参考，不将营销数量或商业页面作为规范。
+- [IBM Carbon Typography](https://carbondesignsystem.com/elements/typography/type-sets/)：expressive 的 16px 正文与流式标题作为可读性参考。
+- [W3C Resize Text](https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html)、[Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)：用真实缩放、重排检查内容，不能靠压缩字号塞满画面。
 
-查阅日期：2026-10-24。以下记录可复用的判断，不照抄商业页面或营销数字。
+## 验收
 
-- [MotionSites](https://motionsites.ai/)：借鉴以强首屏构图组织视觉的方向。站点名存在相近域名；本轮不把未经确认的数量、宣传文案当设计规范，也不依赖付费 prompt。
-- [React Bits](https://reactbits.dev/) 与 [Spotlight Card](https://reactbits.dev/components/spotlight-card)：组件可按需选用，但光效只是注意力辅助。这个站点已有完整工作台，不再叠加另一套视觉主题。
-- [Aceternity Hero Parallax](https://ui.aceternity.com/components/hero-parallax)：可以借鉴图像的空间层次；应用到真实成果的展示面积和轻微错位。
-- [Aceternity Resizable Navbar](https://ui.aceternity.com/components/resizable-navbar)：导航应有明确结构与响应式规则。本轮采用更简洁的品牌与三个链接，不引入组件依赖。
-- [Uiverse](https://uiverse.io/)：局部交互细节的素材来源，不能取代全站排版判断。
-- [Anime.js](https://animejs.com/documentation/)：动画工具；本项目已有 Remotion + Three.js，本轮没有必要增加第二套动画引擎。
-- [IBM Carbon Typography](https://carbondesignsystem.com/elements/typography/type-sets/)：区分 productive 与 expressive 排版；expressive 的 16px 基础正文、流式标题是本项目建立字号层级的参考。
-- [W3C Resize Text](https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html) 和 [Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)：检查 200% 缩放、窄屏重排，不能靠压缩字体解决空间不足。
+使用 **Google Chrome 实际窗口**，应用内侧栏不能作为比例验收。先检查桌面 100%，再检查 200% 和 390 × 844、320 × 568。区分截图物理像素与 CSS 视口，不把 Retina 截图尺寸当作页面宽度。
 
-## 验收方式
+检查首页职业定位、后训练、实习、成果、生活、详录与联系；不得文字相撞、标题切断或出现横向溢出。执行 `npm run build:pages` 和 `git diff --check`，保存 Chrome 截图。只报告实际测过的状态，设备模拟不能写成真机测试。
 
-- 用 Chrome，页面缩放 100%，先检查正常桌面，再在 DevTools 设备模式检查手机。记录 CSS 视口与 DPR，Retina 截图像素数不是 CSS 视口尺寸。
-- 必看：开场结束、搭建、探索、成果停留、生活、资料、联系。检查顶部不压字，底部导航不盖正文，证书与文字不相撞。
-- 320/390px 手机布局、桌面 200% 缩放不能导致主要内容丢失或横向溢出。
-- 运行 `npm run build:pages`。根目录旧 vinext 测试针对旧站，不能作为这个 GitHub Pages 前端的视觉验收。
-- 保存 Chrome 截图，报告实际验证的尺寸；未测的设备或性能指标不得写成已通过。
+本轮于 2026-10-24 在 Google Chrome 完成以下检查：
 
-## 本轮验证记录
+- 桌面 100%：首屏姓名、职业与水墨画；后训练重点章节；项目详录默认展开后训练项目，并能展开字节实习。
+- 桌面 200%：后训练正文、标题与章节导航没有相互遮挡。
+- 设备模拟 390 × 844：后训练章节；320 × 568：首屏、后训练、实习与成果章节，图文与底部导航分开。
+- Chrome 的 `prefers-reduced-motion: reduce` 模拟能自动切换到静态介绍与完整资料；检查后恢复模拟设置。独立 `profile.html` 中职业、项目顺序、字节实习已同步。
+- `npm run build:pages` 与 `git diff --check` 通过。构建仍有 Remotion 的模块指令与大于 500 kB 的 bundle 提示；控制台出现的连接错误指向 Zotero 扩展，不是站点源码。
 
-- Chrome 桌面窗口：100% 与 200% 页面缩放，检查导航、故事文案与成果图组。
-- Chrome DevTools 设备模式：390 × 844、320 × 568。修正窄屏证书说明与标题重叠，以及资料区标题被挤压的问题。
-- 成果档案：证书预览能打开；按 Escape 关闭后焦点返回原入口。
-- `npm run build:pages` 和 `git diff --check` 通过。构建仍提示已有的大 bundle，本轮未做性能优化。
-- 截图保存在本地 `outputs/visual-review/`。设备模式是响应式检查，不能替代真机测试。
+本轮截图位于本地 `outputs/visual-review/chrome-ink-*.png`。以上是 Chrome 桌面与设备模拟检查，不代表手机真机验证。

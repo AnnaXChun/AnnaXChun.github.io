@@ -3,7 +3,7 @@ import { awards, capabilities, experiment, interests, methods, profile, projects
 import './dossier.css';
 
 const tabs = [
-  { id: 'work', label: '项目与方法', count: '04' },
+  { id: 'work', label: '研究与经历', count: String(projects.length).padStart(2, '0') },
   { id: 'life', label: '关于与生活', count: '03' },
   { id: 'archive', label: '成果档案', count: '08' },
 ];
@@ -12,9 +12,9 @@ function ProjectIndex() {
   return (
     <div className="dossier-work-layout">
       <div className="dossier-project-index">
-        <div className="dossier-column-label"><span>项目索引</span><span>展开查阅 ↓</span></div>
+        <div className="dossier-column-label"><span>研究与项目</span><span>展开查阅 ↓</span></div>
         {projects.map((project, index) => (
-          <details className="dossier-project" key={project.id}>
+          <details className={"dossier-project" + (project.featured ? " is-featured" : "")} key={project.id} open={project.featured || undefined}>
             <summary className="dossier-project-summary">
               <span className="dossier-index">{String(index + 1).padStart(2, '0')}</span>
               <span className="dossier-project-heading"><span className="dossier-meta">{project.category}</span><span className="dossier-project-title">{project.title}</span><span className="dossier-project-date">{project.period || project.organization}</span></span>
@@ -22,15 +22,15 @@ function ProjectIndex() {
             </summary>
             <div className="dossier-project-body">
               <p>{project.summary}</p>
-              <p>{project.details}</p>
+              {project.details && <p>{project.details}</p>}
               <ul className="dossier-tags" aria-label={`${project.title}技术栈`}>
                 {project.stack.map(item => <li key={item}>{item}</li>)}
               </ul>
-              <p className="dossier-project-proof">{project.proof}</p>
-              <figure className="dossier-project-figure">
+              {project.proof && <p className="dossier-project-proof">{project.proof}</p>}
+              {project.image && <figure className="dossier-project-figure">
                 <a href={project.image} target="_blank" rel="noopener noreferrer" aria-label={`打开${project.title}配图原图`}><img src={project.image} alt={project.imageAlt} loading="lazy" /></a>
                 <figcaption>{project.imageCredit || project.organization}<span>原图 ↗</span></figcaption>
-              </figure>
+              </figure>}
               {project.supportingImage && <a className="dossier-inline-link" href={project.supportingImage} target="_blank" rel="noopener noreferrer">{project.supportingLabel} ↗</a>}
             </div>
           </details>
@@ -114,7 +114,7 @@ export default function Dossier() {
 
   return (
     <section className="dossier-root" id="dossier" aria-labelledby="dossier-title">
-      <header className="dossier-header"><div><span className="dossier-eyebrow">PERSONAL DOSSIER</span><h2 id="dossier-title">资料抽屉</h2></div><p>项目的来龙去脉，<br />和图纸之外的日常。</p><span className="dossier-header-mark" aria-hidden="true">+</span></header>
+      <header className="dossier-header"><div><span className="dossier-eyebrow">RESEARCH & PRACTICE</span><h2 id="dossier-title">研究与经历</h2></div><p>从后训练到 Agent 开发，<br />以及工作之外的日常。</p><span className="dossier-header-mark" aria-hidden="true">+</span></header>
       <div className="dossier-tablist" role="tablist" aria-label="个人资料分类">
         {tabs.map((tab, index) => <button className="dossier-tab" type="button" role="tab" id={`dossier-tab-${tab.id}`} aria-controls={`dossier-panel-${tab.id}`} aria-selected={activeTab === tab.id} tabIndex={activeTab === tab.id ? 0 : -1} key={tab.id} ref={node => { tabRefs.current[index] = node; }} onClick={() => setActiveTab(tab.id)} onKeyDown={event => changeTabWithKey(event, index)}>{tab.label}<span>{tab.count}</span></button>)}
       </div>

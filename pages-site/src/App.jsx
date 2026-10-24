@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Player} from '@remotion/player';
 import Film, {CHAPTERS, FPS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
 import Dossier from './Dossier';
+import {profile} from './data';
 
 const LAST_FRAME = TOTAL_FRAMES - 1;
 const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
@@ -67,7 +68,7 @@ function Story() {
     const observer=new ResizeObserver(entries=>{
       const rect=entries[0].contentRect;
       if(rect.width<=0 || rect.height<=0) return;
-      // Typography uses real CSS pixels; only the WebGL layer has a raster budget.
+      // Typography uses real CSS pixels, independent of the illustration resolution.
       const width=Math.max(1,Math.round(rect.width));
       const height=Math.max(1,Math.round(rect.height));
       setSize(previous=>previous.width===width&&previous.height===height?previous:{width,height});
@@ -187,15 +188,16 @@ function Story() {
   return <section id="story" className="story-scroll" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver={driver}>
     <div className="story-stage" ref={stage}>
       <div className="film-viewport" ref={viewport} aria-hidden="true">
-        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请通过顶部导航阅读完整档案。</div>}/>
+        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请向下阅读完整档案。</div>}/>
       </div>
-      <div className="film-accessible sr-only"><h1>椿襄 · 下一步</h1><p>软件开发工程师，武汉大学软件工程背景。这里讲述后端与支付系统、生命科学推理智能体、团队成果，以及羽毛球、健身和视频剪辑。可以跳过开场、暂停播放、切换章节，或直接阅读下方完整资料。</p></div>
+      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 SFT、GRPO 与生命科学推理智能体，以及字节跳动国际商业化部门的 Agent 开发实习。随后是团队成果与生活。可以跳过开场、暂停播放、切换章节，或直接阅读下方完整资料。</p></div>
       <div className="story-controls">
         <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
         {driver==='intro'&&<div className="story-actions">
           <button type="button" className="journey-toggle" onClick={toggleOpening}>{playing?'暂停开场':'继续开场'}</button>
           <button type="button" className="skip-intro" onClick={finishIntro}>跳过开场 ↗</button>
         </div>}
+        {driver!=='intro'&&<a className="story-dossier-link" href="#dossier">项目详录 <span aria-hidden="true">↗</span></a>}
       </div>
       <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress}/></div>
     </div>
@@ -229,19 +231,13 @@ export default function App(){
   return <>
     <a className="skip-link" href="#dossier">跳到完整资料</a>
     <div id="top" />
-    <header className="site-header">
-      <a className="brand" href="#top" aria-label="椿襄，返回首页"><span>椿襄<small>CHUNXIANG</small></span></a>
-      <nav aria-label="主导航">
-        <a href={motion ? '#story' : '#top'}>故事</a>
-        <a href="#dossier">档案</a>
-        <a href="#contact">联系</a>
-      </nav>
-    </header>
     <main>
       {motion ? <Story /> : <section className="static-intro">
-        <span>CHUNXIANG</span>
-        <h1>把想法，<br />一层层建成。</h1>
-        <p>我是椿襄，软件开发工程师。这里记录我的项目、方法，以及工作之外的生活。</p>
+        <span>CHUNXIANG / PORTFOLIO</span>
+        <h1>椿襄</h1>
+        <h2>{profile.role}</h2>
+        <p>专注智能体工具调用、强化学习后训练与多步推理。这里记录我的研究、实习与作品。</p>
+        <img src="./assets/minnan-ink-courtyard.webp" alt="闽南红砖古厝与燕尾脊的水墨插画" />
       </section>}
       <Dossier />
       <Contact />
