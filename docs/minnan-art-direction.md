@@ -1,6 +1,6 @@
 # 闽南水墨视觉参考与素材
 
-日期：2026-10-24。当前方向来自用户本轮明确要求，替代此前的蓝白 3D 建筑工作台。
+日期：2026-10-24。当前方向来自用户最新澄清：以闽南水墨气质重建三维建筑，并保留真实相机转场。
 
 ## 参考图
 
@@ -10,23 +10,36 @@
 
 来源：[《古建筑写生游记》](https://champaignmagazine.com/2021/08/20/%E5%8F%A4%E5%BB%BA%E7%AD%91%E5%86%99%E7%94%9F%E6%B8%B8%E8%AE%B0/)、[《巧夺天工 泉州燕尾脊》](https://www.qzwb.com/gb/content/2022-05/20/content_7142653.htm)。参考作品不作为网页发布素材，署名与水印不被改写为个人作品。
 
-## 网页素材
+## 当前实现：三维古厝与镜头行程
 
-- 文件：`pages-site/public/assets/minnan-ink-courtyard.webp`，1536 × 1024，约 450 KiB。
-- 通过内置 imagegen 生成新的古厝构图，使用以上三图作建筑及媒介参考；未调用 CLI/API 后备路径。
-- PNG 原始生成图保留于本机 Codex generated_images；网页使用 WebP 压缩版。
-- 用于视觉叙事的插画，不作为用户本人建筑作品或项目证据。
-- 动效仅作轻微平移、缩放和淡入；成果原件保持原貌。页面不再导入 Three.js、WorkshopModel 或 CameraRig。
+用户明确要求三维建筑，不接受二维水墨画加平移、缩放。上面的参考图用于核对建筑结构和水墨色调；页面实际渲染自建三维几何。
 
-## 生成提示词
+- `pages-site/src/MinnanModel.js`：主厝、两侧厢房与入口门楼围合石院。屋面曲率、瓦垄、分叉燕尾脊、墙体、石基、窗棂、廊柱、庭院石板、石井和榕树均为三维几何。门楼前后留有真实贯通门洞。
+- 材质使用低饱和红砖、暖灰白石、灰绿屋面与哑光光照，叠加世界空间墨色变化、细颗粒和轮廓线；四周渐隐融入纸面。几何按材质合并为 12 个网格批次，顶点预算小于 60 万。
+- `pages-site/src/MinnanScene.jsx`：WebGL 场景、光照、阴影、响应式相机；DPR 上限 1.75，离开组件时释放资源。逐帧不重建模型。减少动态效果时显示同一三维模型的静止视角。
+- `pages-site/src/MinnanCamera.js`：真实世界坐标的镜头路径，滚动前后可逆。开场俯瞰并推近，随后绕行；后训练到实习之间对准门洞、降低视线、穿门进入庭院；在庭院看主厝与回廊，随后升高拉远，再绕至建筑侧面。窄屏不改变穿门位置，门洞附近关闭指针摇摆。
+- `pages-site/test/minnan-model.test.mjs`：检查模型三轴体积、有限顶点及法线、批次预算、实际门洞，以及逐帧穿门路径的碰撞和相机连续性。
 
-```text
-Use case: illustration-story.
-Asset type: a finished high-resolution editorial illustration for a personal portfolio website, replacing a blue 3D building scene.
-Primary request: an original contemporary Chinese ink-wash painting of southern Fujian / Minnan red-brick ancestral courtyard houses. Study the three supplied images as reference material ONLY: reference 1 for the clustered swallowtail ridge silhouette and old courtyard, reference 2 for dry-brush ink and soft landscape washes, reference 3 for authentic red brick and pale stone. Create a new composition, not a copy of any one artwork.
-Composition: wide landscape 3:2 composition, gently elevated eye-level oblique view of a small group of traditional red-brick houses around a stone courtyard. One clear main house with elegant, distinctive two-pronged swallowtail roof ridges; smaller roofs recede diagonally behind it. Strong asymmetric architectural cluster, readable silhouette, with a small banyan tree at one side. Architectural subject fills the central 70% with generous empty margins on ALL edges. No modern tower blocks, no miniature plinth, no floating island. No dramatic mountains or unrelated Chinese pagodas.
-Medium: genuine-looking wet and dry Chinese ink on warm ivory xuan paper. Expressive hand-brushed broken lines, feathered edges, diluted gray washes, subtle warm vermilion brick pigments, near-black roof details, pale stone. High-quality contemporary museum catalogue illustration, spacious and quietly sophisticated, not cartoon, not vector, not glossy 3D, not photoreal.
-Background: warm pale ivory (#f7f4eb) with subtle paper grain, landscape dissolves softly into unpainted paper at edges. Top quarter mostly empty paper. Keep darkest ink around the building roofs and doorways. Atmospheric depth from lighter distant roofs.
-No writing, no calligraphy, no labels, no logos, no watermark, no signature, no seals, no frame, no UI.
-Save the final image for use as the site's main visual.
-```
+## 内容与视觉层级
+
+正文保持实际 CSS 字号，不随 WebGL 画布缩小。OPD + RL 后训练及开源 benchmark SOTA 为第一重点；字节国际商业化实习补充 2026.09.20 至今、Claude Code 内核接入、业务流程适配、Skill 优化和 Bad Case Studio。用户要求以经历概述呈现，不需要详细榜单与数字。
+
+证书仍为用户真实原件，成果章节给主证书更大面积。顶部 banner 与阅读模式入口保持移除。
+
+## 已替代的二维草案
+
+`pages-site/public/assets/minnan-ink-courtyard.webp` 是同日先前生成的二维概念稿，保留为历史素材，当前动态页、减少动态效果的页面和无 JavaScript 资料页均不再引用。它不构成当前网站的建模实现，也不冒充用户的建筑作品。
+
+## 验证记录
+
+2026-10-24，使用 Google Chrome 扩展连接到实际 Chrome 标签页验证，未使用应用内侧栏作为比例依据。
+
+- 桌面庭院近景：主厝、两侧回廊和地面有真实遮挡与透视；实习职责和起止时间可读。
+- 实际滚动穿门段：文字淡出、三维画面展开，能看到门洞遮挡逐渐退出、院落与主厝进入视野。章节导航可回到稳定阅读位置。
+- Chrome 设备模拟 390 × 844、320 × 568：实习正文为 16px，无横向溢出，正文底部与章节导航分离。
+- Chrome 200% 实际页面缩放：后训练内容重排为紧凑三列；修复初测发现的右侧研究板超出短视口，复核后正文与研究板均在导航上方。
+- 几何与相机路径检查：三维体积、有限数据、真实门洞、逐帧穿门无碰撞、推拉连续。
+- Chrome 控制台未见站点 WebGL 或着色器错误，保留 Remotion 现有授权说明。
+- `npm run build:pages` 与 `git diff --check` 通过。构建保留 Remotion 模块指令及大于 500 kB 的 bundle 提示；当前主 JS gzip 约 326 kB。
+
+截图在本地 `outputs/visual-review/chrome-3d-*.png`。桌面截图与设备模拟不代表手机真机测试。

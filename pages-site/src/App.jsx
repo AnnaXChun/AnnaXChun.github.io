@@ -3,6 +3,7 @@ import {Player} from '@remotion/player';
 import Film, {CHAPTERS, FPS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
 import Dossier from './Dossier';
 import {profile} from './data';
+import MinnanScene from './MinnanScene';
 
 const LAST_FRAME = TOTAL_FRAMES - 1;
 const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
@@ -179,7 +180,7 @@ function Story() {
   const seekChapter=index=>{
     pendingIntroRef.current=false;
     pause();setDriver('scroll');
-    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+45,INTRO_END_FRAME,LAST_FRAME);
+    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+(index===2?80:45),INTRO_END_FRAME,LAST_FRAME);
     const top=scrollTopForFrame(target);
     if(Math.abs(window.scrollY-top)<1) player.current?.seekTo(target);
     scrollToFrame(target,window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth');
@@ -190,7 +191,7 @@ function Story() {
       <div className="film-viewport" ref={viewport} aria-hidden="true">
         <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请向下阅读完整档案。</div>}/>
       </div>
-      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 SFT、GRPO 与生命科学推理智能体，以及字节跳动国际商业化部门的 Agent 开发实习。随后是团队成果与生活。可以跳过开场、暂停播放、切换章节，或直接阅读下方完整资料。</p></div>
+      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。三维闽南古厝随滚动切换视角；也可切换章节或直接阅读下方完整资料。</p></div>
       <div className="story-controls">
         <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
         {driver==='intro'&&<div className="story-actions">
@@ -237,7 +238,7 @@ export default function App(){
         <h1>椿襄</h1>
         <h2>{profile.role}</h2>
         <p>专注智能体工具调用、强化学习后训练与多步推理。这里记录我的研究、实习与作品。</p>
-        <img src="./assets/minnan-ink-courtyard.webp" alt="闽南红砖古厝与燕尾脊的水墨插画" />
+        <div className="static-model" role="img" aria-label="闽南红砖古厝与燕尾脊的三维建筑"><MinnanScene still /></div>
       </section>}
       <Dossier />
       <Contact />

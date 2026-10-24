@@ -31,15 +31,18 @@ img, svg { max-width: 100%; display: block; }
 .skip-link { position: fixed; left: 20px; top: -100px; z-index: 100; padding: 10px 18px; background: var(--ink); color: var(--paper); }
 .skip-link:focus { top: 12px; }
 
-/* A paper scroll, without a header bar or a miniature 3D stage. */
+/* A full-size WebGL architectural study on paper; copy stays in CSS pixels. */
 .story-scroll { height: 540svh; position: relative; }
 .story-stage { position: sticky; top: 0; height: 100svh; background: var(--paper); overflow: hidden; color: var(--ink); }
 .film-viewport { position: absolute; inset: 0; }
 .film-viewport > div { max-width: none !important; }
 .ink-film { background: var(--paper); color: var(--ink); font-family: var(--sans); overflow: hidden; }
 .ink-film::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .035; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.7' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.ink-landscape { position: absolute; width: 68%; left: 40%; top: 5%; height: 88%; mix-blend-mode: multiply; mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 94%, transparent 100%), linear-gradient(0deg, transparent, #000 15%, #000 82%, transparent); mask-composite: intersect; }
-.ink-landscape img { width: 100%; height: 100%; object-fit: cover; transform-origin: 60% 55%; }
+.ink-landscape { position: absolute; width: calc(62% + 38% * var(--travel, 0)); left: calc(40% * (1 - var(--travel, 0))); top: calc(4% * (1 - var(--travel, 0))); height: calc(87% + 13% * var(--travel, 0)); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 92%, transparent), linear-gradient(0deg, transparent, #000 12%, #000 89%, transparent); mask-composite: intersect; }
+.minnan-scene { position: relative; width: 100%; height: 100%; }
+.minnan-scene canvas { display: block; width: 100%; height: 100%; }
+.scene-unavailable { position: absolute; inset: 40% 12%; font-size: 14px; color: var(--muted); }
+.static-model { height: clamp(300px, 60vw, 660px); margin: 20px auto 0; }
 .ink-margin-note { position: absolute; top: 7%; right: 5%; writing-mode: vertical-rl; letter-spacing: .3em; font: 13px/1.8 var(--serif); color: var(--muted); }
 .ink-signature { position: absolute; left: var(--page-gutter); top: 7%; border: 1px solid var(--red); color: var(--red); display: flex; gap: 2px; padding: 3px 7px; font: 19px/1.4 var(--serif); transform: rotate(-3deg); }
 .film-error { display: grid; place-content: center; padding: 32px; height: 100%; text-align: center; }
@@ -64,6 +67,7 @@ img, svg { max-width: 100%; display: block; }
 .training-study strong { font: 500 clamp(1rem, 1.6vw, 1.375rem)/1.5 var(--sans); }
 .training-study li p { font-size: .875rem; color: var(--muted); margin-top: 3px; }
 .study-caption { font-size: .75rem; color: var(--muted); }
+.study-result strong { color: var(--red); }
 
 .film-evidence { position: absolute; left: 47%; right: 6%; top: 19%; bottom: 24%; display: grid; grid-template-columns: 1.65fr 1fr; gap: clamp(18px, 2vw, 40px); align-items: center; pointer-events: none; }
 .film-evidence figure { min-width: 0; margin: 0; }
@@ -116,7 +120,7 @@ footer small { font: .6875rem var(--mono); letter-spacing: .12em; margin-left: 8
 
 @media (max-width: 899px) {
   .story-scroll { height: 500svh; }
-  .ink-landscape { left: -10%; width: 120%; top: 0; height: 44%; mask-image: linear-gradient(0deg, transparent, #000 15%, #000 90%, transparent); }
+  .ink-landscape { left: 0; width: 100%; top: 0; height: 42%; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(0deg, transparent, #000 16%, #000 90%, transparent); }
   .ink-margin-note { display: none; }
   .ink-signature { left: 7%; top: 4%; font-size: 16px; }
   .story-scroll:not([data-chapter="0"]) .ink-signature { display: none; }
@@ -188,6 +192,19 @@ footer small { font: .6875rem var(--mono); letter-spacing: .12em; margin-left: 8
   .film-evidence figcaption strong { font-size: .75rem; white-space: nowrap; }
   .evidence-mount img { max-height: 22svh; }
   .film-evidence figcaption { padding-top: 6px; }
+}
+@media (max-height: 560px) and (min-width: 900px) {
+  .film-eyebrow, .film-note, .ink-margin-note { display: none; }
+  .film-copy-intro .film-title { font-size: 4rem; }
+  .film-description { line-height: 1.7; }
+  .training-study { top: 12%; padding: 14px 0; }
+  .training-study h3 { font-size: 1.5rem; margin-top: 10px; }
+  .training-study h3 br { display: none; }
+  .training-study ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0 4px; }
+  .training-study li { display: block; padding-top: 10px; }
+  .training-study strong { display: block; font-size: 1rem; }
+  .training-study li p { font-size: .8125rem; }
+  .study-caption { display: none; }
 }
 @media (min-width: 600px) and (max-width: 899px) and (max-height: 520px) {
   .ink-landscape { left: 44%; width: 62%; height: 90%; top: 0; }
