@@ -137,7 +137,7 @@ function StoryPanel({index,frame}){
 
 function EvidenceCards({frame}){
   // Give the evidence the whole settled chapter, including chapter navigation's landing frame.
-  const appear=range(frame,828,862)*(1-range(frame,1020,1050));
+  const appear=range(frame,828,850)*(1-range(frame,1020,1050));
   if(appear<=0)return null;
   return <div className="film-evidence" style={{transform:`translateY(${36*(1-appear)}px)`,opacity:appear}}>
     <figure className="evidence-primary">
@@ -172,7 +172,7 @@ export default function Film(){
       </div>
     </div>}
     {STORIES.map((_,index)=><StoryPanel key={index} index={index} frame={frame}/>)}
-    <div className="evidence-backdrop" style={{opacity:range(frame,828,862)*(1-range(frame,1020,1050))}} />
+    <div className="evidence-backdrop" style={{opacity:range(frame,828,850)*(1-range(frame,1020,1050))}} />
     <EvidenceCards frame={frame}/>
   </AbsoluteFill>;
 }
