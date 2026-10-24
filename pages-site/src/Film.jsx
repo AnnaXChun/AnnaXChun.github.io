@@ -63,7 +63,7 @@ function TrainingStudy({frame}) {
     <ol>
       <li><span>一</span><div><strong>OPD + RL</strong><p>后训练方法研究</p></div></li>
       <li><span>二</span><div><strong>Agent</strong><p>智能体能力提升</p></div></li>
-      <li className="study-result"><span>三</span><div><strong>SOTA</strong><p>开源 benchmark 评测成果</p></div></li>
+      <li className="study-result"><span>三</span><div><strong>SOTA</strong><p>开源评测成果</p></div></li>
     </ol>
   </div>;
 }
@@ -87,7 +87,6 @@ export default function Film() {
   const frame = useCurrentFrame();
   return <AbsoluteFill className="ink-film">
     <InkLandscape frame={frame} />
-    <div className="ink-margin-note" aria-hidden="true">闽南 · 红砖燕尾 · 一纸新篇</div>
     {STORIES.map((_, index) => <StoryPanel key={index} index={index} frame={frame} />)}
     <TrainingStudy frame={frame} />
     <EvidenceCards frame={frame} />

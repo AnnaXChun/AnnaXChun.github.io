@@ -16,9 +16,9 @@ export function createMinnanCourtyard() {
   };
   const mat = {
     plaster: washMaterial(0xdcd8ca,.75), stone: washMaterial(0xb5b7af,.75),
-    brick: washMaterial(0xa76c5b,.95), brickLight: washMaterial(0xd3ad97,.8),
-    roof: washMaterial(0x535c57,.9), tile: washMaterial(0x777f75,.9),
-    ridge: washMaterial(0xb0b1a3,.7), wood: washMaterial(0x55594c,.8),
+    brick: washMaterial(0x985d49,.75), brickLight: washMaterial(0xb67d63,.65),
+    roof: washMaterial(0x3c4841,.7), tile: washMaterial(0x59675b,.65),
+    ridge: washMaterial(0xb7b7a6,.5), wood: washMaterial(0x514d3c,.55),
     dark: washMaterial(0x303d36,.6), leaf: washMaterial(0x435f50,.7,true),
     paleLeaf: washMaterial(0x819581,.8,true), paving: washMaterial(0xe4dfd2,.95),
     vermilion: washMaterial(0xa1503b,.65),
@@ -42,7 +42,7 @@ export function createMinnanCourtyard() {
   function path(points, radius, m, matrix=null, tapered=false) {
     const curve = new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
     const steps = Math.max(8, points.length*2);
-    const radial=radius>.1?9:5;
+    const radial=radius>.1?16:radius>.04?8:5;
     const geometry = new THREE.TubeGeometry(curve,steps,radius,radial,false);
     if(tapered) {
       const positions=geometry.getAttribute('position');
@@ -59,7 +59,7 @@ export function createMinnanCourtyard() {
   }
 
   function roof(w,d,eave,rise,matrix) {
-    const yAt=(x,z)=>eave+rise*Math.pow(1-Math.abs(z)/(d/2),1.6)+.24*Math.pow(Math.abs(z)/(d/2),7)+.26*Math.pow(Math.abs(x)/(w/2),10);
+    const yAt=(x,z)=>eave+rise*Math.pow(Math.max(0,1-Math.abs(z)/(d/2)),1.6)+.24*Math.pow(Math.abs(z)/(d/2),7)+.26*Math.pow(Math.abs(x)/(w/2),10);
     const positions=[], indices=[], nx=48,nz=28;
     for(let i=0;i<=nx;i++) for(let j=0;j<=nz;j++) {
       const x=(i/nx-.5)*w, z=(j/nz-.5)*d;
@@ -77,19 +77,31 @@ export function createMinnanCourtyard() {
     const reverse=underside.index.array;
     for(let i=0;i<reverse.length;i+=3) [reverse[i+1],reverse[i+2]]=[reverse[i+2],reverse[i+1]];
     underside.computeVertexNormals(); add(underside,mat.dark,[0,0,0],[0,0,0],matrix);
-    const tileCount=Math.floor(w/.19);
-    for(let col=0;col<=tileCount;col++) {
-      if(col%7===3)continue;
-      const x=(col/tileCount-.5)*w+(random()-.5)*.025;
-      for(const side of [-1,1]) {
-        const points=Array.from({length:13},(_,j)=>{const z=side*(.03+j/12*(d/2-.03));return [x,yAt(x,z)+.025,z];});
-        path(points,.015+random()*.013,col%3===0?mat.roof:mat.tile,matrix);
+    // Individual overlapping barrel tiles: curved sections, not long tube rails.
+    const tileCount=Math.floor(w/.18), rows=9;
+    for(let col=0;col<tileCount;col++) for(const side of [-1,1]) for(let row=0;row<rows;row++) {
+      const x=(col+.5)/tileCount*w-w/2, z0=side*(.025+row/rows*(d/2-.02));
+      const z1=side*Math.min(d/2+.018,(row+1.13)/rows*(d/2));
+      const v=[],idx=[];
+      for(let longitudinal=0;longitudinal<=2;longitudinal++)for(let across=0;across<=5;across++) {
+        const angle=across/5*Math.PI,xx=x+Math.cos(angle)*.082,z=z0+(z1-z0)*longitudinal/2;
+        v.push(xx,yAt(xx,z)+.015+Math.sin(angle)*.045+(row%2)*.004,z);
       }
+      for(let j=0;j<2;j++)for(let k=0;k<5;k++) {
+        const a=j*6+k;idx.push(a,a+6,a+1,a+1,a+6,a+7);
+      }
+      // Opposite roof slopes need opposite winding.
+      if(side>0)for(let i=0;i<idx.length;i+=3)[idx[i+1],idx[i+2]]=[idx[i+2],idx[i+1]];
+      const tile=new THREE.BufferGeometry();tile.setAttribute('position',new THREE.Float32BufferAttribute(v,3));tile.setIndex(idx);tile.computeVertexNormals();
+      add(tile,random()>.82?mat.roof:mat.tile,[0,0,0],[0,0,0],matrix);
     }
-    // Fine transverse courses remain geometry, rather than a texture on a flat roof.
-    for(const side of [-1,1]) for(let row=2;row<8;row+=2) {
-      const z=side*d/2*row/8;
-      path(Array.from({length:17},(_,i)=>{const x=(i/16-.5)*w;return[x,yAt(x,z)+.033,z];}),.012,mat.roof,matrix);
+    // Timber rafters and a second fascia make the overhang readable from the gate.
+    for(const side of [-1,1]) {
+      for(let i=0;i<Math.floor(w/.34);i++) {
+        const x=-w/2+.18+i*.34;
+        box(.055,.07,.36,x,yAt(x,side*d/2)-.09,side*(d/2-.14),mat.wood,matrix);
+      }
+      path(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*w;return[x,yAt(x,side*d/2)-.11,side*(d/2-.05)];}),.032,mat.ridge,matrix);
     }
     for(const side of [-1,1]) {
       const z=side*d/2;
@@ -131,32 +143,47 @@ export function createMinnanCourtyard() {
       for(const s of [-1,1]) box(.08,bh+.16,.14,bx+s*(bw/2+.04),by,front+.02,mat.plaster,M);
       for(const sy of [-1,1]) box(bw+.2,.09,.14,bx,by+sy*(bh/2+.04),front+.02,mat.plaster,M);
       if(!gate) {
-        for(let n=-2;n<=2;n++) box(.025,bh-.08,.035,bx+n*bw/6,by,front+.05,mat.ridge,M);
+        for(let n=-2;n<=2;n++) box(.022,bh-.08,.045,bx+n*bw/6,by,front+.075,mat.wood,M);
+        for(const side of [-1,1])box(.028,bh-.025,.055,bx+side*(bw/2-.045),by,front+.10,mat.wood,M);
+        for(const sy of [-1,1])box(bw-.06,.035,.055,bx,by+sy*(bh/2-.045),front+.10,mat.wood,M);
+        for(let row=0;row<(door?4:2);row++)for(let col=0;col<3;col++) {
+          const cx=bx+(col-1)*bw/3.6,cy=by-bh*.31+row*bh/(door?5:2.6);
+          const diamond=[[cx,cy+.105,front+.085],[cx+.09,cy,front+.085],[cx,cy-.105,front+.085],[cx-.09,cy,front+.085],[cx,cy+.105,front+.085]];
+          path(diamond,.012,mat.ridge,M);
+        }
         const rows=door?5:3;
         for(let n=1;n<rows;n++) box(bw-.05,.025,.035,bx,by-bh/2+n*bh/rows,front+.05,mat.ridge,M);
         if(door) for(const s of [-1,1]) add(new THREE.TorusGeometry(.052,.012,5,12),mat.ridge,[bx+s*.11,.98,front+.08],[0,0,0],M);
       }
     }
-    // Thin mortar joints on every facade; staggered bricks keep the red walls readable.
-    for(let row=0;row<7;row++) {
-      const yy=.64+row*.17;
-      for(const side of [-1,1]) {
-        if(row%2===0) {
-          if(gate)for(const s of [-1,1])box((w-1.5)/2,.008,.008,s*(w+1.5)/4,yy,side*(d/2+.008),mat.brickLight,M);
-          else box(w*.84,.008,.008,0,yy,side*(d/2+.008),mat.brickLight,M);
+    // Relief masonry is modelled brick by brick; recessed joints cast fine shadows.
+    for(const side of [-1,1])for(let row=0;row<10;row++) {
+      const yy=.65+row*.135;
+      for(let b=0;b<Math.ceil(w/.32);b++) {
+        const xx=-w/2+.16+b*.32+(row%2)*.16;
+        if(xx>w/2-.1 || (gate&&Math.abs(xx)<.79))continue;
+        let opening=false;
+        if(side===1&&!gate)for(let i=0;i<bays;i++) {
+          const bx=(i-(bays-1)/2)*(w/(bays+.15)),door=i===Math.floor(bays/2);
+          if(Math.abs(xx-bx)<(door?.61:.5)&&Math.abs(yy-(door?1.02:1.27))<(door?.78:.51))opening=true;
         }
-        for(let b=0;b<Math.floor(w/.42);b++) {
-          const xx=-w/2+.14+b*.42+(row%2)*.21;
-          if(random()>.55 && xx<w/2-.03 && !(gate&&Math.abs(xx)<.8)) box(.009,.11,.009,xx,yy+.085,side*(d/2+.008),mat.brickLight,M);
-        }
-        box(.012,.012,d,side*(w/2+.008),yy,0,mat.brickLight,M);
+        if(!opening)box(.306,.122,.026+(random()*.008),xx,yy,side*(d/2+.008),random()>.83?mat.brickLight:mat.brick,M);
       }
     }
+    // A carved band and terracotta diamond frieze sit below the layered eaves.
+    box(w+.12,.055,.08,0,h-.22,d/2+.06,mat.ridge,M);
+    for(let i=0;i<Math.floor(w/.36);i++) {
+      const xx=-w/2+.2+i*.36;
+      add(new THREE.BoxGeometry(.09,.09,.04),mat.brickLight,[xx,h-.31,d/2+.035],[0,0,Math.PI/4],M);
+    }
     // Eave posts and a shaded veranda reveal real depth at the front of the hall.
-    for(const px of [-w*.43,0,w*.43]) {
+    for(const px of (gate?[-w*.43,w*.43]:[-w*.43,-w*.16,w*.16,w*.43])) {
       if(gate&&px===0)continue;
-      add(new THREE.CylinderGeometry(.065,.083,h-.08,16),mat.wood,[px,h/2,d/2+.36],[0,0,0],M);
+      add(new THREE.CylinderGeometry(.065,.083,h-.08,24),mat.wood,[px,h/2,d/2+.36],[0,0,0],M);
       box(.19,.2,.19,px,.23,d/2+.36,mat.stone,M);
+      add(new THREE.CylinderGeometry(.14,.12,.08,20),mat.ridge,[px,.36,d/2+.36],[0,0,0],M);
+      // Curved knee braces reveal the joinery at the veranda.
+      for(const sign of [-1,1])path([[px,h-.36,d/2+.36],[px+sign*.12,h-.18,d/2+.36],[px+sign*.30,h-.07,d/2+.36]],.035,mat.wood,M);
     }
     box(w+.25,.16,.16,0,h+.03,d/2+.36,mat.wood,M);
     // Sloped gable infill is a solid volume beneath the curved roof.
@@ -190,18 +217,23 @@ export function createMinnanCourtyard() {
   // a faceted canopy ball or a camera-facing image. Gaps let paper show through.
   function leafGeometry(length,width,bend) {
     const vertices=[],indices=[];
-    for(let row=0;row<=4;row++)for(let col=0;col<=2;col++) {
-      const t=row/4,u=col-1;
+    for(let row=0;row<=6;row++)for(let col=0;col<=2;col++) {
+      const t=row/6,u=col-1;
       vertices.push(u*width*Math.sin(Math.PI*t)*.5,t*length,Math.sin(t*Math.PI)*bend+u*u*width*.16);
     }
-    for(let row=0;row<4;row++)for(let col=0;col<2;col++) {
+    for(let row=0;row<6;row++)for(let col=0;col<2;col++) {
       const a=row*3+col;indices.push(a,a+1,a+3,a+1,a+4,a+3);
     }
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
   }
   function banyan(x,z,size) {
     const p=new THREE.Object3D();p.position.set(x,.08,z);p.scale.setScalar(size);p.updateMatrix();const M=p.matrix;
-    path([[0,0,0],[.12,.8,.06],[-.08,1.7,.13],[.16,2.7,0]],.20,mat.wood,M,true);
+    path([[0,0,0],[.12,.8,.06],[-.08,1.7,.13],[.16,2.7,0]],.22,mat.wood,M,true);
+    path([[.18,0,.14],[-.02,.6,.18],[.12,1.3,.08],[-.16,2.3,.02]],.13,mat.dark,M,true);
+    for(let root=0;root<8;root++) {
+      const a=root/8*Math.PI*2,r=.55+random()*.22;
+      path([[.03,.65,.06],[Math.cos(a)*.16,.22,Math.sin(a)*.16],[Math.cos(a)*r,.035,Math.sin(a)*r]],.085,mat.wood,M,true);
+    }
     for(let i=0;i<18;i++) {
       const a=i*2.3999,r=.65+random()*1.1,y=1.95+random()*1.2;
       const end=[Math.cos(a)*r,y,Math.sin(a)*r];
@@ -211,7 +243,7 @@ export function createMinnanCourtyard() {
         path([end,[(end[0]+tip[0])*.5,tip[1]+.08,(end[2]+tip[2])*.5],tip],.018,mat.dark,M,true);
         for(let j=0;j<23;j++) {
           const theta=random()*Math.PI*2,rr=Math.sqrt(random())*.47;
-          add(leafGeometry(.15+random()*.23,.075+random()*.09,.025+random()*.05),random()>.52?mat.paleLeaf:mat.leaf,
+          add(leafGeometry(.13+random()*.18,.06+random()*.075,.03+random()*.06),random()>.52?mat.paleLeaf:mat.leaf,
             [tip[0]+Math.cos(theta)*rr,tip[1]+(random()-.5)*.4,tip[2]+Math.sin(theta)*rr],
             [1.0+random()*1.5,random()*Math.PI*2,(random()-.5)*1.5],M);
         }
@@ -223,32 +255,52 @@ export function createMinnanCourtyard() {
   banyan(5.8,-2.1,1.10);
   banyan(-5.35,2.5,.8);
   // Courtyard well and benches create useful foreground parallax.
-  add(new THREE.CylinderGeometry(.37,.4,.36,12,1,true),mat.stone,[-1.35,.29,1.4]);
-  add(new THREE.TorusGeometry(.39,.065,6,18),mat.ridge,[-1.35,.49,1.4],[Math.PI/2,0,0]);
+  add(new THREE.CylinderGeometry(.37,.4,.36,32,1,true),mat.stone,[-1.35,.29,1.4]);
+  add(new THREE.TorusGeometry(.39,.065,10,40),mat.ridge,[-1.35,.49,1.4],[Math.PI/2,0,0]);
   for(const x of [-2.5,2.5]) {
     box(1,.12,.35,x,.48,.65,mat.stone);
     for(const s of [-1,1])box(.16,.36,.27,x+s*.32,.26,.65,mat.stone);
   }
-  // A real workbench and freestanding paper workflow board connect the courtyard
-  // to the portfolio. Everything stays outside the central gate/camera corridor.
-  box(2.65,.09,1,-1.75,.76,-.28,mat.wood);
-  for(const x of [-2.88,-.62])for(const z of [-.64,.08])box(.075,.68,.075,x,.39,z,mat.wood);
-  box(.86,.035,.58,-2.25,.83,-.40,mat.dark);
-  add(new THREE.BoxGeometry(.90,.60,.035),mat.wood,[-2.25,1.14,-.67],[-.14,0,0]);
-  box(1.10,.035,.72,-1.03,.835,-.23,mat.plaster);
-  box(.045,.045,.74,-1.03,.86,-.23,mat.vermilion);
-  box(.65,.06,.38,-2.40,.85,.02,mat.plaster);
-  box(2.18,1.60,.055,1.55,1.65,-.95,mat.wood);
-  box(2.08,1.50,.025,1.55,1.65,-.91,mat.plaster);
-  for(const x of [.57,2.53])box(.055,1.8,.055,x,.98,-.96,mat.wood);
+  // A scholar's work court: a real desk, open folio and a low archive beneath
+  // the veranda. No freestanding diagram or billboard occupies the courtyard.
+  box(3.5,.11,1.12,-.62,.79,-.65,mat.wood);
+  for(const x of [-2.15,.91])for(const z of [-1.06,-.23]) {
+    box(.10,.73,.10,x,.40,z,mat.wood);
+    box(.14,.06,.14,x,.07,z,mat.dark);
+  }
+  box(3.12,.08,.06,-.62,.38,-.95,mat.wood);
+  box(1.16,.035,.68,-1.58,.88,-.65,mat.dark);
+  add(new THREE.BoxGeometry(1.20,.78,.045),mat.wood,[-1.58,1.29,-1.01],[-.10,0,0]);
+  // The research folio rests on a sloping bookstand, facing the arriving camera.
+  add(new THREE.BoxGeometry(1.38,.88,.065),mat.plaster,[.12,1.12,-.64],[-.85,0,0]);
+  add(new THREE.BoxGeometry(.055,.90,.08),mat.vermilion,[-.535,1.12,-.635],[-.85,0,0]);
+  for(let i=0;i<3;i++)box(.62,.055,.42,-1.96,.90+i*.055,-.26,mat.plaster);
+  // Inkstone, brush rest and cinnabar seals share the desk with the laptop.
+  add(new THREE.CylinderGeometry(.12,.13,.025,28),mat.dark,[.64,.867,-.33]);
+  path([[.48,.88,-.46],[.77,.88,-.20],[.87,.88,-.12]],.014,mat.wood);
+  box(.13,.12,.13,.80,.91,-.86,mat.vermilion);
+  // A low open cabinet, tool volumes and case scrolls: labels are large book
+  // titles on their actual objects, rather than a second page UI inside the model.
+  box(1.65,.08,.64,2.25,.28,-.65,mat.wood);
+  box(1.65,.08,.64,2.25,1.00,-.65,mat.wood);
+  for(const x of [1.45,3.05])box(.08,.84,.64,x,.57,-.65,mat.wood);
+  box(1.62,.66,.045,2.25,.64,-.96,mat.wood);
+  box(1.48,.055,.6,2.25,.64,-.65,mat.wood);
+  box(1.30,.24,.52,2.24,.46,-.61,mat.vermilion);
+  box(1.28,.235,.50,2.24,.79,-.61,mat.plaster);
+  for(let i=0;i<3;i++) {
+    add(new THREE.CylinderGeometry(.065,.065,.58,20),mat.plaster,[1.87+i*.25,1.12,-.64],[Math.PI/2,0,0]);
+    add(new THREE.TorusGeometry(.067,.013,6,20),mat.vermilion,[1.87+i*.25,1.12,-.64],[0,0,0]);
+  }
+  // Small carved lintel above the rear doorway belongs to the architecture.
+  box(1.78,.42,.08,0,2.23,-1.59,mat.wood);
   const studioLabels=[
-    {kind:'agent',position:[1.55,1.65,-.891],rotation:[0,0,0],size:[2.03,1.45]},
-    {kind:'terminal',position:[-2.25,1.14,-.646],rotation:[-.14,0,0],size:[.83,.53]},
-    {kind:'research',position:[-1.03,.858,-.23],rotation:[-Math.PI/2,0,0],size:[1.04,.66]},
+    {kind:'terminal',position:[-1.58,1.29,-.984],rotation:[-.10,0,0],size:[1.11,.69]},
+    {kind:'research',position:[.12,1.146,-.611],rotation:[-.85,0,0],size:[1.28,.79]},
+    {kind:'skills',position:[2.24,.46,-.343],rotation:[0,0,0],size:[1.20,.20]},
+    {kind:'cases',position:[2.24,.79,-.354],rotation:[0,0,0],size:[1.18,.20]},
+    {kind:'lintel',position:[0,2.23,-1.545],rotation:[0,0,0],size:[1.64,.32]},
   ];
-  const nodes=[[-.67,.94,.02],[-.91,1.02,.1],[-1.12,.94,.04]];
-  for(const node of nodes)add(new THREE.SphereGeometry(.043,12,8),mat.vermilion,node);
-  path(nodes,.009,mat.wood);
   for(const [surface,geometries] of batches) {
     const geometry=mergeGeometries(geometries,false);geometries.forEach(g=>g.dispose());resources.add(geometry);
     const mesh=new THREE.Mesh(geometry,surface);mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import {createMinnanCourtyard} from './MinnanModel';
 import {minnanCamera} from './MinnanCamera';
 import {createStudioSurfaces} from './MinnanStudio';
+import {createAgentJourney} from './MinnanJourney';
 
 export default function MinnanScene({frame=90,still=false}) {
   const host=useRef(null),runtime=useRef(null),current=useRef(frame);
@@ -10,7 +11,7 @@ export default function MinnanScene({frame=90,still=false}) {
   current.current=frame;
   useLayoutEffect(()=>{
     const container=host.current;
-    let renderer,model,studio,resize,raf=0,alive=true;
+    let renderer,model,studio,journey,resize,raf=0,alive=true;
     const resources=[];
     const pointer={x:0,y:0},smoothed={x:0,y:0};
     try {
@@ -21,17 +22,18 @@ export default function MinnanScene({frame=90,still=false}) {
       renderer.setClearColor(0xf7f4eb,0);
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap;
       renderer.domElement.setAttribute('aria-hidden','true');container.appendChild(renderer.domElement);
-      const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xf7f4eb,18,36);
+      const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xf7f4eb,32,64);
       const camera=new THREE.PerspectiveCamera(42,1,.1,75);
-      scene.add(new THREE.HemisphereLight(0xfff9ee,0xa0a798,3.0));
-      const sun=new THREE.DirectionalLight(0xfff7e8,1.5);sun.position.set(-7,14,10);sun.castShadow=true;
+      scene.add(new THREE.HemisphereLight(0xfff9ee,0x929787,2.2));
+      const sun=new THREE.DirectionalLight(0xfff7e8,2.4);sun.position.set(-7,14,10);sun.castShadow=true;
       sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:40});
-      sun.shadow.normalBias=.035;sun.shadow.bias=-.00015;sun.shadow.radius=5;sun.shadow.blurSamples=8;scene.add(sun);
+      sun.shadow.normalBias=.035;sun.shadow.bias=-.00015;sun.shadow.radius=2;sun.shadow.blurSamples=4;scene.add(sun);
       const fill=new THREE.DirectionalLight(0xe5e9db,.8);fill.position.set(9,7,-7);scene.add(fill);
       const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.ShadowMaterial({color:0x798375,opacity:.075}));
       ground.rotation.x=-Math.PI/2;ground.position.y=-.01;ground.receiveShadow=true;scene.add(ground);resources.push(ground.geometry,ground.material);
       model=createMinnanCourtyard();scene.add(model.group);
       studio=createStudioSurfaces(model.studioLabels);scene.add(studio.group);
+      journey=createAgentJourney();scene.add(journey.group);
       let width=1,height=1;
       const draw=()=>{
         if(!alive||!width||!height)return;
@@ -41,7 +43,13 @@ export default function MinnanScene({frame=90,still=false}) {
         // Only fit exterior views; scaling the dolly would pull it back out of the gate.
         const aspect=width/height,fit=1+(Math.max(1,1.2/aspect)-1)*shot.fit;
         camera.position.sub(new THREE.Vector3(...shot.target)).multiplyScalar(fit).add(new THREE.Vector3(...shot.target));
-        camera.lookAt(...shot.target);camera.aspect=aspect;camera.fov=shot.fov;camera.updateProjectionMatrix();
+        camera.lookAt(...shot.target);camera.aspect=aspect;
+        // Keep the physical gate path; widen only the inside courtyard lens on
+        // narrow screens so the archive and the desk stay inside the composition.
+        const interior=Math.min(1,Math.max(0,(current.current-565)/45))*(1-Math.min(1,Math.max(0,(current.current-745)/65)));
+        const lens=1+(Math.max(1,1.48/aspect)-1)*interior;
+        camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(shot.fov/2))*lens));camera.updateProjectionMatrix();
+        journey.update(current.current,still);
         renderer.render(scene,camera);
       };
       const animatePointer=()=>{
@@ -66,7 +74,7 @@ export default function MinnanScene({frame=90,still=false}) {
     return ()=>{
       alive=false;resize?.disconnect();cancelAnimationFrame(raf);
       if(runtime.current?.onPointer)window.removeEventListener('pointermove',runtime.current.onPointer);
-      runtime.current=null;studio?.dispose();model?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();
+      runtime.current=null;journey?.dispose();studio?.dispose();model?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();
       if(renderer?.domElement.parentNode===container)container.removeChild(renderer.domElement);
     };
   },[still]);

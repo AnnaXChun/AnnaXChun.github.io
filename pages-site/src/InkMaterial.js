@@ -8,62 +8,57 @@ const noise = `
   }
 `;
 
-// Pigment is anchored to the actual surface, so brush marks retain their depth
-// during a dolly. Broad wet washes, dragged dry strokes and paper fibres differ.
+// Local pigment deposits follow the geometry. No blur, bright directional stripes,
+// or paper veil: the masonry, roof relief and leaf silhouettes supply the detail.
 export function createInkMaterial(color, strength=.7, foliage=false) {
   const material=new THREE.MeshStandardMaterial({color,roughness:1,metalness:0,side:foliage?THREE.DoubleSide:THREE.FrontSide});
-  material.name=foliage?'curved ink leaves':'mineral pigment on paper';
+  material.name=foliage?'banyan ink leaves':'granulated mineral pigment';
   material.onBeforeCompile=shader=>{
     shader.uniforms.inkStrength={value:strength};
     shader.uniforms.inkFoliage={value:foliage?1:0};
-    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vInkPosition;\nvarying vec3 vInkNormal;');
-    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvInkPosition=position;vInkNormal=normal;');
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vInkPosition;');
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvInkPosition=position;');
     shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
       varying vec3 vInkPosition;
-      varying vec3 vInkNormal;
       uniform float inkStrength;
       uniform float inkFoliage;
       ${noise}
     `);
     shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
       vec3 p=vInkPosition;
-      vec3 paper=vec3(.930,.905,.838);
-      float cloud=inkNoise(p*.65)*.5+inkNoise(p*2.2)*.32+inkNoise(p*6.4)*.18;
-      float roofness=smoothstep(.48,.85,abs(normalize(vInkNormal).y));
-      vec3 brushDirection=mix(vec3(7.0,90.0,5.0),vec3(110.0,5.0,7.0),roofness);
-      float brush=inkNoise(p*brushDirection+vec3(cloud*1.8));
-      float fibre=inkNoise(p*brushDirection*3.0);
-      float dry=smoothstep(.52,.78,brush)*(.35+.65*fibre);
-      float tide=1.0-smoothstep(.025,.105,abs(cloud-.47));
-      float pigment=clamp(mix(.88,.95,inkFoliage)+(cloud-.5)*.48+inkStrength*(tide*.08-dry*.18),.50,1.0);
-      diffuseColor.rgb=mix(paper,diffuseColor.rgb,pigment);
-      diffuseColor.rgb*=.94+.10*inkHash(floor(p*270.0));
+      float wash=inkNoise(p*2.7)*.6+inkNoise(p*8.1)*.4;
+      float granule=inkNoise(p*66.0);
+      float pool=1.0-smoothstep(.02,.12,abs(wash-.45));
+      float dry=smoothstep(.64,.83,inkNoise(p*vec3(38.,56.,43.)));
+      float stroke=smoothstep(.57,.73,inkNoise(p*vec3(31.,57.,25.)+wash*2.));
+      float strokePatch=smoothstep(.51,.66,inkNoise(p*1.7));
+      float pigment=1.0+inkStrength*((wash-.5)*.34-pool*.12+(granule-.5)*.06);
+      diffuseColor.rgb*=pigment*(1.-stroke*strokePatch*.16*inkStrength);
+      // Sparse broken paper flecks occur in dry patches, never across every face.
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.89,.86,.78),dry*.020*inkStrength*(1.-inkFoliage*.65));
     `);
     shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
-      // Compress the hard lit / unlit PBR contrast into diluted ink values.
-      float lightValue=dot(outgoingLight,vec3(.2126,.7152,.0722))/max(.04,dot(diffuseColor.rgb,vec3(.2126,.7152,.0722)));
-      float washLight=smoothstep(.12,1.75,lightValue);
-      outgoingLight=diffuseColor.rgb*mix(.62,1.04,washLight);
-      outgoingLight=mix(outgoingLight,vec3(.930,.905,.838),mix(.035,.012,inkFoliage)*washLight);
+      // Retain directional shading and contact shadows, softly limit the highlights.
+      float lightValue=dot(outgoingLight,vec3(.2126,.7152,.0722))/max(.025,dot(diffuseColor.rgb,vec3(.2126,.7152,.0722)));
+      outgoingLight=diffuseColor.rgb*(.43+.70*smoothstep(.08,2.0,lightValue));
       #include <opaque_fragment>
     `);
   };
-  // All pigment colours share a program; only the leaf sidedness needs a variant.
-  material.customProgramCacheKey=()=> 'ink-wash-v3';
+  material.customProgramCacheKey=()=> 'mineral-ink-v4';
   return material;
 }
 
 export function createInkLines() {
-  const material=new THREE.LineBasicMaterial({color:0x454740,transparent:true,opacity:.32,depthWrite:false});
+  const material=new THREE.LineBasicMaterial({color:0x30372e,transparent:true,opacity:.37,depthWrite:false});
   material.onBeforeCompile=shader=>{
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vInkPosition;');
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvInkPosition=position;');
     shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>\nvarying vec3 vInkPosition;\n${noise}`);
     shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
-      diffuseColor.a*=smoothstep(.22,.62,inkNoise(vInkPosition*vec3(14.,9.,18.)));
+      diffuseColor.a*=smoothstep(.16,.56,inkNoise(vInkPosition*vec3(18.,21.,15.)));
       #include <opaque_fragment>
     `);
   };
-  material.customProgramCacheKey=()=> 'broken-ink-contours-v1';
+  material.customProgramCacheKey=()=> 'broken-ink-contours-v2';
   return material;
 }
