@@ -2,6 +2,8 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Player} from '@remotion/player';
 import Film, {CHAPTERS, FPS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
 import Dossier from './Dossier';
+import {profile} from './data';
+import MinnanScene from './MinnanScene';
 
 const LAST_FRAME = TOTAL_FRAMES - 1;
 const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
@@ -12,15 +14,14 @@ function Story() {
   const [initial] = useState(()=>({intro:!contentHash() && window.scrollY<8}));
   const initialFrame=initial.intro?0:INTRO_END_FRAME;
   const story=useRef(null),stage=useRef(null),viewport=useRef(null),player=useRef(null);
-  const progress=useRef(null),progressTrack=useRef(null),expectedScroll=useRef(null);
+  const progress=useRef(null),progressTrack=useRef(null);
   const driverRef=useRef(initial.intro?'intro':'scroll'),isPlaying=useRef(false);
   const pendingIntroRef=useRef(initial.intro);
   const lastFrame=useRef(initialFrame),currentChapter=useRef(0);
   const [driver,setDriverState]=useState(driverRef.current);
   const [playing,setPlaying]=useState(false),[chapter,setChapter]=useState(0);
   const [size,setSize]=useState(()=>{
-    const width=window.innerWidth<760?720:1440;
-    return {width,height:Math.max(1,Math.round(width*window.innerHeight/window.innerWidth))};
+    return {width:window.innerWidth,height:window.innerHeight};
   });
 
   const setDriver=useCallback(value=>{driverRef.current=value;setDriverState(value);},[]);
@@ -40,7 +41,6 @@ function Story() {
   },[]);
   const scrollToFrame=useCallback((frame,behavior='instant')=>{
     const top=scrollTopForFrame(frame);
-    expectedScroll.current=top;
     window.scrollTo({top,behavior});
   },[scrollTopForFrame]);
   const finishIntro=useCallback(()=>{
@@ -69,8 +69,9 @@ function Story() {
     const observer=new ResizeObserver(entries=>{
       const rect=entries[0].contentRect;
       if(rect.width<=0 || rect.height<=0) return;
-      const width=rect.width<760?720:1440;
-      const height=Math.max(1,Math.round(width*rect.height/rect.width));
+      // Typography uses real CSS pixels, independent of the illustration resolution.
+      const width=Math.max(1,Math.round(rect.width));
+      const height=Math.max(1,Math.round(rect.height));
       setSize(previous=>previous.width===width&&previous.height===height?previous:{width,height});
     });
     observer.observe(element);
@@ -119,14 +120,12 @@ function Story() {
       const frame=event.detail.frame;
       report(frame);
       if(driverRef.current==='intro' && frame>=INTRO_END_FRAME){finishIntro();return;}
-      if(driverRef.current==='journey' && isPlaying.current && frame>=INTRO_END_FRAME) scrollToFrame(frame);
     };
     const onPlay=()=>{pendingIntroRef.current=false;isPlaying.current=true;setPlaying(true);};
     const onPause=()=>{isPlaying.current=false;setPlaying(false);};
     const onEnded=()=>{onPause();setDriver('scroll');report(LAST_FRAME);};
     const onScroll=()=>{
       if(driverRef.current==='intro' && Math.abs(window.scrollY-scrollTopForFrame(INTRO_END_FRAME))>3) takeOver();
-      if(driverRef.current==='journey' && expectedScroll.current!==null && Math.abs(window.scrollY-expectedScroll.current)>3) takeOver();
       scheduleScroll();
     };
     const onUserScroll=()=>{takeOver();scheduleScroll();};
@@ -174,49 +173,35 @@ function Story() {
     };
   },[finishIntro,initial,initialFrame,leaveStory,pause,scrollToFrame,scrollTopForFrame,setDriver,takeOver]);
 
-  const startPlayback=(kind,event)=>{
-    const p=player.current;
-    if(!p) return;
-    pendingIntroRef.current=false;
-    pause();
-    scrollToFrame(INTRO_END_FRAME);
-    setDriver(kind);
-    lastFrame.current=0;
-    p.seekTo(0);
-    p.play(event);
-  };
-  const togglePlayback=event=>{
-    pendingIntroRef.current=false;
-    if(isPlaying.current){pause();return;}
-    if(driverRef.current==='intro' || driverRef.current==='journey'){
-      player.current?.play(event);
-    }else startPlayback('journey',event);
+  const toggleOpening=event=>{
+    if(isPlaying.current) pause();
+    else player.current?.play(event);
   };
   const seekChapter=index=>{
     pendingIntroRef.current=false;
     pause();setDriver('scroll');
-    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+45,INTRO_END_FRAME,LAST_FRAME);
+    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+(index===2?80:45),INTRO_END_FRAME,LAST_FRAME);
     const top=scrollTopForFrame(target);
     if(Math.abs(window.scrollY-top)<1) player.current?.seekTo(target);
     scrollToFrame(target,window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth');
   };
-  const primaryLabel=driver==='intro'?(playing?'暂停开场':'继续开场'):driver==='journey'?(playing?'暂停旅程':'继续旅程'):'播放完整旅程';
 
   return <section id="story" className="story-scroll" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver={driver}>
-    <div className={`story-stage ${chapter===2?'story-dark':''}`} ref={stage}>
+    <div className="story-stage" ref={stage}>
       <div className="film-viewport" ref={viewport} aria-hidden="true">
-        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请通过顶部导航阅读完整档案。</div>}/>
+        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请向下阅读完整档案。</div>}/>
       </div>
-      <div className="film-accessible sr-only"><h1>椿襄 · 下一步</h1><p>软件开发工程师，武汉大学软件工程背景。这里讲述后端与支付系统、生命科学推理智能体、团队成果，以及羽毛球、健身和视频剪辑。可以跳过开场、暂停播放、切换章节，或直接阅读下方完整资料。</p></div>
+      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。生活章节展示可旋转的三维羽毛球与球拍，可按“挥拍”观看一次击球。三维水墨古厝随滚动切换视角，朱砂线随镜头穿门，连接研究书案、开发笔记本与 Skills / Bad Case 卷宗架；也可切换章节或直接阅读下方完整资料。</p></div>
+      {chapter===4&&<div className="story-life-action"><span>拖动羽毛球，可转动</span><button type="button" onClick={()=>window.dispatchEvent(new Event('portfolio:smash'))} aria-label="挥拍，观看三维羽毛球击球动画">挥拍 <span aria-hidden="true">↗</span></button></div>}
       <div className="story-controls">
         <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
-        <div className="story-actions">
-          <button type="button" className="journey-toggle" onClick={togglePlayback}>{primaryLabel}</button>
-          {driver==='intro'?<button type="button" className="skip-intro" onClick={finishIntro}>跳过开场 ↗</button>:<button type="button" className="replay-intro" onClick={event=>startPlayback('intro',event)}>重播开场 ↺</button>}
-        </div>
+        {driver==='intro'&&<div className="story-actions">
+          <button type="button" className="journey-toggle" onClick={toggleOpening}>{playing?'暂停开场':'继续开场'}</button>
+          <button type="button" className="skip-intro" onClick={finishIntro}>跳过开场 ↗</button>
+        </div>}
+        {driver!=='intro'&&<a className="story-dossier-link" href="#dossier">个人详录 <span aria-hidden="true">↗</span></a>}
       </div>
       <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress}/></div>
-      <div className="scroll-direction" aria-hidden="true">{driver==='intro'?'滚动，进入故事':'向下探索'} <span>↓</span></div>
     </div>
   </section>;
 }
@@ -245,9 +230,19 @@ export default function App(){
     const raf=requestAnimationFrame(()=>document.getElementById(window.location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));
     return ()=>cancelAnimationFrame(raf);
   },[]);
-  const changeMode=()=>{
-    if(motion){setMotion(false);requestAnimationFrame(()=>document.getElementById('dossier')?.scrollIntoView({behavior:'instant'}));}
-    else{window.history.replaceState(null,'',window.location.pathname+window.location.search);window.scrollTo({top:0,behavior:'instant'});setMotion(true);}
-  };
-  return <><a className="skip-link" href="#dossier">跳到完整资料</a><div id="top"/><header className="site-header"><a className="brand" href="#top"><span>椿襄<small>CHUNXIANG</small></span></a><nav aria-label="主导航"><a href={motion?'#story':'#dossier'}>故事</a><a href="#dossier">档案</a><a href="#contact">联系</a></nav><button className="motion-toggle" onClick={changeMode}>{motion?'静态阅读':'开启动画故事'}<span>{motion?'↗':'▷'}</span></button></header><main>{motion?<Story/>:<div className="static-intro"><span>THE NEXT MOVE</span><h1>把想法，<br/>一层层建成。</h1><p>我是椿襄，软件开发工程师。这里记录我的项目、方法，以及工作之外的生活。</p><button onClick={changeMode}>观看交互式故事 ↗</button><a href="./profile.html">打开完整静态页面 ↗</a></div>}<Dossier/><Contact/></main></>;
+  return <>
+    <a className="skip-link" href="#dossier">跳到完整资料</a>
+    <div id="top" />
+    <main>
+      {motion ? <Story /> : <section className="static-intro">
+        <span>CHUNXIANG / PORTFOLIO</span>
+        <h1>椿襄</h1>
+        <h2>{profile.role}</h2>
+        <p>专注智能体工具调用、强化学习后训练与多步推理。这里记录我的研究、实习与作品。</p>
+        <div className="static-model" role="img" aria-label="闽南红砖古厝与燕尾脊的三维建筑"><MinnanScene still /></div>
+      </section>}
+      <Dossier />
+      <Contact />
+    </main>
+  </>;
 }
