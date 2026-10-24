@@ -16,7 +16,7 @@ export const CHAPTERS=[
   {title:'成形',line:'与伙伴一起，让成果落地。'},
   {title:'生活',line:'下一步，也在屏幕之外。'},
 ];
-const CREAM='#f6f1df', BLUE='#244bc5', INK='#1b2852';
+const CREAM='#f6f1df', BLUE='#244bc5';
 const clamp=(n,min=0,max=1)=>Math.min(max,Math.max(min,n));
 const smooth=t=>t*t*(3-2*t);
 const range=(f,a,b)=>smooth(clamp((f-a)/(b-a)));
@@ -37,7 +37,7 @@ function ThreeWorkshop({frame,width,height}){
     const disposables=[];
     try{
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-      renderer.setPixelRatio(1);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1,1.5,1920/width));
       renderer.setSize(width,height);
       renderer.outputColorSpace=THREE.SRGBColorSpace;
       renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -79,7 +79,7 @@ function ThreeWorkshop({frame,width,height}){
         runtime.current?.draw(current.current);
       });
       disposables.push(imageGeo,imageMat,texture);
-      const mobile=width<1000;
+      const mobile=width<900;
       const draw=f=>{
         const p=clamp((f-65)/(1319-65));
         model.update(p);
@@ -116,45 +116,43 @@ const STORIES=[
   {eyebrow:'05 / BEYOND THE DESK',title:['合上电脑，','还有下一场。'],body:'球场上的预判，训练时的调整，剪辑里的取舍。工作之外，我也喜欢在反馈里找到下一步。',note:'羽毛球 / 健身 / 视频剪辑',tag:'屏幕之外'},
 ];
 
-function StoryPanel({index,frame,width,height}){
-  const data=STORIES[index],mobile=width<1000;
-  const compact=mobile&&height/width<1.85;
+function StoryPanel({index,frame}){
+  const data=STORIES[index];
   const start=index===0?142:STARTS[index]+4,end=index===4?TOTAL_FRAMES:STARTS[index+1];
   const enter=range(frame,start,start+(index===0?36:42));
   const leave=index===4?0:index===0?range(frame,215,265):range(frame,end-42,end-4);
   const alpha=enter*(1-leave);
   if(alpha<=0)return null;
-  const right=index%2===0;
-  const panelW=mobile?width-90:width*.325;
-  const x=mobile?45:right?width*.65:width*.045;
-  const y=mobile?height*(compact?.52:.56):height*.24;
-  const titleSize=mobile?Math.min(57,height*.043):width*.045;
-  const shift=(1-enter)*55+(leave*-40);
-  return <div className="film-copy" style={{position:'absolute',left:x,top:y,width:panelW,opacity:alpha,transform:'translateY('+shift+'px)',color:INK}}>
-    <div className="film-eyebrow" style={{fontSize:mobile?15:12,letterSpacing:2.2,marginBottom:compact?13:mobile?17:26,color:BLUE}}>{data.eyebrow}</div>
-    <div className="film-title" style={{fontSize:titleSize,fontWeight:550,letterSpacing:-2.8,lineHeight:1.17}}>
+  const shift=(1-enter)*32+(leave*-24);
+  return <div className={`film-copy ${index%2===0?'is-right':'is-left'}`} style={{opacity:alpha,transform:`translateY(${shift}px)`}}>
+    <div className="film-eyebrow">{data.eyebrow}</div>
+    <div className="film-title">
       {data.title.map((line,i)=><div key={line} style={{overflow:'hidden'}}><div style={{transform:'translateY('+((1-range(frame,start+i*5,start+(index===0?32:34)+i*5))*110)+'%)'}}>{line}</div></div>)}
     </div>
-    <p style={{fontSize:mobile?22:18,lineHeight:1.85,marginTop:compact?13:mobile?19:28,maxWidth:440}}>{data.body}</p>
-    {index===0&&<div className="film-person" style={{display:'flex',alignItems:'center',gap:18,marginTop:mobile?18:28}}>
-      <div><strong style={{display:'block',fontSize:mobile?23:20}}>椿襄 <span style={{fontSize:mobile?13:10,fontWeight:400,letterSpacing:2}}>CHUNXIANG</span></strong><span style={{fontSize:mobile?15:12,color:'#647196'}}>软件开发工程师</span></div>
-    </div>}
-    <div style={{marginTop:mobile?16:27,paddingTop:mobile?13:19,borderTop:'1px solid #a9b1ce',fontSize:mobile?13:11,color:'#647196',lineHeight:1.8}}>{data.note}</div>
-    {!compact&&<div style={{marginTop:mobile?12:22,display:'flex',alignItems:'center',gap:13,fontSize:mobile?17:13,color:BLUE}}><span style={{border:'1px solid '+BLUE,width:25,height:25,borderRadius:'50%',display:'grid',placeItems:'center'}}>↗</span>{data.tag}</div>}
+    <p className="film-description">{data.body}</p>
+    {index===0&&<div className="film-person"><strong>椿襄 <span>CHUNXIANG</span></strong><span>软件开发工程师</span></div>}
+    <div className="film-note">{data.note}</div>
   </div>;
 }
 
-function EvidenceCards({frame,width,height}){
-  const mobile=width<1000,appear=range(frame,870,930)*(1-range(frame,1020,1050));
+function EvidenceCards({frame}){
+  // Give the evidence the whole settled chapter, including chapter navigation's landing frame.
+  const appear=range(frame,828,862)*(1-range(frame,1020,1050));
   if(appear<=0)return null;
-  return <div style={{position:'absolute',left:mobile?'43%':'61%',top:mobile?'22%':'31%',display:'flex',gap:16,transform:'translateY('+(80*(1-appear))+'px) rotate(-6deg)',opacity:appear,pointerEvents:'none'}}>
-    <Img src="./assets/xiaomi-2025-first.webp" style={{width:mobile?145:210,height:mobile?110:151,objectFit:'contain',background:'#fffdf5',padding:8,boxShadow:'0 14px 30px #15287522',border:'1px solid #bdc5df'}}/>
-    <Img src="./assets/design-digital-twin-first.webp" style={{width:mobile?90:120,height:mobile?130:176,objectFit:'contain',background:'#fffdf5',padding:7,marginTop:40,boxShadow:'0 14px 30px #15287522',border:'1px solid #bdc5df'}}/>
+  return <div className="film-evidence" style={{transform:`translateY(${36*(1-appear)}px)`,opacity:appear}}>
+    <figure className="evidence-primary">
+      <div className="evidence-mount"><Img src="./assets/xiaomi-2025-first.webp" alt="DeepDog 小米杯全国一等奖获奖证书" /></div>
+      <figcaption><strong>全国一等奖</strong><span>DeepDog · 小米杯</span></figcaption>
+    </figure>
+    <figure className="evidence-secondary">
+      <div className="evidence-mount"><Img src="./assets/design-digital-twin-first.webp" alt="数字孪生三维人体重建，中南地区一等奖获奖证书" /></div>
+      <figcaption><strong>中南地区一等奖</strong><span>数字孪生 · 三维重建</span></figcaption>
+    </figure>
   </div>;
 }
 
 export default function Film(){
-  const frame=useCurrentFrame(),{width,height}=useVideoConfig(),mobile=width<1000;
+  const frame=useCurrentFrame(),{width,height}=useVideoConfig(),mobile=width<900;
   const introAlpha=1-range(frame,48,96);
   const panel=range(frame,142,180);
   const active=Math.max(0,STARTS.findLastIndex(start=>frame>=start));
@@ -165,7 +163,7 @@ export default function Film(){
   return <AbsoluteFill style={{background:CREAM,fontFamily:'"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif',overflow:'hidden'}}>
     <div style={{position:'absolute',inset:0}}>
       <ThreeWorkshop frame={frame} width={width} height={height}/>
-      <div className="film-paper-panel" style={{position:'absolute',opacity:curtainOpacity,...(mobile?{left:0,right:0,bottom:0,height:'48%',background:'linear-gradient(0deg,'+CREAM+' 88%,#f6f1df00)'}:{top:0,bottom:0,left:panelLeft+'%',width:'39%',background:side==='right'?'linear-gradient(90deg,#f6f1df00,'+CREAM+' 18%)':'linear-gradient(270deg,#f6f1df00,'+CREAM+' 18%)'})}}/>
+      <div className="film-paper-panel" style={{position:'absolute',opacity:curtainOpacity,...(mobile?{left:0,right:0,bottom:0,height:'60%',background:'linear-gradient(0deg,'+CREAM+' 90%,#f6f1df00)'}:{top:0,bottom:0,left:panelLeft+'%',width:'39%',background:side==='right'?'linear-gradient(90deg,#f6f1df00,'+CREAM+' 18%)':'linear-gradient(270deg,#f6f1df00,'+CREAM+' 18%)'})}}/>
     </div>
     {introAlpha>0&&<div style={{position:'absolute',inset:0,opacity:introAlpha,pointerEvents:'none'}}>
       <div style={{position:'absolute',bottom:mobile?'18%':'19%',left:'5%',padding:'18px 22px',background:'#f6f1dfed',borderLeft:'2px solid '+BLUE,color:BLUE,transform:'translateY('+mix(15,0,range(frame,0,35))+'px)'}}>
@@ -173,8 +171,8 @@ export default function Film(){
         <div style={{fontSize:mobile?17:13,letterSpacing:3,marginTop:13}}>一张图纸，一次新的开始。</div>
       </div>
     </div>}
-    {STORIES.map((_,index)=><StoryPanel key={index} index={index} frame={frame} width={width} height={height}/>)}
-    <EvidenceCards frame={frame} width={width} height={height}/>
-    {frame>180&&<div style={{position:'absolute',bottom:mobile?height*.49:height*.15,left:mobile?40:width*.035,color:BLUE,fontSize:mobile?12:10,letterSpacing:2,opacity:.65,pointerEvents:'none'}}>CHUNXIANG’S WORKSHOP <span style={{marginLeft:18}}>1 : ∞</span></div>}
+    {STORIES.map((_,index)=><StoryPanel key={index} index={index} frame={frame}/>)}
+    <div className="evidence-backdrop" style={{opacity:range(frame,828,862)*(1-range(frame,1020,1050))}} />
+    <EvidenceCards frame={frame}/>
   </AbsoluteFill>;
 }
