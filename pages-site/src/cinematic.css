@@ -3,14 +3,14 @@
 .story-scroll.cinematic-story { height:680svh; }
 .cinematic-film { isolation:isolate; }
 .cinematic-film::after { z-index:8; }
-.life-tone { position:absolute; inset:0; background:#1e2b26; z-index:0; }
+.life-tone { position:absolute; inset:0; background:radial-gradient(ellipse at 74% 12%,#f2efdb 0%,#d7dbc4 37%,#b8c2a9 78%,#a5b39a 100%); z-index:0; }
 .depth-title { position:absolute; left:0; right:0; top:10%; text-align:center; font:700 14vw/.98 var(--serif); white-space:pre; letter-spacing:-.055em; pointer-events:none; perspective:950px; color:var(--ink); }
 .depth-title span { display:inline-block; transform-style:preserve-3d; }
 .depth-title-0 { font-size:19vw; top:7%; letter-spacing:.09em; }
 .depth-title-1 { font-family:var(--sans); font-size:13vw; top:10%; letter-spacing:-.075em; }
 .depth-title-2 { text-align:left; left:5%; top:53%; font-family:var(--sans); font-size:21vw; letter-spacing:-.075em; color:#b6b6a6; }
 .depth-title-3 { font-size:14vw; top:9%; }
-.depth-title-4 { font-size:19vw; top:12%; color:#e7e3d1; letter-spacing:.015em; }
+.depth-title-4 { font-size:19vw; top:12%; color:#49604b70; letter-spacing:.015em; }
 .cinematic-film .ink-landscape { z-index:2; left:calc(23% * (1 - var(--travel,0))); top:calc(9% * (1 - var(--travel,0))); width:calc(81% + 19% * var(--travel,0)); height:calc(91% + 9% * var(--travel,0)); mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); }
 .cinematic-film.scene-1 .ink-landscape { left:calc(-14% * (1 - var(--travel,0))); width:calc(88% + 12% * var(--travel,0)); top:calc(17% * (1 - var(--travel,0))); height:calc(83% + 17% * var(--travel,0)); }
 .cinematic-film.scene-2 .ink-landscape { left:-4%; width:108%; top:-3%; height:105%; }
@@ -34,10 +34,10 @@
 .shot-copy-3 .shot-title { font-size:32px; }
 .shot-copy-3 .shot-description { font-size:17px; margin-top:12px; }
 .shot-copy-3 .shot-note { display:none; }
-.shot-copy-4 { right:7%; top:53%; width:27%; color:#efeddf; }
+.shot-copy-4 { right:7%; top:53%; width:27%; color:#243d2e; }
 .shot-copy-4 .shot-eyebrow { display:none; }
 .shot-copy-4 .shot-description { font-size:18px; }
-.shot-copy-4 .shot-note { color:#bbc2b6; }
+.shot-copy-4 .shot-note { color:#4c5f47; }
 .cinema-evidence { position:absolute; inset:0; z-index:3; pointer-events:none; }
 .cinema-evidence figure { position:absolute; margin:0; }
 .cinema-evidence-primary { left:9%; top:26%; width:42%; }
@@ -47,13 +47,13 @@
 .cinema-evidence figcaption strong { font-size:22px; }
 .cinema-evidence figcaption span { font-size:14px; color:#5e6658; }
 .cinema-evidence-secondary figcaption { flex-direction:column; gap:2px; }
-.scroll-cue { position:absolute; z-index:5; left:7%; bottom:18%; color:#c7d0c1; font-size:14px; font-weight:700; letter-spacing:.06em; }
+.scroll-cue { position:absolute; z-index:5; left:7%; bottom:18%; color:#40583f; font-size:14px; font-weight:700; letter-spacing:.06em; }
 .scroll-cue span { display:inline-block; margin-left:26px; font-size:25px; }
-.cinematic-story[data-chapter="4"] .story-stage { background:#1e2b26; }
-.cinematic-story[data-chapter="4"] .chapter-nav { border-color:#697565; }
-.cinematic-story[data-chapter="4"] .chapter-nav button,.cinematic-story[data-chapter="4"] .story-dossier-link { color:#c8d0c2; }
-.cinematic-story[data-chapter="4"] .chapter-nav button[aria-pressed="true"] { color:#f4deaf; }
-.cinematic-story[data-chapter="4"] .chapter-nav button[aria-pressed="true"]::before { background:#f4deaf; }
+.cinematic-story[data-chapter="4"] .story-stage { background:#cbd0b8; }
+.cinematic-story[data-chapter="4"] .chapter-nav { border-color:#78886a; }
+.cinematic-story[data-chapter="4"] .chapter-nav button,.cinematic-story[data-chapter="4"] .story-dossier-link { color:#314b34; }
+.cinematic-story[data-chapter="4"] .chapter-nav button[aria-pressed="true"] { color:#742e20; }
+.cinematic-story[data-chapter="4"] .chapter-nav button[aria-pressed="true"]::before { background:#742e20; }
 @media (min-width:900px) and (max-height:650px) {
   .depth-title-0 { top:3%; font-size:16vw; }
   .depth-title-1 { top:4%; font-size:11vw; }

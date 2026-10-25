@@ -4,6 +4,7 @@ import {createMinnanCourtyard} from './MinnanModel';
 import {minnanCamera} from './MinnanCamera';
 import {createStudioSurfaces} from './MinnanStudio';
 import {createAgentJourney} from './MinnanJourney';
+import {createStudioEnvironment} from './StudioLighting';
 
 export default function MinnanScene({frame=90,still=false}) {
   const host=useRef(null),runtime=useRef(null),current=useRef(frame);
@@ -11,25 +12,27 @@ export default function MinnanScene({frame=90,still=false}) {
   current.current=frame;
   useLayoutEffect(()=>{
     const container=host.current;
-    let renderer,model,studio,journey,resize,raf=0,alive=true;
+    let renderer,model,studio,journey,environment,resize,raf=0,alive=true;
     const resources=[];
     const pointer={x:0,y:0},smoothed={x:0,y:0};
     try {
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
       renderer.outputColorSpace=THREE.SRGBColorSpace;
-      renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
       renderer.setClearColor(0xf7f4eb,0);
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap;
       renderer.domElement.setAttribute('aria-hidden','true');container.appendChild(renderer.domElement);
       const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xf7f4eb,32,64);
       const camera=new THREE.PerspectiveCamera(42,1,.1,75);
-      scene.add(new THREE.HemisphereLight(0xfff9ee,0x929787,2.2));
-      const sun=new THREE.DirectionalLight(0xfff7e8,2.4);sun.position.set(-7,14,10);sun.castShadow=true;
+      environment=createStudioEnvironment(renderer);scene.environment=environment.texture;scene.environmentIntensity=.24;
+      scene.add(new THREE.HemisphereLight(0xfff4db,0x4b6158,.55));
+      const sun=new THREE.DirectionalLight(0xffefd2,3.2);sun.position.set(-9,11,8);sun.castShadow=true;
       sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:40});
-      sun.shadow.normalBias=.035;sun.shadow.bias=-.00015;sun.shadow.radius=2;sun.shadow.blurSamples=4;scene.add(sun);
-      const fill=new THREE.DirectionalLight(0xe5e9db,.8);fill.position.set(9,7,-7);scene.add(fill);
-      const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.ShadowMaterial({color:0x798375,opacity:.075}));
+      sun.shadow.normalBias=.018;sun.shadow.bias=-.00015;sun.shadow.radius=3;sun.shadow.blurSamples=6;scene.add(sun);
+      resources.push({dispose(){sun.shadow.map?.dispose();sun.shadow.mapPass?.dispose();}});
+      const fill=new THREE.DirectionalLight(0xe1eaff,.45);fill.position.set(9,7,-7);scene.add(fill);
+      const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.ShadowMaterial({color:0x52614d,opacity:.23}));
       ground.rotation.x=-Math.PI/2;ground.position.y=-.01;ground.receiveShadow=true;scene.add(ground);resources.push(ground.geometry,ground.material);
       model=createMinnanCourtyard();scene.add(model.group);
       studio=createStudioSurfaces(model.studioLabels);scene.add(studio.group);
@@ -74,7 +77,7 @@ export default function MinnanScene({frame=90,still=false}) {
     return ()=>{
       alive=false;resize?.disconnect();cancelAnimationFrame(raf);
       if(runtime.current?.onPointer)window.removeEventListener('pointermove',runtime.current.onPointer);
-      runtime.current=null;journey?.dispose();studio?.dispose();model?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();
+      runtime.current=null;journey?.dispose();studio?.dispose();model?.dispose();environment?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();
       if(renderer?.domElement.parentNode===container)container.removeChild(renderer.domElement);
     };
   },[still]);

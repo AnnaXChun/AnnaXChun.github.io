@@ -37,14 +37,10 @@ export function createInkMaterial(color, strength=.7, foliage=false) {
       // Sparse broken paper flecks occur in dry patches, never across every face.
       diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.89,.86,.78),dry*.020*inkStrength*(1.-inkFoliage*.65));
     `);
-    shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
-      // Retain directional shading and contact shadows, softly limit the highlights.
-      float lightValue=dot(outgoingLight,vec3(.2126,.7152,.0722))/max(.025,dot(diffuseColor.rgb,vec3(.2126,.7152,.0722)));
-      outgoingLight=diffuseColor.rgb*(.43+.70*smoothstep(.08,2.0,lightValue));
-      #include <opaque_fragment>
-    `);
+    // Pigment changes albedo; preserve the actual PBR illumination. Flattening
+    // outgoingLight erased the shaded eaves and made the scene look fogged over.
   };
-  material.customProgramCacheKey=()=> 'mineral-ink-v4';
+  material.customProgramCacheKey=()=> 'mineral-ink-v5-physical-light';
   return material;
 }
 

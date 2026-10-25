@@ -7,11 +7,19 @@ import {badmintonShot,LIFE_START,LIFE_END,IMPACT} from '../src/BadmintonMotion.j
 test('macro model has finite curved feathers, woven strings, grommets and a helical grip',()=>{
   const model=createBadmintonModel();
   try {
+    let meshes=0,vertices=0;
     for(const group of [model.shuttle,model.racket]) {
       const size=new Box3().setFromObject(group).getSize(new Vector3());
       assert.ok(size.x>1&&size.y>1&&size.z>.05);
-      group.traverse(node=>{if(node.isMesh)for(const name of ['position','normal'])assert.ok(Array.from(node.geometry.attributes[name].array).every(Number.isFinite));});
+      group.traverse(node=>{if(node.isMesh){
+        meshes++;vertices+=node.geometry.attributes.position.count;
+        for(const name of ['position','normal'])assert.ok(Array.from(node.geometry.attributes[name].array).every(Number.isFinite));
+        if(node.material.map||node.material.bumpMap)assert.ok(node.geometry.attributes.uv&&Array.from(node.geometry.attributes.uv.array).every(Number.isFinite),'textured surfaces need finite UVs');
+      }});
     }
+    const racketSize=new Box3().setFromObject(model.racket).getSize(new Vector3());
+    assert.ok(racketSize.y/racketSize.x>3&&racketSize.y/racketSize.x<3.8,'long-shaft badminton proportions');
+    assert.ok(meshes<=28&&vertices<450000,'macro details stay within the model budget');
     for(const name of ['sixteen-curved-feathers','feather-barbs','feather-shafts','binding-knots','rounded-cork'])assert.ok(model.shuttle.getObjectByName(name),name);
     for(const name of ['woven-string-bed','string-grommets','helical-grip-seam','aerodynamic-frame'])assert.ok(model.racket.getObjectByName(name),name);
     const bed=model.racket.getObjectByName('woven-string-bed').geometry;
