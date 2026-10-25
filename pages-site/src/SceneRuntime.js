@@ -15,10 +15,10 @@ export function minnanViewport(frame,width,height) {
 
 // One render request per browser frame. CSS camera framing may resize the host,
 // but only a real viewport resize reallocates the drawing buffer.
-export function createSceneRuntime({host,renderer,render,onResize,active=true}) {
+export function createSceneRuntime({host,renderer,render,onResize,active=true,idleFps=60}) {
   const viewport=host.closest('.film-viewport')||host;
   let width=1,height=1,viewWidth=1,viewHeight=1,raf=0,intersecting=true,disposed=false;
-  let bufferKey='',awake=false;
+  let bufferKey='',awake=false,requested=false,lastDraw=-Infinity,lastTick=null,elapsed=0;
   const runnable=()=>active&&intersecting&&!document.hidden&&!disposed;
   const allocate=()=>{
     const enabled=runnable(),key=enabled?`${viewWidth}:${viewHeight}`:'sleep';
@@ -28,13 +28,19 @@ export function createSceneRuntime({host,renderer,render,onResize,active=true}) 
     renderer.setPixelRatio(enabled?renderPixelRatio(w,h,devicePixelRatio||1):1);
     renderer.setSize(w,h,false);onResize?.(w,h,enabled);
   };
-  const flush=()=>{
+  const schedule=()=>{if(runnable()&&!raf)raf=requestAnimationFrame(flush);};
+  const flush=(now=performance.now())=>{
     raf=0;if(!runnable())return;
-    allocate();if(render(width,height))request();
+    // Ambient wind has a modest cadence; a scroll/pointer update always gets
+    // the next frame. Hidden time never accumulates into a large resumed jump.
+    if(!requested&&now-lastDraw<1000/idleFps-.5){schedule();return;}
+    requested=false;allocate();const delta=lastTick===null?0:Math.max(0,Math.min(.1,(now-lastTick)/1000));
+    lastTick=now;lastDraw=now;elapsed+=delta;
+    if(render(width,height,{time:elapsed,delta}))schedule();else lastTick=null;
   };
-  const request=()=>{if(runnable()&&!raf)raf=requestAnimationFrame(flush);};
+  const request=()=>{if(runnable()){requested=true;schedule();}};
   const visibility=()=>{
-    if(!runnable()){cancelAnimationFrame(raf);raf=0;allocate();}
+    if(!runnable()){cancelAnimationFrame(raf);raf=0;lastTick=null;allocate();}
     else {bufferKey=awake?bufferKey:'';request();}
   };
   const sizes=new ResizeObserver(entries=>{

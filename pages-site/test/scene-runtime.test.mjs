@@ -14,17 +14,39 @@ test('render targets have a pixel budget while the physical doorway remains cont
   const center=minnanViewport(485,1440,960);assert.ok(Math.abs(center.x)<.001&&Math.abs(center.y)<.001);assert.equal(center.width,1440);assert.equal(center.height,960);
 });
 
-test('maple retreat and falling motion are reversible, bounded and gone by the sports chapter',()=>{
+test('scroll retreat is reversible while wind-driven leaves stay finite and move continuously',()=>{
   assert.equal(autumnRetreat(850),1);assert.equal(autumnRetreat(1080),0);
   for(let f=900;f<1080;f++)assert.ok(autumnRetreat(f+1)<=autumnRetreat(f));
-  for(let i=0;i<24;i++){
-    const a=fallingLeafPose(i,650);fallingLeafPose(i,980);assert.deepEqual(fallingLeafPose(i,650),a);
-    assert.ok(Object.values(a).every(Number.isFinite));assert.ok(a.y>=-4.6&&a.y<=4.9);
+  for(let i=0;i<18;i++){
+    const a=fallingLeafPose(i,8),b=fallingLeafPose(i,8+1/30);
+    assert.ok(Object.values(a).every(Number.isFinite));assert.ok(a.y>=-5.7&&a.y<=5.7);
+    assert.notDeepEqual(a,b);
+    if(a.visibility>.05&&b.visibility>.05)assert.ok(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)<.15);
   }
   assert.equal(fallingLeafVisibility(.5,.6,400,true),0);
   assert.equal(fallingLeafVisibility(.8,.5,400,false),0);
   assert.equal(fallingLeafVisibility(.3,.3,400,false),1);
   assert.ok(fallingLeafVisibility(.5,.415,400,true)>0&&fallingLeafVisibility(.5,.415,400,true)<1);
+});
+
+test('ambient cadence yields to scroll updates and its clock pauses while hidden',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map(),times=[];let next=0;
+  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};globalThis.devicePixelRatio=1;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{observe(){}disconnect(){}};
+  globalThis.IntersectionObserver=class{observe(){}disconnect(){}};
+  const host={dataset:{},closest:()=>null},renderer={setPixelRatio(){},setSize(){}};
+  const tick=t=>{const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(t));};
+  let runtime;
+  try{
+    runtime=createSceneRuntime({host,renderer,idleFps:30,render(w,h,clock){times.push(clock.time);return true;}});
+    runtime.request();tick(0);tick(16);assert.equal(times.length,1);
+    tick(34);assert.equal(times.length,2);assert.equal(times[1],.034);
+    runtime.request();tick(40);assert.equal(times.length,3);assert.equal(times[2],.04);
+    runtime.setActive(false);tick(900);assert.equal(times.length,3);assert.equal(frames.size,0);
+    runtime.setActive(true);tick(1040);assert.equal(times.length,4);assert.equal(times[3],.04);
+  }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
 });
 
 test('draw requests coalesce, CSS framing does not reallocate buffers, hidden scenes sleep',()=>{

@@ -15,7 +15,8 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
   const [failed,setFailed]=useState(false);current.current=frame;fade.current=opacity;
   useLayoutEffect(()=>{
     const container=host.current;
-    let renderer,model,studio,journey,environment,water,autumn,composite,loop,alive=true;
+    let renderer,model,studio,journey,environment,water,autumn,composite,loop,alive=true,backgroundDirty=true;
+    let previousFrame=-1,previousX=NaN,previousY=NaN,previousWidth=0,previousHeight=0;
     const resources=[],pointer={x:0,y:0},smoothed={x:0,y:0},target=new THREE.Vector3();
     try {
       renderer=new THREE.WebGLRenderer({antialias:false,alpha:true,premultipliedAlpha:false,powerPreference:'high-performance'});
@@ -41,35 +42,45 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
       model=createMinnanCourtyard();scene.add(model.group);
       studio=createStudioSurfaces(model.studioLabels);scene.add(studio.group);
       journey=createAgentJourney();scene.add(journey.group);
-      composite=createCourtyardComposite(renderer);water=createCourtyardWater();scene.add(water.mesh);autumn=createAutumnFrame();
+      composite=createCourtyardComposite(renderer);water=createCourtyardWater();scene.add(water.mesh);autumn=createAutumnFrame(()=>loop?.request());
       renderer.shadowMap.needsUpdate=true;
-      const draw=(width,height)=>{
+      const draw=(width,height,{time})=>{
         if(!alive)return false;
         const f=current.current,shot=minnanCamera(f),view=minnanViewport(f,width,height);
-        smoothed.x+=(pointer.x-smoothed.x)*.16;smoothed.y+=(pointer.y-smoothed.y)*.16;
+        const moving=Math.abs(smoothed.x-pointer.x)+Math.abs(smoothed.y-pointer.y)>.002;
+        if(moving){smoothed.x+=(pointer.x-smoothed.x)*.16;smoothed.y+=(pointer.y-smoothed.y)*.16;}
+        else {smoothed.x=pointer.x;smoothed.y=pointer.y;}
+        const redrawBackground=backgroundDirty||f!==previousFrame||width!==previousWidth||height!==previousHeight||(shot.pointer>0&&(smoothed.x!==previousX||smoothed.y!==previousY));
+        if(redrawBackground){
         camera.position.set(...shot.position);camera.position.x+=smoothed.x*.65*shot.pointer;camera.position.y+=smoothed.y*.35*shot.pointer;
         const aspect=view.width/view.height,fit=1+(Math.max(1,1.2/aspect)-1)*shot.fit;
         target.set(...shot.target);camera.position.sub(target).multiplyScalar(fit).add(target);camera.lookAt(target);camera.aspect=aspect;
         const interior=Math.min(1,Math.max(0,(f-565)/45))*(1-Math.min(1,Math.max(0,(f-745)/65)));
         const lens=1+(Math.max(1,1.48/aspect)-1)*interior;
         camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(shot.fov/2))*lens));camera.updateProjectionMatrix();
-        journey.update(f,still);model.updateFoliage?.(f,still);water.update(still?90:f);autumn.update(f,width/height,still);
+        journey.update(f,still);model.updateFoliage?.(f,still);water.update(still?90:f);
         const dpr=renderer.getPixelRatio();camera.viewport.set(view.x*dpr,view.y*dpr,view.width*dpr,view.height*dpr);
+        }
+        autumn.update(f,width/height,still,time);
         audit.draw(()=>{
-          renderer.info.reset();renderer.setRenderTarget(composite.target);renderer.setViewport(0,0,width,height);renderer.clear();
-          renderer.setViewport(view.x,view.y,view.width,view.height);renderer.render(scene,camera);
+          renderer.info.reset();
+          if(redrawBackground){
+            renderer.setRenderTarget(composite.target);renderer.setViewport(0,0,width,height);renderer.clear();
+            renderer.setViewport(view.x,view.y,view.width,view.height);renderer.render(scene,camera);audit.background();
+            backgroundDirty=false;previousFrame=f;previousX=smoothed.x;previousY=smoothed.y;previousWidth=width;previousHeight=height;
+          }
           renderer.setRenderTarget(null);renderer.setViewport(0,0,width,height);renderer.clear();composite.draw(fade.current,width<height&&f>=270&&f<540?.495:2);renderer.clearDepth();
           if(still||autumnRetreat(f)>0)renderer.render(autumn.scene,autumn.camera);
         });
-        return shot.pointer>0&&Math.abs(smoothed.x-pointer.x)+Math.abs(smoothed.y-pointer.y)>.002;
+        return (!still&&autumnRetreat(f)>0)||(shot.pointer>0&&moving);
       };
-      loop=createSceneRuntime({host:container,renderer,render:draw,active,onResize(w,h,enabled){
+      loop=createSceneRuntime({host:container,renderer,render:draw,active,idleFps:30,onResize(w,h,enabled){
         // Read layout only when the viewport changes/restores, never per frame.
         // Native browser zoom changes the nav's footprint independently of 3D.
         const nav=enabled?container.closest('.story-stage')?.querySelector('.chapter-nav'):null;
         let navigation;
         if(nav){const n=nav.getBoundingClientRect(),r=container.getBoundingClientRect();if(r.width&&r.height)navigation={right:(n.right-r.left+24)/r.width,top:1-(n.top-r.top-16)/r.height};}
-        audit.resize();composite.resize(w,h,navigation);water.resize(enabled);if(!enabled)releaseShadow();
+        backgroundDirty=true;audit.resize();composite.resize(w,h,navigation);water.resize(enabled);if(!enabled)releaseShadow();
       }});
       const onPointer=event=>{
         if(still||!loop.active||event.pointerType==='touch'||!container.closest('.story-stage'))return;

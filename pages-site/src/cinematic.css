@@ -40,8 +40,8 @@
 .shot-copy-4 .shot-note { color:#436b81; }
 .cinema-evidence { position:absolute; inset:0; z-index:3; pointer-events:none; }
 .cinema-evidence figure { position:absolute; margin:0; }
-.cinema-evidence-primary { left:9%; top:26%; width:42%; }
-.cinema-evidence-secondary { left:58%; top:20%; width:21%; }
+.cinema-evidence-primary { left:9%; top:22%; width:42%; }
+.cinema-evidence-secondary { left:58%; top:12%; width:21%; }
 .cinema-evidence .evidence-mount img { max-height:46svh; }
 .cinema-evidence figcaption { display:flex; gap:18px; align-items:baseline; margin-top:16px; font-weight:700; }
 .cinema-evidence figcaption strong { font-size:22px; }
@@ -81,7 +81,7 @@
   .shot-copy-4 { top:37%; }
   .shot-copy-4 .shot-note { display:none; }
   .cinema-evidence-primary { top:25%; width:36%; }
-  .cinema-evidence-secondary { top:19%; width:20%; }
+  .cinema-evidence-secondary { top:12%; width:20%; }
   .cinema-evidence .evidence-mount img { max-height:34svh; }
   .cinema-evidence figcaption { margin-top:8px; }
   .cinema-evidence figcaption strong { font-size:18px; }
