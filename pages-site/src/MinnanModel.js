@@ -301,7 +301,7 @@ export function createMinnanCourtyard() {
     group.add(canopy);resources.add(canopy);resources.add(geometry);
   }
   tree(5.8,-2.1,1.10);
-  tree(-5.35,2.5,.8,true);
+  tree(-5.35,2.5,1.1,true);
   // Courtyard well and benches create useful foreground parallax.
   add(new THREE.CylinderGeometry(.37,.4,.36,32,1,true),mat.stone,[-1.35,.29,1.4]);
   add(new THREE.TorusGeometry(.39,.065,10,40),mat.ridge,[-1.35,.49,1.4],[Math.PI/2,0,0]);

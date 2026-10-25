@@ -9,13 +9,14 @@ import {createStudioEnvironment} from './StudioLighting';
 import {createSceneRuntime,minnanViewport} from './SceneRuntime';
 import {createSceneDiagnostics} from './SceneDiagnostics';
 import {createAutumnFrame,createCourtyardWater,autumnRetreat} from './MinnanAtmosphere';
+import {createLeafTextColliders} from './LeafTextColliders';
 
 export default function MinnanScene({frame=90,still=false,active=true,opacity=1}) {
   const host=useRef(null),runtime=useRef(null),current=useRef(frame),fade=useRef(opacity);
   const [failed,setFailed]=useState(false);current.current=frame;fade.current=opacity;
   useLayoutEffect(()=>{
     const container=host.current;
-    let renderer,model,studio,journey,environment,water,autumn,composite,loop,alive=true,backgroundDirty=true;
+    let renderer,model,studio,journey,environment,water,autumn,composite,letterColliders,loop,alive=true,backgroundDirty=true;
     let previousFrame=-1,previousX=NaN,previousY=NaN,previousWidth=0,previousHeight=0;
     const resources=[],pointer={x:0,y:0},smoothed={x:0,y:0},target=new THREE.Vector3();
     try {
@@ -43,8 +44,9 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
       studio=createStudioSurfaces(model.studioLabels);scene.add(studio.group);
       journey=createAgentJourney();scene.add(journey.group);
       composite=createCourtyardComposite(renderer);water=createCourtyardWater();scene.add(water.mesh);autumn=createAutumnFrame(()=>loop?.request());
+      letterColliders=createLeafTextColliders(container,()=>loop?.request());
       renderer.shadowMap.needsUpdate=true;
-      const draw=(width,height,{time})=>{
+      const draw=(width,height,{time,delta})=>{
         if(!alive)return false;
         const f=current.current,shot=minnanCamera(f),view=minnanViewport(f,width,height);
         const moving=Math.abs(smoothed.x-pointer.x)+Math.abs(smoothed.y-pointer.y)>.002;
@@ -61,7 +63,12 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
         journey.update(f,still);model.updateFoliage?.(f,still);water.update(still?90:f);
         const dpr=renderer.getPixelRatio();camera.viewport.set(view.x*dpr,view.y*dpr,view.width*dpr,view.height*dpr);
         }
-        autumn.update(f,width/height,still,time);
+        audit.simulate(()=>{
+          const textSurface=letterColliders.update(f,width,height,delta);
+          if(textSurface)audit.letters(textSurface.boxes);
+          autumn.update(f,width/height,still,time,delta,textSurface);
+        });
+        audit.physics(()=>autumn.getDiagnostics());
         audit.draw(()=>{
           renderer.info.reset();
           if(redrawBackground){
@@ -80,7 +87,7 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
         const nav=enabled?container.closest('.story-stage')?.querySelector('.chapter-nav'):null;
         let navigation;
         if(nav){const n=nav.getBoundingClientRect(),r=container.getBoundingClientRect();if(r.width&&r.height)navigation={right:(n.right-r.left+24)/r.width,top:1-(n.top-r.top-16)/r.height};}
-        backgroundDirty=true;audit.resize();composite.resize(w,h,navigation);water.resize(enabled);if(!enabled)releaseShadow();
+        backgroundDirty=true;letterColliders.invalidate();autumn.setPaused(!enabled||still);audit.resize();composite.resize(w,h,navigation);water.resize(enabled);if(!enabled)releaseShadow();
       }});
       const onPointer=event=>{
         if(still||!loop.active||event.pointerType==='touch'||!container.closest('.story-stage'))return;
@@ -90,7 +97,7 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
     }catch(error){setFailed(true);console.warn('Minnan WebGL scene unavailable:',error.message);}
     return()=>{
       alive=false;loop?.dispose();if(runtime.current?.onPointer)window.removeEventListener('pointermove',runtime.current.onPointer);runtime.current=null;
-      composite?.dispose();autumn?.dispose();water?.dispose();journey?.dispose();studio?.dispose();model?.dispose();environment?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();renderer?.forceContextLoss();renderer?.domElement.remove();
+      letterColliders?.dispose();composite?.dispose();autumn?.dispose();water?.dispose();journey?.dispose();studio?.dispose();model?.dispose();environment?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();renderer?.forceContextLoss();renderer?.domElement.remove();
     };
   },[still]);
   useLayoutEffect(()=>{runtime.current?.loop.setActive(active);runtime.current?.loop.request();},[frame,active,opacity]);

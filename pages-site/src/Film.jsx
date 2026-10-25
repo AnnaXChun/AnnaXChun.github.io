@@ -35,7 +35,7 @@ function DepthTitle({index,frame}) {
   const end=index===1?480:STARTS[index+1]??TOTAL_FRAMES;
   const outgoing=index===4?range(frame,1280,1410):range(frame,end-70,end-3);
   const incoming=range(frame,STARTS[index]+4,STARTS[index]+60);
-  return <div className={`depth-title depth-title-${index}`} style={{opacity:alpha*(index===4?1-range(frame,1370,1445):1),zIndex:outgoing>.15?6:1}} aria-hidden="true">
+  return <div className={`depth-title depth-title-${index}`} data-leaf-surface={index<4&&alpha>.98&&outgoing<.001?index:undefined} data-leaf-pose={Math.round((1-incoming)*650)} style={{opacity:alpha*(index===4?1-range(frame,1370,1445):1),zIndex:outgoing>.15?6:1}} aria-hidden="true">
     {[...STORIES[index].depth].map((letter,i)=><span key={i} style={{transform:`translate3d(${outgoing*(i%2?18:-18)}px,${(1-incoming)*65-outgoing*(100+i*24)}px,${outgoing*520}px) rotateY(${outgoing*(i%2?20:-24)}deg) rotateX(${-outgoing*12}deg) rotate(${outgoing*(i%2?8:-9)}deg)`,opacity:1-outgoing*.8}}>{letter}</span>)}
   </div>;
 }

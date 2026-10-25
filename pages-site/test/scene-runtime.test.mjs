@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {renderPixelRatio,minnanViewport,createSceneRuntime} from '../src/SceneRuntime.js';
-import {autumnRetreat,fallingLeafPose,fallingLeafVisibility} from '../src/MinnanAtmosphere.js';
+import {autumnRetreat,fallingLeafVisibility} from '../src/MinnanAtmosphere.js';
 
 test('render targets have a pixel budget while the physical doorway remains continuous',()=>{
   for(const [w,h] of [[2048,1040],[1440,960],[390,844],[3840,2160]]){
@@ -14,15 +14,9 @@ test('render targets have a pixel budget while the physical doorway remains cont
   const center=minnanViewport(485,1440,960);assert.ok(Math.abs(center.x)<.001&&Math.abs(center.y)<.001);assert.equal(center.width,1440);assert.equal(center.height,960);
 });
 
-test('scroll retreat is reversible while wind-driven leaves stay finite and move continuously',()=>{
+test('scroll retreat is reversible and body copy keeps a readable reserve',()=>{
   assert.equal(autumnRetreat(850),1);assert.equal(autumnRetreat(1080),0);
   for(let f=900;f<1080;f++)assert.ok(autumnRetreat(f+1)<=autumnRetreat(f));
-  for(let i=0;i<18;i++){
-    const a=fallingLeafPose(i,8),b=fallingLeafPose(i,8+1/30);
-    assert.ok(Object.values(a).every(Number.isFinite));assert.ok(a.y>=-5.7&&a.y<=5.7);
-    assert.notDeepEqual(a,b);
-    if(a.visibility>.05&&b.visibility>.05)assert.ok(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)<.15);
-  }
   assert.equal(fallingLeafVisibility(.5,.6,400,true),0);
   assert.equal(fallingLeafVisibility(.8,.5,400,false),0);
   assert.equal(fallingLeafVisibility(.3,.3,400,false),1);

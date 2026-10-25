@@ -1,23 +1,10 @@
 import * as THREE from 'three';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import {createMapleLeafAsset} from './MapleLeafAsset.js';
+import {createMaplePhysics} from './MaplePhysics.js';
 
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b);
 export function autumnRetreat(frame){return 1-smooth(900,1080,frame);}
-export function fallingLeafPose(index,time){
-  const duration=15+(index*7)%11,phase=((index*.61803398875+time/duration)%1+1)%1;
-  const gust=Math.sin(time*.47)*.5+Math.sin(time*1.13+1.8)*.18;
-  return {
-    x:Math.sin(index*2.4)*4.5+(phase-.5)*2.8+Math.sin(phase*Math.PI*2+index)*.65+gust,
-    y:5.5-phase*11+Math.sin(time*1.4+index)*.12,
-    z:(index%5===0?3.3:.15+Math.sin(index)*.65)+Math.sin(phase*Math.PI*2+index)*.45,
-    turn:time*(.63+index%4*.13)+index,
-    flutter:.5+Math.sin(time*(1.35+index%3*.13)+index)*.9,
-    scale:index%5===0?.4+(index%3)*.025:.13+(index%4)*.018,
-    // Recycle outside the image with a soft birth/death, never snap in view.
-    visibility:smooth(0,.07,phase)*(1-smooth(.89,1,phase)),
-  };
-}
 export function fallingLeafVisibility(x,y,frame,portrait){
   // Screen-space copy reserves avoid DOM measurement during scroll. Fade before
   // a leaf reaches the text, rather than drawing the text over red fragments.
@@ -46,7 +33,7 @@ export function createAutumnFrame(onReady=()=>{}){
       .replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed.yz=leafBend*vec2(position.y+.5,position.z);transformed.y-=.5;');
   };
   leaf.customProgramCacheKey=()=> 'closed-maple-wind-v1';
-  const leafCount=180,leaves=new THREE.InstancedMesh(leafGeo,leaf,leafCount),pose=new THREE.Object3D();
+  const leafCount=132,leaves=new THREE.InstancedMesh(leafGeo,leaf,leafCount),pose=new THREE.Object3D();
   const palette=[0xffffff,0xf8e0c8,0xffd6ba,0xe8c4ad,0xf9ead3].map(c=>new THREE.Color(c));
   const twigs=[];
   function twig(points,radius){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));const g=new THREE.TubeGeometry(curve,18,radius,7,false);const m=new THREE.Mesh(g,wood);branch.add(m);twigs.push(g);return curve;}
@@ -61,41 +48,46 @@ export function createAutumnFrame(onReady=()=>{}){
     const tip=tips[i%tips.length],a=i*2.39996,r=.1+Math.sqrt((i*.754877)%1)*.42;
     pose.position.set(tip[0]+Math.cos(a)*r,tip[1]+Math.sin(a)*r*.6,tip[2]+Math.sin(i*4.3)*.28);
     pose.rotation.set(.3+Math.sin(i)*.95,Math.sin(i*1.7)*.8,a);
-    pose.scale.setScalar(.22+(i%7)*.018);pose.updateMatrix();leaves.setMatrixAt(i,pose.matrix);leaves.setColorAt(i,palette[i%palette.length]);
+    pose.scale.setScalar(.34+(i%7)*.024);pose.updateMatrix();leaves.setMatrixAt(i,pose.matrix);leaves.setColorAt(i,palette[i%palette.length]);
   }
   leaves.instanceMatrix.needsUpdate=true;branch.add(leaves);
   const fallingCount=18,fallingGeo=leafGeo.clone(),visibility=new THREE.InstancedBufferAttribute(new Float32Array(fallingCount),1);
   visibility.setUsage(THREE.DynamicDrawUsage);fallingGeo.setAttribute('leafVisibility',visibility);
   const fallingMaterial=leaf.clone();fallingMaterial.transparent=true;fallingMaterial.depthWrite=false;
   fallingMaterial.onBeforeCompile=s=>{
-    leaf.onBeforeCompile(s);
     s.vertexShader='attribute float leafVisibility;varying float vLeafVisibility;\n'+s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvLeafVisibility=leafVisibility;');
     s.fragmentShader='varying float vLeafVisibility;\n'+s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a*=vLeafVisibility;');
   };
-  fallingMaterial.customProgramCacheKey=()=> 'closed-maple-falling-reserve-v1';
+  fallingMaterial.customProgramCacheKey=()=> 'closed-maple-rigid-body-v2';
   const falling=new THREE.InstancedMesh(fallingGeo,fallingMaterial,fallingCount),projected=new THREE.Vector3();falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);falling.frustumCulled=false;scene.add(falling);
   for(let i=0;i<fallingCount;i++)falling.setColorAt(i,palette[i%palette.length]);
+  const physics=createMaplePhysics({count:fallingCount});
   let lastFrame=-1,lastAspect=0,lastTime=-1;
-  return {scene,camera,branch,falling,
-    update(frame,aspect,still=false,time=0){
+  return {scene,camera,branch,falling,getDiagnostics:()=>physics.getDiagnostics(),setPaused:value=>physics.setPaused(value),
+    update(frame,aspect,still=false,time=0,delta=0,textSurface=null){
       const windTime=still?0:time;
-      if(lastFrame===frame&&lastAspect===aspect&&lastTime===windTime)return;lastFrame=frame;lastAspect=aspect;lastTime=windTime;
-      const f=still?90:frame,remain=autumnRetreat(f),halfWidth=13*Math.tan(THREE.MathUtils.degToRad(17.5))*aspect;
+      if(lastFrame===frame&&lastAspect===aspect&&lastTime===windTime&&!textSurface)return;
+      const halfHeight=13*Math.tan(THREE.MathUtils.degToRad(17.5)),halfWidth=halfHeight*aspect;
+      if(lastAspect!==aspect)physics.resize({halfWidth,halfHeight,portrait:aspect<1});
+      if(textSurface)physics.setTextColliders(textSurface.boxes,textSurface.key);
+      lastFrame=frame;lastAspect=aspect;lastTime=windTime;
+      const f=still?90:frame,remain=autumnRetreat(f);
       const portrait=aspect<1;
       scene.visible=remain>0;camera.aspect=aspect;camera.updateProjectionMatrix();camera.updateMatrixWorld();
       const breeze=still?0:Math.sin(windTime*.68)*.022+Math.sin(windTime*1.31)*.007;
-      branch.position.set(halfWidth+(portrait?.2:.35)+(1-remain)*3,(portrait?4.05:3.35)+(1-remain)*1.8+breeze*.8,0);
-      branch.scale.setScalar((portrait?.42:1)*(.55+.45*remain));branch.rotation.set(breeze*.5,breeze*.9,breeze+(1-remain)*.2);
+      branch.position.set(halfWidth+(portrait?.55:.6)+(1-remain)*5,(portrait?4.7:4.3)+(1-remain)*2.5+breeze*.8,0);
+      branch.scale.setScalar((portrait?.7:1.65)*(.55+.45*remain));branch.rotation.set(breeze*.5,breeze*.9,breeze+(1-remain)*.2);
       wind.value=windTime*2.4;
+      const poses=physics.step(still?0:delta,time);
       for(let i=0;i<fallingCount;i++){
-        const p=fallingLeafPose(i,windTime);pose.position.set(p.x*(portrait?.32:1),p.y+(1-remain)*7,p.z);
-        projected.copy(pose.position).project(camera);visibility.setX(i,p.visibility*fallingLeafVisibility(projected.x*.5+.5,.5-projected.y*.5,f,portrait));
-        pose.rotation.set(p.flutter,p.turn,Math.sin(windTime*.67+i)*.55+p.turn*.23);
-        pose.scale.setScalar(p.scale*(portrait?.5:1)*remain);pose.updateMatrix();falling.setMatrixAt(i,pose.matrix);
+        const p=poses[i];pose.position.fromArray(p.position);pose.position.y+=(1-remain)*7;
+        projected.copy(pose.position).project(camera);visibility.setX(i,fallingLeafVisibility(projected.x*.5+.5,.5-projected.y*.5,f,portrait));
+        pose.quaternion.fromArray(p.quaternion);
+        pose.scale.setScalar(p.scale*remain);pose.updateMatrix();falling.setMatrixAt(i,pose.matrix);
       }
       falling.instanceMatrix.needsUpdate=true;visibility.needsUpdate=true;
     },
-    dispose(){fallingGeo.dispose();fallingMaterial.dispose();asset.dispose();wood.dispose();twigs.forEach(g=>g.dispose());leaves.dispose();falling.dispose();}
+    dispose(){physics.dispose();fallingGeo.dispose();fallingMaterial.dispose();asset.dispose();wood.dispose();twigs.forEach(g=>g.dispose());leaves.dispose();falling.dispose();}
   };
 }
 
