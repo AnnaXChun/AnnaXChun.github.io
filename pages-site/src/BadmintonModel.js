@@ -1,93 +1,99 @@
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
-// Modelled feather vanes, quills, binding thread and a rounded cork nose.
-// The shuttle is open, with visible space between feathers and a true 3D skirt.
+// Every visible strand, grommet and tape seam is geometry, including in macro shots.
 export function createBadmintonModel() {
-  const shuttle=new THREE.Group(),racket=new THREE.Group(),resources=new Set();
+  const shuttle=new THREE.Group(),racket=new THREE.Group(),resources=new Set(),batches=new Map();
   const material=(color,roughness=.8,metalness=0)=>{
     const m=new THREE.MeshStandardMaterial({color,roughness,metalness});resources.add(m);return m;
   };
-  const feather=material(0xf6f0dd),quill=material(0xcac5ae),cork=material(0xd1b88e),ink=material(0x263c34,.38),red=material(0xa34f3e,.5),string=material(0xc1b79e);
+  const feather=material(0xf4efdf,.92),quill=material(0xd8cfb5),cork=material(0xc7a87b,.95);
+  const ink=material(0x1b302a,.27,.34),red=material(0xa34f3e,.46),string=material(0xd9cba8,.5),rubber=material(0x19231f,.85);
+  const pores=new Uint8Array(128*128*4);
+  for(let i=0;i<128*128;i++) {
+    const n=((Math.imul(i+19,1103515245)>>>8)%255),v=n>227?65:170+n*.25;
+    pores.set([v,v,v,255],i*4);
+  }
+  const corkBump=new THREE.DataTexture(pores,128,128);corkBump.wrapS=corkBump.wrapT=THREE.RepeatWrapping;corkBump.repeat.set(5,2);corkBump.needsUpdate=true;resources.add(corkBump);cork.bumpMap=corkBump;cork.bumpScale=.006;
   feather.side=THREE.DoubleSide;
-  const batches=new Map();
-  function add(g,m,parent,position=[0,0,0],rotation=[0,0,0]) {
-    const mesh=new THREE.Mesh(g,m);mesh.position.set(...position);mesh.rotation.set(...rotation);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);resources.add(g);return mesh;
+  function add(g,m,parent,name,position=[0,0,0],rotation=[0,0,0]) {
+    const mesh=new THREE.Mesh(g,m);mesh.name=name;mesh.position.set(...position);mesh.rotation.set(...rotation);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);resources.add(g);return mesh;
   }
-  function stroke(points,radius,m,parent) {
-    const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
-    return add(new THREE.TubeGeometry(curve,Math.max(8,points.length*3),radius,5,false),m,parent);
-  }
-  function batch(g,m) {
+  function batch(g,m,parent,name) {
     const flat=g.index?g.toNonIndexed():g;if(flat!==g)g.dispose();flat.deleteAttribute('uv');
-    if(!batches.has(m))batches.set(m,[]);batches.get(m).push(flat);
+    const key=name;if(!batches.has(key))batches.set(key,{material:m,parent,name,geometries:[]});batches.get(key).geometries.push(flat);
   }
-  const corkProfile=[new THREE.Vector2(0,-.66),new THREE.Vector2(.13,-.64),new THREE.Vector2(.23,-.56),new THREE.Vector2(.27,-.43),new THREE.Vector2(.27,-.18),new THREE.Vector2(.24,-.12)];
-  add(new THREE.LatheGeometry(corkProfile,40),cork,shuttle);
-  add(new THREE.CylinderGeometry(.275,.275,.10,40),ink,shuttle,[0,-.20,0]);
-  add(new THREE.TorusGeometry(.273,.014,8,40),red,shuttle,[0,-.15,0],[Math.PI/2,0,0]);
-  for(let i=0;i<16;i++) {
-    const angle=i/16*Math.PI*2,transform=new THREE.Matrix4().makeRotationY(angle);
-    const positions=[],indices=[],rows=12,cols=6;
-    for(let row=0;row<=rows;row++)for(let col=0;col<=cols;col++) {
-      const t=row/rows,u=(col/cols-.5)*2;
-      const width=.12*Math.pow(Math.sin(Math.PI*(.05+.9*t)),.52);
-      const y=.24+t*1.18,radial=.36+t*.49;
-      positions.push(u*width,y-.065*u*u,radial+.055*Math.sin(t*Math.PI)+.035*u*u);
-    }
-    for(let row=0;row<rows;row++)for(let col=0;col<cols;col++) {
-      const a=row*(cols+1)+col;indices.push(a,a+1,a+cols+1,a+1,a+cols+2,a+cols+1);
-    }
-    const vane=new THREE.BufferGeometry();vane.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));vane.setIndex(indices);vane.computeVertexNormals();vane.applyMatrix4(transform);batch(vane,feather);
-    const veinPoints=[[0,-.14,.20],[0,.26,.36],[0,.80,.62],[0,1.43,.85]];
-    const vein=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(veinPoints.map(p=>new THREE.Vector3(...p))),14,.009,5,false);vein.applyMatrix4(transform);batch(vein,quill);
-    for(let j=0;j<7;j++)for(const side of [-1,1]) {
-      const t=.14+j*.105,y=.24+t*1.18,r=.36+t*.49+.055*Math.sin(t*Math.PI),w=.115*Math.pow(Math.sin(Math.PI*(.05+.9*t)),.52);
-      const barb=new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0,y,r+.008),new THREE.Vector3(side*w*.6,y+.045,r+.029),new THREE.Vector3(side*w,y+.07,r+.04)]),4,.003,3,false);
-      barb.applyMatrix4(transform);batch(barb,quill);
-    }
+  function tube(points,radius,segments=32,sides=6) {
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),segments,radius,sides,false);
   }
-  for(const [y,r] of [[.28,.38],[.49,.47]])add(new THREE.TorusGeometry(r,.014,6,64),quill,shuttle,[0,y,0],[Math.PI/2,0,0]);
-  for(const [m,geometries] of batches) {
-    const g=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());add(g,m,shuttle);
+  const corkProfile=[[0,-.66],[.09,-.657],[.17,-.63],[.23,-.575],[.263,-.49],[.27,-.39],[.27,-.19],[.255,-.14],[0,-.14]].map(p=>new THREE.Vector2(...p));
+  add(new THREE.LatheGeometry(corkProfile,72),cork,shuttle,'rounded-cork');
+  add(new THREE.CylinderGeometry(.277,.278,.09,64),ink,shuttle,'woven-collar',[0,-.20,0]);
+  for(const y of [-.251,-.154])add(new THREE.TorusGeometry(.278,.006,6,64),red,shuttle,'collar-seam',[0,y,0],[Math.PI/2,0,0]);
+  // Fine recessed-looking cork speckles stay dimensional instead of a blurry image filter.
+  for(let i=0;i<120;i++) {
+    const a=i*2.399963,y=-.48+((i*37)%113)/113*.29,r=.271;
+    const g=new THREE.SphereGeometry(.0035+(i%3)*.001,4,3);g.scale(1,1,.35);g.rotateY(a);g.translate(Math.sin(a)*r,y,Math.cos(a)*r);batch(g,quill,shuttle,'cork-grain');
   }
-  // An oval racket has a narrow carbon frame, open string bed and wrapped handle.
-  const oval=(radius)=>Array.from({length:65},(_,i)=>{const a=i/64*Math.PI*2;return[Math.sin(a)*.72*radius,Math.cos(a)*.92*radius,0];});
-  stroke(oval(1),.036,ink,racket);stroke(oval(.94),.011,red,racket);
-  for(let i=-7;i<=7;i++) {
-    const x=i*.085,y=.87*Math.sqrt(1-(x/.68)**2);
-    stroke([[x,-y,0],[x,y,0]],.005,string,racket);
-  }
-  for(let i=-9;i<=9;i++) {
-    const y=i*.085,x=.68*Math.sqrt(1-(y/.87)**2);
-    stroke([[-x,y,0],[x,y,0]],.005,string,racket);
-  }
-  stroke([[-.24,-.87,0],[-.13,-1.07,0],[0,-1.16,0],[.13,-1.07,0],[.24,-.87,0]],.028,ink,racket);
-  add(new THREE.CylinderGeometry(.023,.028,.88,12),ink,racket,[0,-1.58,0]);
-  add(new THREE.CylinderGeometry(.068,.074,.65,20),red,racket,[0,-2.31,0]);
-  for(let i=0;i<13;i++)add(new THREE.TorusGeometry(.071,.005,4,20),ink,racket,[0,-2.60+i*.046,0],[Math.PI/2,0,0]);
-  return {shuttle,racket,dispose(){resources.forEach(r=>r.dispose());}};
-}
-
-// Each sample is deterministic: scrolling back restores the same flight phase.
-export function shuttleFlight(progress) {
-  const t=Math.max(0,Math.min(1,progress));
-  return {
-    position:[.72+Math.sin(t*Math.PI*1.4)*.24,.15+Math.sin(t*Math.PI)*.36,.45+Math.cos(t*Math.PI)*.18],
-    rotation:[.30+t*.26,-t*Math.PI*3,-.64+t*.22],
+  const vanePoint=(t,u,seed=0)=>{
+    const width=.175*Math.pow(Math.sin(Math.PI*(.025+.94*t)),.42)*(1+.12*u)*(1+.035*Math.sin(seed*7.3)+.016*Math.sin(t*73+seed)*Math.abs(u));
+    return [u*width+.035*t*t,.20+(1.23+.018*Math.sin(seed*3.7))*t-.05*u*u,.34+.50*t+.065*Math.sin(t*Math.PI)+.04*u*u+(.018+.006*Math.cos(seed*2.7))*u];
   };
-}
+  for(let i=0;i<16;i++) {
+    const transform=new THREE.Matrix4().makeRotationY(i/16*Math.PI*2+.025),positions=[],indices=[],rows=32,cols=12;
+    for(let row=0;row<=rows;row++)for(let col=0;col<=cols;col++)positions.push(...vanePoint(row/rows,(col/cols-.5)*2,i));
+    for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){const a=row*(cols+1)+col;indices.push(a,a+1,a+cols+1,a+1,a+cols+2,a+cols+1);}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();g.applyMatrix4(transform);batch(g,feather,shuttle,'sixteen-curved-feathers');
+    const spine=[ [0,-.14,.20],...Array.from({length:18},(_,j)=>vanePoint(j/17,0,i)) ];
+    batch(tube(spine,.0075,48).applyMatrix4(transform),quill,shuttle,'feather-shafts');
+    for(let j=0;j<34;j++)for(const side of [-1,1]) {
+      const t=.06+j*.0255;
+      const points=[vanePoint(t,0,i),vanePoint(t+.014,side*.5,i),vanePoint(t+.03,side*.98,i)].map(p=>[p[0],p[1],p[2]+.003]);
+      batch(tube(points,.0017,6,4).applyMatrix4(transform),quill,shuttle,'feather-barbs');
+    }
+    for(const [y,r] of [[.28,.378],[.46,.45]]) {
+      const knot=new THREE.TorusGeometry(.022,.005,5,12);knot.rotateX(Math.PI/2);knot.translate(0,y,r);knot.applyMatrix4(transform);batch(knot,quill,shuttle,'binding-knots');
+    }
+  }
+  for(const [y,r] of [[.28,.378],[.46,.45]])for(const offset of [-.007,.007])add(new THREE.TorusGeometry(r,.006,6,96),quill,shuttle,'binding-thread',[0,y+offset,0],[Math.PI/2,0,0]);
 
-const ease=t=>{const x=Math.max(0,Math.min(1,t));return x*x*(3-2*x);};
-const blend=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*ease(t));
-export function rallyPose(progress) {
-  const t=Math.max(0,Math.min(1,progress));
-  const rest=[-.65,-.10,-.15],windup=[-1.05,.35,-.25],contact=[.35,.10,.25],follow=[1.2,-.55,.4];
-  const position=t<.18?blend(rest,windup,t/.18):t<.34?blend(windup,contact,(t-.18)/.16):t<.56?blend(contact,follow,(t-.34)/.22):blend(follow,rest,(t-.56)/.44);
-  const rotation=t<.34?blend([-.22,.32,-.62],[.35,1.1,-.45],t/.34):blend([.35,1.1,-.45],[-.22,.32,-.62],(t-.34)/.66);
-  // The cork's tip (local y=-.66) exactly meets the string bed at impact.
-  const contactRotation=[0,0,-.7],tip=new THREE.Vector3(0,-.66,0).applyEuler(new THREE.Euler(...contactRotation));
-  const shuttleContact=contact.map((v,i)=>v-tip.getComponent(i));
-  const flight=Math.max(0,(t-.34)/.44);
-  return {position,rotation,contact,contactRotation,shuttleContact,flight,approach:ease(t/.25),reset:t>=.78?ease((t-.78)/.22):null};
+  // Aerodynamic section: a flattened elliptical frame with an inset string channel.
+  const framePositions=[],frameIndices=[],segments=144,sides=12;
+  for(let i=0;i<=segments;i++)for(let j=0;j<=sides;j++) {
+    const a=i/segments*Math.PI*2,b=j/sides*Math.PI*2;
+    framePositions.push(Math.sin(a)*(.72+Math.cos(b)*.034),Math.cos(a)*(.92+Math.cos(b)*.037),Math.sin(b)*.022);
+    if(i<segments&&j<sides){const n=i*(sides+1)+j;frameIndices.push(n,n+1,n+sides+1,n+1,n+sides+2,n+sides+1);}
+  }
+  const frame=new THREE.BufferGeometry();frame.setAttribute('position',new THREE.Float32BufferAttribute(framePositions,3));frame.setIndex(frameIndices);frame.computeVertexNormals();add(frame,ink,racket,'aerodynamic-frame');
+  for(const z of [-.014,.014]) {
+    const points=Array.from({length:145},(_,i)=>{const a=i/144*Math.PI*2;return[Math.sin(a)*.705,Math.cos(a)*.905,z];});
+    add(tube(points,.004,144,5),red,racket,'frame-pinstripe');
+  }
+  for(let i=0;i<76;i++) {
+    const a=i/76*Math.PI*2;
+    const g=new THREE.CylinderGeometry(.013,.013,.024,8);g.rotateZ(-a);g.translate(Math.sin(a)*.687,Math.cos(a)*.887,0);batch(g,rubber,racket,'string-grommets');
+  }
+  // Alternating depth at crossings creates a woven string bed, not a flat grid.
+  const spacing=.073;
+  for(let i=-8;i<=8;i++) {
+    const x=i*spacing,y=.873*Math.sqrt(1-(x/.679)**2),points=[[x,-y,0]];
+    for(let j=-11;j<=11;j++)if(Math.abs(j*spacing)<y)points.push([x,j*spacing,((i+j)%2===0?1:-1)*.004]);
+    points.push([x,y,0]);batch(tube(points,.0038,80,5),string,racket,'woven-string-bed');
+  }
+  for(let j=-11;j<=11;j++) {
+    const y=j*spacing,x=.679*Math.sqrt(1-(y/.873)**2),points=[[-x,y,0]];
+    for(let i=-8;i<=8;i++)if(Math.abs(i*spacing)<x)points.push([i*spacing,y,((i+j)%2===0?-1:1)*.004]);
+    points.push([x,y,0]);batch(tube(points,.0038,64,5),string,racket,'woven-string-bed');
+  }
+  add(tube([[-.20,-.89,0],[-.11,-1.07,0],[0,-1.15,0],[.11,-1.07,0],[.20,-.89,0]],.023,36,10),ink,racket,'integrated-throat');
+  add(new THREE.CylinderGeometry(.019,.027,.89,24),ink,racket,'tapered-shaft',[0,-1.58,0]);
+  add(new THREE.CylinderGeometry(.031,.034,.10,24),red,racket,'shaft-collar',[0,-1.99,0]);
+  add(new THREE.CylinderGeometry(.067,.075,.64,8),red,racket,'octagonal-grip',[0,-2.32,0],[0,Math.PI/8,0]);
+  const helix=Array.from({length:460},(_,i)=>{const t=i/459,a=t*12*Math.PI*2,r=.076-t*.008;return[Math.cos(a)*r,-2.64+t*.64,Math.sin(a)*r];});
+  add(tube(helix,.004,480,5),rubber,racket,'helical-grip-seam');
+  add(new THREE.CylinderGeometry(.077,.086,.04,8),rubber,racket,'bevelled-butt-cap',[0,-2.66,0],[0,Math.PI/8,0]);
+  for(const {material:m,parent,name,geometries} of batches.values()) {
+    const merged=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());add(merged,m,parent,name);
+  }
+  return {shuttle,racket,dispose(){resources.forEach(r=>r.dispose());}};
 }
