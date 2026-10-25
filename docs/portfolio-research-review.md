@@ -1,6 +1,6 @@
 # 个人网站调研与独立验收
 
-日期：2026-10-25。评审者：独立研究与验收 subagent。实现者负责生产代码；本文件由评审者维护。**当前状态：精细开源模型与清透摄影第 3 轮 PASS。两轮生活章阻塞及 1440 × 960 首屏回归问题均已修复并在 Chrome 复验；通过范围、证据和未测边界见末尾。** 上轮 Halora 第 3 轮 PASS 只记录当时的灯光与排版检查；用户已明确否定其最终高级感，不能当作本轮参考达标。下方保留历史 FAIL 与 PASS 证据。
+日期：2026-10-25。评审者：独立研究与验收 subagent。实现者负责生产代码；本文件由评审者维护。**当前状态：秋庭与性能第 4 轮独立验收 PASS。红枫前景、落叶、真实雨水倒影与可逆收回已实际观察；手机文字避让、桌面成果间距、200% 导航安全区均修复。停滚、隐藏章节与完全离屏暂停有 Chrome 计数证据。性能数字仅按已验证范围报告，不宣称已测总显存或低端设备 FPS。** 上一轮开源模型第 3 轮 PASS 保留为历史证据，不能替代本轮性能结论。 上轮 Halora 第 3 轮 PASS 只记录当时的灯光与排版检查；用户已明确否定其最终高级感，不能当作本轮参考达标。下方保留历史 FAIL 与 PASS 证据。
 
 下方保留旧版本的研究与验收历史；其中按钮、拖动、自动慢旋建议已被用户后续明确要求覆盖。当前规则见本文“滚动与摄影式空间”“Halora 摄影布光”、[motion-sites-study.md](./motion-sites-study.md) 与 [halora-lighting-study.md](./halora-lighting-study.md)。
 
@@ -225,3 +225,129 @@
 - **署名核对**：读取公开 `model-credits.html`，球拍 Kin Chen / CC0、羽球 kyle1003 / CC BY 4.0 与实际调研来源一致，包含作者链接、许可证与格式 / 材质修改说明；手部 LibHand / Marin Šarić / CC BY 3.0 的归属由实现者提供。没有新增成绩或经历。
 - **边界**：本轮 Chrome 模拟手机尺寸，未用真机触摸、低端 GPU、低带宽网络实测；未重新做 200% 或减少动态效果路径，最终确认 reduce=false。约 18 MB 延迟加载 GLB 仍需视为性能待实测项；实现者报告构建、6 项测试与 diff-check 通过，本 subagent 未独立重跑这些构建测试。
 - **交付**：Chrome 默认视口 / 100% 已恢复，实际 2048 × 984 / DPR 2；标签 `1859663499` 停在生活 68%，已标记 `markDeliverable`，可上下滚动体验。最终展示图：`outputs/visual-review/open-model-final-entry.png` 与 `outputs/visual-review/open-model-final-macro.png`。Chrome 操作权交回实现者。
+
+
+## 2026-10-25 秋庭氛围与性能 — 实现前只读审计
+
+用户本轮认可羽毛球效果，要求庭院加入红枫、落叶、叶片轻摆与倒影，同时解决内存高和滚动卡顿。当前先审计，不操作 Chrome、不修改生产代码；下列成本是源码证据、局部 Node 实验或配置估算，**不是已测 FPS / 显存，也不是优化完成声明**。
+
+### 方法与范围
+
+已按记忆协议读取 Dashboard、项目索引及个人简历网站页；该项目页仍记载旧拖动 / 按钮交互，当前代码与用户新要求优先。codebase-memory 先查询 Story、Film、MinnanScene / Model、InkMaterial 等符号；索引未含新 PhotographicFinish / ImportedSportModels，后读取当前工作区文件及本地锁定 Three.js 0.180.0 一手实现。覆盖 App、Film、MinnanScene、MinnanModel、InkMaterial、MinnanJourney、MinnanStudio、BadmintonScene、PhotographicFinish、ImportedSportModels、StudioLighting、ProductLights 与相关 CSS。以下行号指审计读取快照，实现者后续改动可能移动行号。
+
+### 优先问题与可验证修正
+
+| 优先级 | 具体证据 | 建议与验收方式 |
+| --- | --- | --- |
+| P1：隐藏庭院仍重绘 | `Film.jsx:75` 始终挂载庭院，生活章只改 opacity；`MinnanScene.jsx:84` 每个 frame 直接 draw。全局 pointermove 也只判断 DOM 矩形是否在视口，没有检查章节透明度。 | 章节 active + 视口 / visibility 门控；同一 rAF 合并 frame、pointer、resize 请求。生活稳定段庭院 draw 计数应保持不变；进入资料区两个场景都不继续渲染。 |
+| P1：滚动中反复 resize | `cinematic.css:14–15` 的 width / height 依赖逐帧 `--travel`；`MinnanScene.jsx:70–72` ResizeObserver 每次 setSize 后 draw，frame effect 同期又 draw。穿门 440–485 / 535–585 持续重配绘图缓冲。 | 固定物理画布尺寸；构图用相机 / view offset / 外层 transform、mask，不逐帧改 drawing buffer。正常滚动段 setSize 次数应为 0，真正窗口变化只处理有效尺寸差异。 |
+| P1：静态阴影重复生成 | `MinnanScene.jsx:24,31–32` 使用 2048 VSM、6 blur samples；未关闭 autoUpdate。Three 的 WebGLShadowMap 每次更新都重画阴影并执行纵 / 横模糊。 | 静态建筑 / 固定太阳下缓存阴影；第一次或场景改变才 needsUpdate。微风叶片只做必要的低频阴影更新，不能把整栋建筑每帧重算。 |
+| P1：后处理全屏高精度缓冲 | `PhotographicFinish.js:11–27`：HalfFloat base + 4x MSAA、双 composer target、5 级 bloom、alpha 和 OutputPass；体育 renderer DPR 上限 1.75。 | 设置总像素预算；降低 MSAA / bloom 工作分辨率，保持高对比羽枝。默认 canvas 只接收全屏输出，无须额外 antialias；只画全屏 quad 的 composer / bloom target 可关 depthBuffer，base 保留深度。离屏按需释放 / 缩小 target。 |
+| P1：细玻璃弧触发整场景透射 | `PhotographicFinish.js:36` transmission .96。Three WebGLRenderer 的 renderTransmissionPass 默认全分辨率、HalfFloat、4x MSAA、mipmaps，并额外重画全部不透明物体。 | 优先用环境反射 / Fresnel 透明边保持玻璃弧外观，或将 transmissionResolutionScale 降至 .25–.5；只看见细弧时不应为全屏透射保留巨额预算。必须复验用户已满意的体育画面。 |
+| P2：边界重建和原始字节常驻 | `ImportedSportModels.js:5–10` Map 永久持有 3 个 ArrayBuffer；`Film.jsx:76` 在 frame975 来回跨越会卸载 / 重建体育场景，重新 parse、PMREM、shader 初始化。 | 明确缓存预算与生命周期，避免边界抖动反复重建；用滞回 / 延迟卸载或受控缓存。反复跨界后资源数和 heap 不应阶梯增长。保留原始 bytes 与解析场景不能无限同时常驻。 |
+| P2：ImageBitmap 释放不完整 | `disposeTree` 只 dispose texture / material / geometry，未 close 图像。GLTFLoader 本地官方注释明确 ImageBitmap 需要额外释放。 | 独占解码图像用 Set 去重 close，避免关闭仍被共享缓存使用的图像；取消加载后的晚到结果也需释放。测试重复进出生活章的图像 / texture 生命周期。 |
+| P2：片元噪声昂贵 | `InkMaterial.js:29–34` 每片元 6 次 3D value noise，每次 8 个 sin hash，合计约 48 次 sin，再加 PBR 与阴影。双面层叠叶片扩大覆盖成本。 | 将低频 wash / pool / strokePatch 烘焙为顶点色或小纹理，只保留 1–2 层细颗粒；不要先删真实瓦与枝叶。按同一相机落点比较明暗、水墨分布与 GPU 帧时。 |
+| P3：主线程小分配与布局读写 | 每次相机 draw 构造 Vector3；运动采样创建多组向量 / 数组；App scroll rAF 读 rect，report 写 progress width / ARIA / dataset。 | 向量复用、投影参数变化时再 updateProjectionMatrix、进度用 scaleX；辅助优化，不能当作数百 MB 缓冲问题的替代。wheel / scroll 已 rAF 合并，不把它误报为两个独立持续循环。 |
+
+### 实际只读模型 / 文件测量
+
+- 当前庭院：13 个 mesh、585,516 个 mesh 顶点、91,244 个线顶点；全部 position / normal / 线属性为 **14.45 MiB**。这是 CPU TypedArray 字节总和，GPU 上传通常还有副本；不包含材料、程序、阴影或渲染目标。
+- Node 一次首次构建约 **308 ms**；仅说明同步构建成本可观，不能当作浏览器加载时长。模型按材质合批，draw call 数本身已经较克制。
+- 对同一几何做只读 `mergeVertices(1e-5)` 实验，保留三角面、依照全部属性合并可复用顶点：585,516 → 170,667，mesh 属性加索引 **13.40 → 5.02 MiB**。实验焊接约 **347 ms**，因此适合构建时预处理，不能移到用户跨章时同步执行。实验未写回任何模型。
+- 现有 2 棵树合计 2,484 片叶；每片源叶 21 唯一顶点被 toNonIndexed 展开为 72，合计 178,848。红枫可采用少量共享带弯曲叶形和实例参数，保留疏密 / 缝隙；不能为每帧微风重新构造 / 合并叶片 geometry。
+- 实际 GLB 体积：球拍 7,508,144 B、羽球 6,256,832 B、手 4,194,844 B，原始 bytes 合计约 **17.13 MiB**。球拍 3 张 1024² 法线 + 2 张 512² 颜色，按 RGBA8 + mipmaps 约 **18.67 MiB**；手 2048² 皮肤纹理约 **21.33 MiB**；羽球无纹理，羽枝是几何。纹理 GPU 格式和实际驱动仍需运行时核对。
+
+### 渲染目标配置预算（估算，非显存读数）
+
+在 2048 × 984、DPR 1.75 时，6,171,648 个物理像素，一个 RGBA16F 全屏颜色纹理约 **47.09 MiB**。按支持 HalfFloat / 4x MSAA 的配置计，当前 base、MSAA 颜色、composer 双缓冲与 bloom 颜色附件约 **372.73 MiB**；默认全分辨率透射的颜色 / MSAA / mipmaps 再约 **251.13 MiB**。这些数字**尚未包含深度、canvas 默认缓冲、阴影和驱动开销**；实际 sample count / 格式 / 分配依设备而异。该预算说明为什么 18 MB 模型文件大小不能解释或代表运行时内存。
+
+### 新氛围的性能边界
+
+红枫与地面落叶共享 geometry / 材质，微风使用实例参数与顶点位移。静止资料页、隐藏章节和后台连风与倒影一起暂停，减少动态效果保持静止。倒影优先单个低分辨率平面反射、活动时更新；避免叠加全屏 SSR 与高精度透射，不能用每片叶逐帧镜像对象。若采用真实反射，需单独计入额外场景 draw 与 buffer 预算，保护文字留白和当前体育质感。
+
+本轮后续验收要同尺寸、同相机、同滚动脚本对比前后 frame time / long task / draw 次数 / resize 次数 / 资源数量；无法读取真实 GPU 内存时必须写成配置预算，不能把 JS heap 或 renderer.info.memory 的对象数量冒称显存。当前尚未操作 Chrome、尚未对优化后的帧率或内存给 PASS。
+
+
+### 秋庭 / 第 1 轮 — FAIL（手机文字避让）
+
+- Chrome 独立标签 `1859663509`，地址 `http://127.0.0.1:4173/?renderAudit=1`。默认 CSS 2048 × 984 / DPR 2，手机模拟 390 × 844 与 320 × 568 / DPR 1。主侧暂停 UI 和运行时编辑后开始；未使用 IAB。
+- **实际成立的部分**：默认桌面前景枫枝从右上画外进入，明显超出庭院模型边界；真实红枫树冠与疏绿树有颜色区分。门前雨水能辨认门楼 / 树影的镜像，随构图变化，非椭圆假影。进入实习院内后桌案、标签、门洞空间仍清楚，正文纸底可读。390 实习与 320 成果的主要事实和导航保持完整，无横向溢出。
+- **P2 / 阻塞：手机前景枝遮住核心大字。** 390 首屏枫枝约在 x180–390 / y25–180，遮住“襄”的上半部和中间笔画；研究章覆盖“+ RL”大半，成果章也遮住后半标题。320 同样复现。应给手机独立缩放及上 / 右偏移，在标题上方或右侧保留出框枝叶；不能把重要文字的大块遮挡视为摄影式叠层已经成功。
+- **P2 / 阻塞：倒影和落叶未给文字留白。** 320 研究落点，倒影 / 石板边延伸至约 y275–325，“开源 benchmark”与 SOTA 标题进入灰面；390 情况较轻。建议短屏按正文起点柔和淡出倒影，保留建筑下方真实反射。落叶还在首屏“强化学习”、研究“开源 benchmark”字沿经过，应对实际阅读区域避让，而非增加卡片遮掩。
+- 证据：`autumn-r1-mobile390-{hero,research,intern,achievement}.png` 与 `autumn-r1-mobile320-{hero,research,achievement}.png`，均在 `outputs/visual-review/`。重要问题已即时反馈，实现者准备修订；不重复验旧版本 1440 / 体育完整姿态。
+- **运行证据**：默认桌面首屏 / 研究 / 实习庭院 draws 为 90 → 154 → 225，resizes 始终 **2**，buffer 2414 × 1159（约 2.8 MP），说明该段章节切换不再逐帧重新分配画布。CPU P50 / P95 是 JS 提交耗时，含首次编译等因素，未拿来宣称 GPU FPS。
+- **尚未作为通过项**：完整反向恢复、两场景在资料页暂停 / 1×1、体育画质回归、1440 排版、真实低端 GPU / 网络；待修订后继续。当前 Chrome 已暂停并交回，停在 320 成果章并 markHandoff。
+
+### 实例树叶与共享水墨纹理 — 本 subagent 限定实现及检查
+
+在实现者明确交付的两个文件内完成 `MinnanModel.js` / `InkMaterial.js`，未改其他运行时文件、未提交。建筑、枝干的 position / normal 数组及 `studioLabels` 对原版本逐字节一致。2,484 片树叶分成 2 个 InstancedMesh，左侧五裂、锯齿、弯曲红枫，右侧绿叶；`updateFoliage(frame, still)` 只更新统一 uniform，无自有 RAF，不逐帧写实例矩阵。停滚 / 反向 uniform 与实例矩阵稳定性已检查。
+
+几何与实例缓冲 **14.45 → 10.55 MiB**（约 -27%），13 meshes、406,739 个储存顶点，共享叶几何 71 个顶点。实例展开后的三角形因枫叶轮廓精细度从 195,172 增至约 221,254（+13.4%）；不能把储存顶点下降冒称 GPU 三角形也下降。既有庭院 3 项模型测试通过，diff-check 通过。
+
+水墨从每片元 6 次 3D noise / 约 48 次 sin 改为 2 次共享小纹理采样，轮廓线 1 次；仅修改 albedo，保留 PBR 明暗。128² RGBA8 纹理基础 64 KiB，含 mip 约 85 KiB；多个材质 / 模型共享，释放其中一个不会销毁纹理，最后 owner 释放一次，重复 dispose 不重复减计数，重新创建获得新纹理。Chrome 上已实际渲染，未发现 shader 编译导致的黑片或丢叶。
+
+### 更新的体育颜色缓冲预算（配置估算）
+
+对照本地锁定 Three.js r180 的 `WebGLRenderer.renderTransmissionPass` 与 `UnrealBloomPass`，按相同 RGBA16F 颜色附件口径计算：
+
+| 配置 | post 颜色附件 | 透射颜色 / MSAA / mip | 合计 |
+| --- | ---: | ---: | ---: |
+| 旧：2048 × 984、DPR 1.75，6,171,648 像素，base MSAA 4，透射比例 1 | 372.73 MiB | 251.13 MiB | 623.86 MiB |
+| 新：2,800,000 像素上限，base MSAA 2，透射比例 .25 | 126.38 MiB | 7.12 MiB | 133.50 MiB |
+
+该颜色附件预算降低约 **78.6%**。`.25` 是透射宽高比例，像素为 1/16；Three 内部透射 target 仍为 4 samples，不能说它也降为 2。公式含 base 的解析颜色 + MSAA、composer 双颜色目标、五级 bloom、透射解析颜色 / mip 和 MSAA；忽略取整的少量像素差。关闭 post 深度附件另有节省，但没有混入颜色口径。
+
+这些仍是**配置预算，不是总显存或进程内存实测**，未包含深度、canvas 默认缓冲、阴影、模型、贴图、驱动与新增庭院倒影。原 `/tmp/courtyard-baseline.json` 为 2048 × 1040 / DPR 2 的开发态指标，不能与本轮不同视口 / DPR 的 heap 或 CPU 样本直接声称总体内存 / FPS 提升。
+
+
+### 秋庭 / 第 2 轮 — FAIL（手机修复通过，桌面回归问题）
+
+- 实现者将 portrait 前景枝缩至 .42 并上移，落叶按投影阅读区淡出，窄屏研究的建筑 / 倒影在标题前柔和消散。
+- **390 × 844 与 320 × 568 定点通过**：姓名、“OPD + RL”与成果标题恢复主要笔画；枫枝仍从右上画外探入。320 研究的“开源 benchmark / SOTA”恢复干净留白，落叶不再穿过主要正文。390 实习日期 / 职责与成果事实、320 成果事实均完整。
+- **新增 P2 / FAIL：1440 × 960 研究章底部导航落进倒影。** “04 成果 / 05 生活”被灰色镜像降低可读性；需给真实导航区域留白，保留水面主体。证据 `autumn-r2-1440-research.png`。
+- **新增 P2 / FAIL：1440 × 960 成果段说明重叠。** 副证书的“数字孪生 · 三维重建”在 52% 停留点压住“与伙伴，一起探索。”，至 58% 移动段奖项名称也靠近正文标题。需移动正文而非删掉奖项事实。证据 `autumn-r2-1440-achievement52.png`、`autumn-r2-1440-retreat58.png`。
+- **已实际通过且后续修订未改变的行为**：
+  - 1440 研究 15% → 门洞 26% → 院内 32% 的透视、遮挡与开放门洞连续成立；镜头确实穿过建筑。对应 `autumn-r2-1440-gate26.png`、`autumn-r2-1440-gate32.png`。
+  - 成果约 52 / 58 / 64% 至生活 68% 实看前景枫枝向右上缩回；建筑在成果后景变淡，红枫仍保持前景，进入生活时枝叶完全退走。反向从资料区上滚回成果 53%，庭院和枫枝恢复，未残留体育模型。
+  - 1440 生活 68 / 87% 与 390 生活 68 / 88% 回归：拍框、网线、羽枝、羽片暗面、手势与局部亮弧仍可辨，未发现降采样后变成一块白影或丢模型。不是重新宣称照片级皮肤。
+  - 1440 成果 58% 停滚后，两次截图字节完全相同，draws 保持 **705**。风、落叶与反射没有靠独立时钟继续播放。
+
+### 秋庭 / 第 3 轮 — FAIL（200% 导航边界）
+
+- 实现者新增左下导航柔和留白，将桌面成果正文 top 从 64% 调到 69%，手机 / 短屏原覆写保留。
+- 1440 × 960 定点复验通过：研究导航恢复浅色底；成果 52% 与 56% 的副证书说明和正文之间有间距。证据 `autumn-r3-1440-research.png`、`autumn-r3-1440-achievement.png`。
+- 实际使用 Chrome 原生缩放菜单快捷键至 **200%**，原生工具栏确认 200%，DOM CSS 视口 **1024 × 492 / DPR 4**。五章均检查；首屏、OPD + RL / SOTA、字节实习 / 日期、两证书奖项与生活标题正文没有裁字或横向溢出。短屏成果保留主要奖项事实。
+- **P2 / 仍需修正**：固定 44% 宽的导航安全区未覆盖 200% 下最后一项“05 生活”（约 x420–475 / y445），该项仍处于灰色倒影内。证据 `autumn-r3-zoom200-research.png`；其余四章证据 `autumn-r3-zoom200-{hero,intern,achievement,life}.png`。
+- **减少动态效果实际通过**：在 Chrome DevTools 命令菜单选择 `Emulate CSS prefers-reduced-motion: reduce`，保持 DevTools 开启时实测 `matchMedia(...).matches === true`；`#story` 消失，静止入口及完整资料仍存在，仅 1 个 canvas。四类入口文本 computed 字重均 **700**（span / h1 / h2 / p），静止截图两次字节一致，draws 保持 **3**。此时 docked CSS 视口 1493 × 984，截图 `autumn-r3-reduced-motion.png`。
+- 模拟恢复时出现原生窗口焦点丢失，Raise Chrome 窗口后成功执行 `Do not emulate CSS prefers-reduced-motion`，关闭 DevTools 并重新加载；最终已核实 reduce=false 与正常故事路径恢复。这是工具操作过程，不作为网站缺陷。DevTools 警告中仅读取到 Remotion 开发提示，未见本轮 shader 编译错误。
+
+### 秋庭 / 第 4 轮 — PASS（最终）
+
+- 导航安全区改为按真实 DOM bounds 初始化 / resize 时计算，right 加 24px、top 上留 16px，并向外柔和消散；无逐帧 DOM 读取。底部落叶提前淡出，避免短屏导航。
+- **最终定点通过**：200% / CSS 1024 × 492 的研究章五项导航全部位于清楚留白，最后“生活”不再落进镜像；100% / 1440 × 960 同样清楚，水面主要镜像仍保留。证据 `autumn-r4-zoom200-research.png` 与 `autumn-r4-1440-research.png`。
+- 默认 2048 × 984 首屏实际看见建筑瓦面 / 檐下明暗、左侧红枫与右侧疏绿、超出建筑的前景枝条、稀疏落叶与门前倒影。人物姓名、角色和正文仍是信息主体。390 最终首屏也重新截图，手机前景枝不再吞掉姓名。
+- **最终总体结论：PASS。** 四轮发现的重要遮挡 / 排版问题已经修复；通过依据是上述 Chrome 实际图像、滚动行为与运行计数，而非参数存在或单测成功。用户已认可的羽毛球构图与材质得到保留。
+
+#### 有效运行证据与性能边界
+
+| 实测情境 | 结果 | 能支持的结论 |
+| --- | --- | --- |
+| 1440 首屏 → 研究 → 穿门 | draws 515 → 624，resizes 始终 5，buffer 1440 × 960 | 已检查的正常滚动段不再逐帧重新分配画布 |
+| 1440 成果 58% 停滚 | 两次截图字节一致，draws 705 不变 | 叶摆、落叶和倒影跟随滚动，停滚后停止绘制 |
+| 1440 生活 68% → 87% | 庭院 draws 固定 719、state=suspended、canvas 1×1；体育 draws 48 → 49 | 隐藏庭院不继续绘制 |
+| 390 生活 68% → 88% | 庭院 draws 固定 419、canvas 1×1；体育 11 → 13 | 手机模拟也符合章节暂停门控 |
+| 完全滚入资料区并继续滚动 | 两场景均 suspended、canvas 均 1×1；庭院 719 / 体育 58 保持不变 | 完全离屏后两个场景均停止绘制 |
+| 资料区反向回成果约 53% | 庭院恢复 1440×960 / active，体育仍 1×1 / suspended | 恢复路径正常，不必重建体育才能回退 |
+| reduce 模拟静止版 | 1 canvas，draws 3 不变，两次截图一致，主要文字 700 | 减少动态效果路径静止且保留信息 |
+
+点击“个人详录”后页面顶部仍有约 32px 故事条时，体育仍被判定为可见；继续滚动完全离屏后才暂停，以上表格按完全离屏状态记录。`data-render-audit` 的 buffer / resizes 是最近一次 draw 的快照，暂停时以实际 canvas.width / height 和 `data-render-state` 为准。
+
+**没有测量总 GPU / 进程内存或低端设备 FPS。** CPU 指标是渲染提交耗时，不能充当 GPU 帧时；heap 与基线不同尺寸 / DPR 的样本不能直接比较。canvas 与显式后处理缓冲已缩小，Three 内部透射 target 可能在休眠时继续保留约 7 MiB 的颜色缓存，不能称“全部 GPU 资源释放”。手机为 Chrome 模拟视口，不是真机触摸测试；本轮未做低带宽网络、低端 GPU 或长时间反复进出的泄漏压力测试。
+
+#### 最终交付
+
+- 正常 Chrome 预览 `http://127.0.0.1:4173/`，已移除 audit 查询参数；标签 `1859663509` 标记 `markDeliverable`，停首屏，可继续向下体验。
+- 已恢复默认视口、Chrome 100%、DevTools 关闭、reduce=false；最终 DOM 核实 **2048 × 984 / DPR 2**，无横向溢出。
+- 最终桌面图：`outputs/visual-review/autumn-final-desktop.png`。
+- 最终手机图：`outputs/visual-review/autumn-final-mobile390.png`。
+- 值得沉淀：装饰性前景可越过建筑边界，但响应式安全区应围绕实际文字 / 导航 bounds；性能验收分别记录提交成本、实际暂停行为与显存配置预算，避免把一个数字冒称全部体验。

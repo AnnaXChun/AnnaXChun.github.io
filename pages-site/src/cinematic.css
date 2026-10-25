@@ -29,7 +29,7 @@
 .shot-copy-1 .shot-title span:first-child { font:700 22px/1.5 var(--sans); letter-spacing:0; }
 .shot-copy-1 .shot-title span:last-child { font-size:80px; line-height:1.05; margin-top:5px; }
 .shot-copy-2 { right:7%; top:13%; width:30%; padding:20px; background:#f4f9fcf7; box-shadow:0 0 32px 24px #f4f9fcd9; }
-.shot-copy-3 { right:7%; top:64%; width:32%; }
+.shot-copy-3 { right:7%; top:69%; width:32%; }
 .shot-copy-3 .shot-eyebrow { display:none; }
 .shot-copy-3 .shot-title { font-size:32px; }
 .shot-copy-3 .shot-description { font-size:17px; margin-top:12px; }
@@ -171,3 +171,6 @@
   .cinema-evidence .evidence-mount img { max-height:42svh; }
   .scroll-cue { left:7%; top:70%; }
 }
+/* Full-stage canvas: camera viewports reproduce the architectural composition;
+   the foreground maple can cross the building's bounds without canvas resizing. */
+.cinematic-film .ink-landscape.full-courtyard-frame { inset:0; width:100%; height:100%; mask-image:none; }

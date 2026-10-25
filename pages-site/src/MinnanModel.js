@@ -11,16 +11,17 @@ export function createMinnanCourtyard() {
   const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
   const ink=createInkLines();
   resources.add(ink);
+  const foliageMotion={time:{value:0},strength:{value:0}};
   const washMaterial=(color,strength=.7,foliage=false)=>{
-    const material=createInkMaterial(color,strength,foliage);resources.add(material);return material;
+    const material=createInkMaterial(color,strength,foliage,foliage?foliageMotion:null);resources.add(material);return material;
   };
   const mat = {
     plaster: washMaterial(0xdcd8ca,.75), stone: washMaterial(0xb5b7af,.75),
     brick: washMaterial(0x985d49,.75), brickLight: washMaterial(0xb67d63,.65),
     roof: washMaterial(0x3c4841,.7), tile: washMaterial(0x59675b,.65),
     ridge: washMaterial(0xb7b7a6,.5), wood: washMaterial(0x514d3c,.55),
-    dark: washMaterial(0x303d36,.6), leaf: washMaterial(0x435f50,.7,true),
-    paleLeaf: washMaterial(0x819581,.8,true), paving: washMaterial(0xe4dfd2,.95),
+    dark: washMaterial(0x303d36,.6), leaf: washMaterial(0xffffff,.7,true),
+    maple: washMaterial(0xffffff,.7,true), paving: washMaterial(0xe4dfd2,.95),
     vermilion: washMaterial(0xa1503b,.65),
   };
   const transform = new THREE.Object3D();
@@ -226,8 +227,45 @@ export function createMinnanCourtyard() {
     }
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
   }
-  function banyan(x,z,size) {
+  // Five lobes with recessed sinuses, small edge teeth and a gently cupped
+  // surface. This silhouette is geometry, not a red oval or sprite.
+  function mapleLeafGeometry() {
+    const corners=[[0,0],[.10,.20],[.45,.28],[.25,.42],[.62,.82],[.26,.69],[.08,.97],[0,1.20],[-.08,.97],[-.26,.69],[-.62,.82],[-.25,.42],[-.45,.28],[-.10,.20]];
+    const outline=[];
+    for(let i=0;i<corners.length;i++) {
+      const a=corners[i],b=corners[(i+1)%corners.length];outline.push(a);
+      if(i<1||i>12)continue;
+      const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);
+      for(const t of [.38,.48,.58]) {
+        const tooth=t===.48?.018:0;
+        outline.push([a[0]+dx*t+dy/length*tooth,a[1]+dy*t-dx/length*tooth]);
+      }
+    }
+    const vertices=[],indices=[];
+    for(const [x,y] of outline) {
+      const t=y/1.2;
+      vertices.push(x,t,Math.sin(t*Math.PI)*.20+Math.abs(x)*.05);
+    }
+    // Concave sinuses need proper triangulation; a centre fan folds across
+    // these indentations and leaves intersecting/inverted triangles.
+    for(const triangle of THREE.ShapeUtils.triangulateShape(outline.map(([x,y])=>new THREE.Vector2(x,y)),[])) {
+      const [a,b,c]=triangle.map(i=>outline[i]);
+      const area=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+      if(Math.abs(area)>1e-8)indices.push(...triangle);
+    }
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
+  }
+  function tree(x,z,size,maple=false) {
     const p=new THREE.Object3D();p.position.set(x,.08,z);p.scale.setScalar(size);p.updateMatrix();const M=p.matrix;
+    const geometry=maple?mapleLeafGeometry():leafGeometry(1,1,.25),count=18*3*23;
+    const motionData=new Float32Array(count*2);
+    geometry.setAttribute('leafMotion',new THREE.InstancedBufferAttribute(motionData,2));
+    const canopy=new THREE.InstancedMesh(geometry,maple?mat.maple:mat.leaf,count);
+    canopy.name=maple?'left five-lobed vermilion maple':'right sparse green canopy';
+    canopy.castShadow=true;canopy.receiveShadow=true;
+    const leafTransform=new THREE.Object3D(),leafMatrix=new THREE.Matrix4(),color=new THREE.Color();
+    const darkColor=new THREE.Color(maple?0x7b2733:0x435f50),lightColor=new THREE.Color(maple?0xc45836:0x819581);
+    let leafIndex=0;
     path([[0,0,0],[.12,.8,.06],[-.08,1.7,.13],[.16,2.7,0]],.22,mat.wood,M,true);
     path([[.18,0,.14],[-.02,.6,.18],[.12,1.3,.08],[-.16,2.3,.02]],.13,mat.dark,M,true);
     for(let root=0;root<8;root++) {
@@ -243,17 +281,27 @@ export function createMinnanCourtyard() {
         path([end,[(end[0]+tip[0])*.5,tip[1]+.08,(end[2]+tip[2])*.5],tip],.018,mat.dark,M,true);
         for(let j=0;j<23;j++) {
           const theta=random()*Math.PI*2,rr=Math.sqrt(random())*.47;
-          add(leafGeometry(.13+random()*.18,.06+random()*.075,.03+random()*.06),random()>.52?mat.paleLeaf:mat.leaf,
-            [tip[0]+Math.cos(theta)*rr,tip[1]+(random()-.5)*.4,tip[2]+Math.sin(theta)*rr],
-            [1.0+random()*1.5,random()*Math.PI*2,(random()-.5)*1.5],M);
+          // Consume the same seeded samples as the old canopy, so trunks, branch
+          // tips and following architecture retain their authored coordinates.
+          const length=.13+random()*.18,width=.06+random()*.075,bend=.03+random()*.06,shade=random();
+          leafTransform.position.set(tip[0]+Math.cos(theta)*rr,tip[1]+(random()-.5)*.4,tip[2]+Math.sin(theta)*rr);
+          leafTransform.rotation.set(1.0+random()*1.5,random()*Math.PI*2,(random()-.5)*1.5);
+          leafTransform.scale.set(maple?length*.72:width,length,bend/.25);leafTransform.updateMatrix();
+          leafMatrix.multiplyMatrices(M,leafTransform.matrix);canopy.setMatrixAt(leafIndex,leafMatrix);
+          canopy.setColorAt(leafIndex,color.copy(darkColor).lerp(lightColor,shade));
+          motionData[leafIndex*2]=theta+tip[0]*1.7+tip[2]*2.1;motionData[leafIndex*2+1]=.65+.35*(length-.13)/.18;
+          leafIndex++;
         }
       }
       if(i%4===0)path([end,[end[0]+.04,end[1]-.5,end[2]],[end[0]+.08,.7,end[2]+.03]],.009,mat.wood,M,true);
     }
     for(let i=0;i<10;i++) {const a=i/10*Math.PI*2;box(.3,.10,.23,Math.cos(a)*.56,.04,Math.sin(a)*.56,mat.plaster,M);}
+    canopy.instanceMatrix.needsUpdate=true;canopy.instanceColor.needsUpdate=true;
+    canopy.computeBoundingSphere();canopy.boundingSphere.radius+=.06;
+    group.add(canopy);resources.add(canopy);resources.add(geometry);
   }
-  banyan(5.8,-2.1,1.10);
-  banyan(-5.35,2.5,.8);
+  tree(5.8,-2.1,1.10);
+  tree(-5.35,2.5,.8,true);
   // Courtyard well and benches create useful foreground parallax.
   add(new THREE.CylinderGeometry(.37,.4,.36,32,1,true),mat.stone,[-1.35,.29,1.4]);
   add(new THREE.TorusGeometry(.39,.065,10,40),mat.ridge,[-1.35,.49,1.4],[Math.PI/2,0,0]);
@@ -304,12 +352,16 @@ export function createMinnanCourtyard() {
   for(const [surface,geometries] of batches) {
     const geometry=mergeGeometries(geometries,false);geometries.forEach(g=>g.dispose());resources.add(geometry);
     const mesh=new THREE.Mesh(geometry,surface);mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
-    if(![mat.leaf,mat.paleLeaf,mat.tile,mat.roof,mat.brickLight].includes(surface)) {
+    if(![mat.tile,mat.roof,mat.brickLight].includes(surface)) {
       const edges=new THREE.EdgesGeometry(geometry,38);resources.add(edges);
       const lines=new THREE.LineSegments(edges,ink);group.add(lines);
     }
   }
-  const stats={meshes:0,vertices:0};
-  group.traverse(node=>{if(node.isMesh){stats.meshes++;stats.vertices+=node.geometry.getAttribute('position').count;}});
-  return {group,stats,studioLabels,dispose(){resources.forEach(resource=>resource.dispose());}};
+  const stats={meshes:0,vertices:0,leafInstances:0};
+  group.traverse(node=>{if(node.isMesh){stats.meshes++;stats.vertices+=node.geometry.getAttribute('position').count;if(node.isInstancedMesh)stats.leafInstances+=node.count;}});
+  const updateFoliage=(frame,still=false)=>{
+    foliageMotion.time.value=Number.isFinite(frame)?frame/30:0;
+    foliageMotion.strength.value=still?0:1;
+  };
+  return {group,stats,studioLabels,updateFoliage,dispose(){resources.forEach(resource=>resource.dispose());}};
 }

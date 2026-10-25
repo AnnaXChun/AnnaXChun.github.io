@@ -1,4 +1,4 @@
-import React,{lazy,Suspense,useEffect} from 'react';
+import React,{lazy,Suspense,useEffect,useState} from 'react';
 import {AbsoluteFill,Img,useCurrentFrame} from 'remotion';
 import MinnanScene from './MinnanScene';
 const loadBadminton=()=>import('./BadmintonScene');
@@ -67,13 +67,15 @@ function EvidenceCards({frame}) {
 export default function Film() {
   const frame=useCurrentFrame(),chapter=Math.max(0,STARTS.findLastIndex(f=>frame>=f));
   const warmLife=frame>800;
+  const [lifeMounted,setLifeMounted]=useState(frame>975);
+  useEffect(()=>{if(frame>975)setLifeMounted(true);},[frame]);
   useEffect(()=>{if(warmLife)loadBadminton().then(m=>m.preloadSportAssets()).catch(()=>{});},[warmLife]);
-  const life=range(frame,1015,1080),travel=range(frame,440,485)*(1-range(frame,535,585));
+  const life=range(frame,1015,1080);
   return <AbsoluteFill className={`ink-film cinematic-film scene-${chapter}`}>
     <div className="life-tone" style={{opacity:life}}/>
     {STORIES.map((_,index)=><DepthTitle key={index} index={index} frame={frame}/>)}
-    <div className="ink-landscape" style={{'--travel':travel,opacity:(.35+.65*range(frame,0,72))*(1-chapterOpacity(frame,3)*.94)*(1-life)}}><MinnanScene frame={frame}/></div>
-    {frame>975&&<div className="life-visual" style={{opacity:life}}><Suspense fallback={null}><BadmintonScene frame={frame}/></Suspense></div>}
+    <div className="ink-landscape full-courtyard-frame" style={{opacity:1-life}}><MinnanScene frame={frame} active={frame<1080} opacity={(.35+.65*range(frame,0,72))*(1-chapterOpacity(frame,3)*.94)}/></div>
+    {lifeMounted&&<div className="life-visual" style={{opacity:life}}><Suspense fallback={null}><BadmintonScene frame={frame} active={frame>975}/></Suspense></div>}
     {STORIES.map((_,index)=><StoryPanel key={index} index={index} frame={frame}/>)}
     <EvidenceCards frame={frame}/>
     {chapter===4&&<div className="scroll-cue" style={{opacity:1-range(frame,1190,1240)}}>向下滚动，随之挥拍 <span>↓</span></div>}

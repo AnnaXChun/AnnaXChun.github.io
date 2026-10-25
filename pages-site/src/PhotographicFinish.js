@@ -8,10 +8,11 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 // Keep DOM typography behind the real scene. Bloom affects only radiance above
 // the threshold; reconstruct alpha so the ice-white page is never replaced by black.
 export function createPhotographicFinish(renderer) {
-  const base=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
-  const composer=new EffectComposer(renderer,new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType}));
+  const base=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:2});
+  const composer=new EffectComposer(renderer,new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,depthBuffer:false}));
   const source=new TexturePass(base.texture);
   const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.38,.6,3.5);
+  for(const target of [bloom.renderTargetBright,...bloom.renderTargetsHorizontal,...bloom.renderTargetsVertical])target.depthBuffer=false;
   const alpha=new ShaderPass({
     uniforms:{tDiffuse:{value:null},baseImage:{value:null}},
     vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
@@ -23,7 +24,7 @@ export function createPhotographicFinish(renderer) {
   alpha.uniforms.baseImage.value=base.texture;
   composer.addPass(source);composer.addPass(bloom);composer.addPass(alpha);composer.addPass(new OutputPass());
   return {
-    resize(w,h){const dpr=renderer.getPixelRatio();base.setSize(w*dpr,h*dpr);composer.setSize(w,h);},
+    resize(w,h){const dpr=renderer.getPixelRatio();base.setSize(Math.round(w*dpr),Math.round(h*dpr));composer.setPixelRatio(dpr);composer.setSize(w,h);},
     render(scene,camera){const tone=renderer.toneMapping;renderer.toneMapping=THREE.NoToneMapping;renderer.setRenderTarget(base);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(null);renderer.toneMapping=tone;composer.render();},
     dispose(){base.dispose();source.dispose();bloom.dispose();alpha.dispose();composer.passes.at(-1).dispose();composer.dispose();},
   };

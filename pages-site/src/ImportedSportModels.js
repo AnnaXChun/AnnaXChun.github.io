@@ -3,24 +3,25 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 const files=['kin-chen-racket','kyle1003-shuttlecock','libhand'];
 const pending=new Map();
+let residentScenes=0;
 function assetBytes(name){
   if(!pending.has(name))pending.set(name,fetch(`/models/${name}.glb`).then(r=>{if(!r.ok)throw new Error(`${name}: ${r.status}`);return r.arrayBuffer();}).catch(e=>{pending.delete(name);throw e;}));
   return pending.get(name);
 }
-export function preloadSportAssets(){return Promise.all(files.map(assetBytes));}
+export function preloadSportAssets(){return residentScenes?Promise.resolve():Promise.all(files.map(assetBytes));}
 
 function disposeTree(root) {
   const resources=new Set();
   root.traverse(o=>{if(o.geometry)resources.add(o.geometry);for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[]){resources.add(m);for(const value of Object.values(m))if(value?.isTexture)resources.add(value);}});
-  resources.forEach(r=>r.dispose());
+  const images=new Set();resources.forEach(r=>{if(r.isTexture&&r.source?.data?.close)images.add(r.source.data);r.dispose();});images.forEach(image=>image.close());
 }
 
 export function createImportedSportModels(onReady,onError) {
   const racket=new THREE.Group(),shuttle=new THREE.Group(),hand=new THREE.Group();
-  const roots=[racket,shuttle,hand];let disposed=false;
+  const roots=[racket,shuttle,hand];let disposed=false;residentScenes++;
   const handFade={bottom:{value:.035},top:{value:.18}};
   const loader=new GLTFLoader();
-  const load=(name,target,configure)=>assetBytes(name).then(bytes=>loader.parseAsync(bytes,'/models/')).then(gltf=>{
+  const load=(name,target,configure)=>assetBytes(name).then(bytes=>loader.parseAsync(bytes,'/models/').finally(()=>pending.delete(name))).then(gltf=>{
     if(disposed){disposeTree(gltf.scene);return;}
     configure(gltf.scene);gltf.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;for(const m of Array.isArray(o.material)?o.material:[o.material]){if(m.map)m.map.anisotropy=8;}}});target.add(gltf.scene);onReady();
   }).catch(onError);
@@ -57,5 +58,5 @@ export function createImportedSportModels(onReady,onError) {
       };
     }});
   });
-  return {racket,shuttle,hand,fit(aspect){handFade.bottom.value=aspect<1?.18:.035;handFade.top.value=aspect<1?.34:.18;},dispose(){disposed=true;roots.forEach(disposeTree);}};
+  return {racket,shuttle,hand,fit(aspect){handFade.bottom.value=aspect<1?.18:.035;handFade.top.value=aspect<1?.34:.18;},dispose(){if(disposed)return;disposed=true;residentScenes--;roots.forEach(disposeTree);}};
 }

@@ -1,3 +1,5 @@
+import {createSceneRuntime} from './SceneRuntime';
+import {createSceneDiagnostics} from './SceneDiagnostics';
 import React,{useLayoutEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {createImportedSportModels} from './ImportedSportModels';
@@ -6,23 +8,24 @@ import {badmintonShot} from './BadmintonMotion';
 import {createStudioEnvironment,createStudioShadows} from './StudioLighting';
 import {createProductLights} from './ProductLights';
 
-export default function BadmintonScene({frame=1050,still=false}) {
+export default function BadmintonScene({frame=1050,still=false,active=true}) {
   const host=useRef(null),runtime=useRef(null),current=useRef(frame),[failed,setFailed]=useState(false);
   current.current=frame;
   useLayoutEffect(()=>{
     const container=host.current;
-    let renderer,model,observer,environment,lights,shadows,finish,halo,alive=true,width=1,height=1;
+    let renderer,model,loop,environment,lights,shadows,finish,halo,alive=true;
     try {
-      renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,premultipliedAlpha:false});renderer.setClearColor(0,0);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+      renderer=new THREE.WebGLRenderer({alpha:true,antialias:false,premultipliedAlpha:false});renderer.setClearColor(0,0);renderer.transmissionResolutionScale=.25;
       renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
       renderer.domElement.setAttribute('aria-hidden','true');container.appendChild(renderer.domElement);
+      const audit=createSceneDiagnostics(container,renderer);
       const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,1,.1,50);
       environment=createStudioEnvironment(renderer,true);scene.environment=environment.texture;scene.environmentIntensity=.65;
       lights=createProductLights(scene);shadows=createStudioShadows(scene);
       finish=createPhotographicFinish(renderer);halo=createGlassHalo(scene);
-      model=createImportedSportModels(()=>runtime.current?.draw(),error=>{if(alive){setFailed(true);console.warn('Sport asset unavailable:',error.message);}});scene.add(model.shuttle,model.racket,model.hand);
-      const draw=()=>{
+      model=createImportedSportModels(()=>runtime.current?.request(),error=>{if(alive){setFailed(true);console.warn('Sport asset unavailable:',error.message);}});scene.add(model.shuttle,model.racket,model.hand);
+      const draw=(width,height)=>{
         if(!alive||!width||!height||document.hidden)return;
         const shot=badmintonShot(still?1160:current.current);
         model.racket.position.set(...shot.racketPosition);model.racket.rotation.set(...shot.racketRotation);
@@ -36,14 +39,13 @@ export default function BadmintonScene({frame=1050,still=false}) {
         camera.position.set(shot.cameraPosition[0]+framing,shot.cameraPosition[1],shot.cameraPosition[2]);camera.lookAt(shot.cameraTarget[0]+framing,shot.cameraTarget[1],shot.cameraTarget[2]);camera.fov=shot.fov;
         // Portrait crops retain the flight axis; motion still approaches the real camera.
         if(camera.aspect<1)camera.fov+=13;
-        camera.updateProjectionMatrix();finish.render(scene,camera);
+        camera.updateProjectionMatrix();audit.draw(()=>finish.render(scene,camera));
       };
-      document.addEventListener('visibilitychange',draw);runtime.current={draw};
-      observer=new ResizeObserver(entries=>{const r=entries[0].contentRect;width=Math.round(r.width);height=Math.round(r.height);if(width&&height){renderer.setSize(width,height);finish.resize(width,height);draw();}});observer.observe(container);
+      loop=createSceneRuntime({host:container,renderer,render:draw,active,onResize(w,h){audit.resize();finish.resize(w,h);}});runtime.current=loop;
     }catch(error){setFailed(true);console.warn('Badminton scene unavailable:',error.message);}
-    return()=>{alive=false;observer?.disconnect();if(runtime.current)document.removeEventListener('visibilitychange',runtime.current.draw);runtime.current=null;model?.dispose();finish?.dispose();halo?.dispose();shadows?.dispose();lights?.dispose();environment?.dispose();renderer?.dispose();renderer?.domElement.remove();};
+    return()=>{alive=false;loop?.dispose();runtime.current=null;model?.dispose();finish?.dispose();halo?.dispose();shadows?.dispose();lights?.dispose();environment?.dispose();renderer?.dispose();renderer?.forceContextLoss();renderer?.domElement.remove();};
   },[still]);
-  useLayoutEffect(()=>{runtime.current?.draw();},[frame]);
+  useLayoutEffect(()=>{runtime.current?.setActive(active);runtime.current?.request();},[frame,active]);
   return <div className="badminton-scene" ref={host}>{failed&&<div className="badminton-fallback">羽毛球 · 预判与节奏</div>}</div>;
 }
 

@@ -1,0 +1,51 @@
+export function renderPixelRatio(width,height,dpr=1) {
+  return Math.min(dpr,1.5,Math.sqrt(2_800_000/Math.max(1,width*height)));
+}
+
+export function minnanViewport(frame,width,height) {
+  const s=(a,b)=>{const t=Math.max(0,Math.min(1,(frame-a)/(b-a)));return t*t*(3-2*t);};
+  const travel=s(440,485)*(1-s(535,585)),chapter=frame<270?0:frame<540?1:frame<810?2:3;
+  let box=chapter===1?[-14*(1-travel),17*(1-travel),88+12*travel,83+17*travel]:chapter===2?[-4,-3,108,105]:[23*(1-travel),9*(1-travel),81+19*travel,91+9*travel];
+  if(width<900){
+    box=chapter===1?[-25,13,140,44]:chapter===2?[-15,0,130,height<=650?47:51]:[-12,12,124,44];
+    if(width>=600&&height<=520)box=chapter===1?[-10,16,90,80]:chapter===2?[0,0,100,100]:[18,8,90,90];
+  }
+  return {x:box[0]*width/100,y:(100-box[1]-box[3])*height/100,width:box[2]*width/100,height:box[3]*height/100};
+}
+
+// One render request per browser frame. CSS camera framing may resize the host,
+// but only a real viewport resize reallocates the drawing buffer.
+export function createSceneRuntime({host,renderer,render,onResize,active=true}) {
+  const viewport=host.closest('.film-viewport')||host;
+  let width=1,height=1,viewWidth=1,viewHeight=1,raf=0,intersecting=true,disposed=false;
+  let bufferKey='',awake=false;
+  const runnable=()=>active&&intersecting&&!document.hidden&&!disposed;
+  const allocate=()=>{
+    const enabled=runnable(),key=enabled?`${viewWidth}:${viewHeight}`:'sleep';
+    if(key===bufferKey)return;
+    bufferKey=key;awake=enabled;host.dataset.renderState=enabled?'active':'suspended';
+    const w=enabled?viewWidth:1,h=enabled?viewHeight:1;
+    renderer.setPixelRatio(enabled?renderPixelRatio(w,h,devicePixelRatio||1):1);
+    renderer.setSize(w,h,false);onResize?.(w,h,enabled);
+  };
+  const flush=()=>{
+    raf=0;if(!runnable())return;
+    allocate();if(render(width,height))request();
+  };
+  const request=()=>{if(runnable()&&!raf)raf=requestAnimationFrame(flush);};
+  const visibility=()=>{
+    if(!runnable()){cancelAnimationFrame(raf);raf=0;allocate();}
+    else {bufferKey=awake?bufferKey:'';request();}
+  };
+  const sizes=new ResizeObserver(entries=>{
+    for(const {target,contentRect:r} of entries){
+      if(target===host){width=Math.max(1,Math.round(r.width));height=Math.max(1,Math.round(r.height));}
+      if(target===viewport){viewWidth=Math.max(1,Math.round(r.width));viewHeight=Math.max(1,Math.round(r.height));}
+    }
+    request();
+  });
+  sizes.observe(host);if(viewport!==host)sizes.observe(viewport);
+  const intersection=new IntersectionObserver(entries=>{intersecting=entries[0].isIntersecting;visibility();});
+  intersection.observe(host);document.addEventListener('visibilitychange',visibility);
+  return {request,get active(){return runnable();},setActive(value){if(active!==value){active=value;visibility();}},dispose(){disposed=true;cancelAnimationFrame(raf);sizes.disconnect();intersection.disconnect();document.removeEventListener('visibilitychange',visibility);}};
+}
