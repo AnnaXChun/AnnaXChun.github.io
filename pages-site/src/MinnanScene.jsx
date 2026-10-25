@@ -76,7 +76,8 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
             renderer.setViewport(view.x,view.y,view.width,view.height);renderer.render(scene,camera);audit.background();
             backgroundDirty=false;previousFrame=f;previousX=smoothed.x;previousY=smoothed.y;previousWidth=width;previousHeight=height;
           }
-          renderer.setRenderTarget(null);renderer.setViewport(0,0,width,height);renderer.clear();composite.draw(fade.current,width<height&&f>=270&&f<540?.495:2);renderer.clearDepth();
+          renderer.setRenderTarget(null);renderer.setViewport(0,0,width,height);renderer.clear();
+          autumn.drawShelves(renderer);composite.draw(fade.current,width<height&&f>=270&&f<540?.495:2);renderer.clearDepth();
           if(still||autumnRetreat(f)>0)renderer.render(autumn.scene,autumn.camera);
         });
         return (!still&&autumnRetreat(f)>0)||(shot.pointer>0&&moving);

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import {createMapleLeafAsset} from './MapleLeafAsset.js';
 import {createMaplePhysics} from './MaplePhysics.js';
+import {createGlyphShelves,frameAutumnCamera} from './GlyphShelves.js';
 
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b);
 export function autumnRetreat(frame){return 1-smooth(900,1080,frame);}
@@ -16,8 +17,14 @@ export function fallingLeafVisibility(x,y,frame,portrait){
 }
 export function createAutumnFrame(onReady=()=>{}){
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.1,40);
-  camera.position.z=13;scene.add(new THREE.HemisphereLight(0xecf6ff,0x4b251e,2));
-  const sun=new THREE.DirectionalLight(0xffede1,3);sun.position.set(-3,6,8);scene.add(sun);
+  frameAutumnCamera(camera,1);
+  const ambient=new THREE.HemisphereLight(0xecf6ff,0x4b251e,2);ambient.layers.enable(1);scene.add(ambient);
+  const sun=new THREE.DirectionalLight(0xffede1,3);sun.position.set(-3,6,8);sun.layers.enable(1);scene.add(sun);
+  sun.castShadow=true;sun.shadow.mapSize.set(512,512);sun.shadow.camera.layers.enable(1);
+  Object.assign(sun.shadow.camera,{left:-9,right:9,top:6,bottom:-6,near:1,far:24});
+  sun.shadow.normalBias=.008;sun.shadow.bias=-.0001;sun.shadow.radius=2;sun.shadow.blurSamples=4;
+  const shelves=createGlyphShelves();scene.add(shelves.group);
+  const releaseShadow=()=>{sun.shadow.map?.dispose();sun.shadow.mapPass?.dispose();sun.shadow.map=null;sun.shadow.mapPass=null;};
   const branch=new THREE.Group();scene.add(branch);
   const wood=new THREE.MeshStandardMaterial({color:0x503a32,roughness:.94});
   const asset=createMapleLeafAsset(),leaf=asset.material,leafGeo=asset.geometry;
@@ -51,7 +58,7 @@ export function createAutumnFrame(onReady=()=>{}){
     pose.scale.setScalar(.34+(i%7)*.024);pose.updateMatrix();leaves.setMatrixAt(i,pose.matrix);leaves.setColorAt(i,palette[i%palette.length]);
   }
   leaves.instanceMatrix.needsUpdate=true;branch.add(leaves);
-  const fallingCount=18,fallingGeo=leafGeo.clone(),visibility=new THREE.InstancedBufferAttribute(new Float32Array(fallingCount),1);
+  const fallingCount=12,fallingGeo=leafGeo.clone(),visibility=new THREE.InstancedBufferAttribute(new Float32Array(fallingCount),1);
   visibility.setUsage(THREE.DynamicDrawUsage);fallingGeo.setAttribute('leafVisibility',visibility);
   const fallingMaterial=leaf.clone();fallingMaterial.transparent=true;fallingMaterial.depthWrite=false;
   fallingMaterial.onBeforeCompile=s=>{
@@ -59,23 +66,27 @@ export function createAutumnFrame(onReady=()=>{}){
     s.fragmentShader='varying float vLeafVisibility;\n'+s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a*=vLeafVisibility;');
   };
   fallingMaterial.customProgramCacheKey=()=> 'closed-maple-rigid-body-v2';
-  const falling=new THREE.InstancedMesh(fallingGeo,fallingMaterial,fallingCount),projected=new THREE.Vector3();falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);falling.frustumCulled=false;scene.add(falling);
+  const falling=new THREE.InstancedMesh(fallingGeo,fallingMaterial,fallingCount),projected=new THREE.Vector3();falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);falling.frustumCulled=false;falling.castShadow=true;scene.add(falling);
   for(let i=0;i<fallingCount;i++)falling.setColorAt(i,palette[i%palette.length]);
   const physics=createMaplePhysics({count:fallingCount});
   let lastFrame=-1,lastAspect=0,lastTime=-1;
-  return {scene,camera,branch,falling,getDiagnostics:()=>physics.getDiagnostics(),setPaused:value=>physics.setPaused(value),
+  return {scene,camera,branch,falling,getDiagnostics:()=>physics.getDiagnostics(),setPaused(value){physics.setPaused(value);if(value)releaseShadow();},
+    drawShelves(renderer){if(!shelves.group.children.length)return;camera.layers.set(1);renderer.shadowMap.needsUpdate=true;renderer.render(scene,camera);camera.layers.set(0);},
     update(frame,aspect,still=false,time=0,delta=0,textSurface=null){
       const windTime=still?0:time;
       if(lastFrame===frame&&lastAspect===aspect&&lastTime===windTime&&!textSurface)return;
       const halfHeight=13*Math.tan(THREE.MathUtils.degToRad(17.5)),halfWidth=halfHeight*aspect;
       if(lastAspect!==aspect)physics.resize({halfWidth,halfHeight,portrait:aspect<1});
-      if(textSurface)physics.setTextColliders(textSurface.boxes,textSurface.key);
+      if(textSurface){physics.setTextColliders(textSurface.boxes,textSurface.key);shelves.update(textSurface);}
       lastFrame=frame;lastAspect=aspect;lastTime=windTime;
       const f=still?90:frame,remain=autumnRetreat(f);
       const portrait=aspect<1;
-      scene.visible=remain>0;camera.aspect=aspect;camera.updateProjectionMatrix();camera.updateMatrixWorld();
+      scene.visible=remain>0;frameAutumnCamera(camera,aspect);
       const breeze=still?0:Math.sin(windTime*.68)*.022+Math.sin(windTime*1.31)*.007;
-      branch.position.set(halfWidth+(portrait?.55:.6)+(1-remain)*5,(portrait?4.7:4.3)+(1-remain)*2.5+breeze*.8,0);
+      // Keep the large crown above the lettering; its resting leaves still
+      // belong to the title. Narrow desktop views need more top clearance.
+      const crownClearance=portrait?0:1.1+.4*(1-smooth(1.45,2,aspect));
+      branch.position.set(halfWidth+(portrait?.55:.8)+(1-remain)*5,(portrait?4.7:4.3+crownClearance)+(1-remain)*2.5+breeze*.8,0);
       branch.scale.setScalar((portrait?.7:1.65)*(.55+.45*remain));branch.rotation.set(breeze*.5,breeze*.9,breeze+(1-remain)*.2);
       wind.value=windTime*2.4;
       const poses=physics.step(still?0:delta,time);
@@ -87,7 +98,7 @@ export function createAutumnFrame(onReady=()=>{}){
       }
       falling.instanceMatrix.needsUpdate=true;visibility.needsUpdate=true;
     },
-    dispose(){physics.dispose();fallingGeo.dispose();fallingMaterial.dispose();asset.dispose();wood.dispose();twigs.forEach(g=>g.dispose());leaves.dispose();falling.dispose();}
+    dispose(){physics.dispose();shelves.dispose();releaseShadow();fallingGeo.dispose();fallingMaterial.dispose();asset.dispose();wood.dispose();twigs.forEach(g=>g.dispose());leaves.dispose();falling.dispose();}
   };
 }
 

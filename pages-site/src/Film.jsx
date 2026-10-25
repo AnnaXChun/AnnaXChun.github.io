@@ -64,6 +64,29 @@ function EvidenceCards({frame}) {
     </figure>
   </div>;
 }
+function CourtyardBackdrop({frame,opacity}){
+  return <div className="courtyard-tone" style={{opacity,'--drift':`${-Math.min(frame,1050)/65}px`}} aria-hidden="true">
+    <div className="courtyard-daylight"/>
+    <svg className="courtyard-distance" viewBox="0 0 1600 900" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="ridge-wash" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#7298ae" stopOpacity=".28"/><stop offset="1" stopColor="#d1e8f2" stopOpacity="0"/></linearGradient>
+        <linearGradient id="near-wash" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#789da7" stopOpacity=".17"/><stop offset="1" stopColor="#edf7fa" stopOpacity="0"/></linearGradient>
+        <filter id="distant-air"><feGaussianBlur stdDeviation="1.3"/></filter>
+      </defs>
+      <g filter="url(#distant-air)" fill="url(#ridge-wash)">
+        <path d="M-80 470 C30 455 63 406 122 395 C174 385 195 343 246 356 C291 368 308 391 346 381 C391 368 419 423 469 427 C528 435 572 391 628 400 C675 411 718 451 759 446 C809 434 844 411 898 430 C944 448 975 410 1012 385 C1044 365 1080 378 1119 342 C1154 309 1199 325 1238 367 C1285 418 1321 385 1370 409 C1430 437 1459 395 1516 414 C1564 430 1623 455 1680 451 L1680 760 L-80 760Z"/>
+      </g>
+      <path fill="url(#near-wash)" d="M-80 580 C5 534 56 551 119 513 C164 487 198 499 244 523 C283 542 314 526 361 550 C410 574 465 556 518 576 C600 607 649 578 713 591 C796 610 848 564 922 587 C990 605 1054 558 1108 550 C1163 541 1197 572 1254 542 C1316 507 1372 533 1415 505 C1482 463 1510 504 1584 490 L1680 690 L1680 900 L-80 900Z"/>
+    </svg>
+    <svg className="courtyard-cast-shade" viewBox="0 0 700 800" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="#476c81" strokeLinecap="round"><path d="M-60 850 Q220 600 210 410 Q218 205 470 -35" strokeWidth="11"/><path d="M212 470 Q340 400 502 415 M220 348 Q107 231 60 140 M285 190 Q447 205 590 100 M202 570 Q88 530 10 438" strokeWidth="5"/></g>
+      <g fill="#476c81">
+        <path d="M213 340 Q135 252 141 197 Q213 229 213 340 M290 189 Q280 110 329 57 Q356 134 290 189 M403 200 Q421 117 484 105 Q477 179 403 200 M350 408 Q350 329 408 302 Q424 366 350 408 M467 414 Q527 353 582 371 Q540 427 467 414 M121 530 Q87 458 108 412 Q163 463 121 530 M73 181 Q10 142 4 79 Q78 95 73 181"/>
+      </g>
+    </svg>
+    <div className="courtyard-ground-air"/>
+  </div>;
+}
 export default function Film() {
   const frame=useCurrentFrame(),chapter=Math.max(0,STARTS.findLastIndex(f=>frame>=f));
   const warmLife=frame>800;
@@ -72,6 +95,7 @@ export default function Film() {
   useEffect(()=>{if(warmLife)loadBadminton().then(m=>m.preloadSportAssets()).catch(()=>{});},[warmLife]);
   const life=range(frame,1015,1080);
   return <AbsoluteFill className={`ink-film cinematic-film scene-${chapter}`}>
+    <CourtyardBackdrop frame={frame} opacity={1-life}/>
     <div className="life-tone" style={{opacity:life}}/>
     {STORIES.map((_,index)=><DepthTitle key={index} index={index} frame={frame}/>)}
     <div className="ink-landscape full-courtyard-frame" style={{opacity:1-life}}><MinnanScene frame={frame} active={frame<1080} opacity={(.35+.65*range(frame,0,72))*(1-chapterOpacity(frame,3)*.94)}/></div>

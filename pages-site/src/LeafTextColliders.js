@@ -36,7 +36,7 @@ export function createLeafTextColliders(host,onChange=()=>{}){
     ctx.fillText(text,pad,pad+(lineHeight+ascent-descent)/2);
     const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data,alpha=new Uint8Array(canvas.width*canvas.height);
     for(let i=0;i<alpha.length;i++)alpha[i]=pixels[i*4+3];
-    const result={rects:inkRectangles(alpha,canvas.width,canvas.height),pad,resolution};
+    const result={rects:inkRectangles(alpha,canvas.width,canvas.height),pad,resolution,canvas,alpha,width:canvas.width,height:canvas.height};
     glyphCache.set(cacheKey,result);return result;
   }
 
@@ -47,14 +47,14 @@ export function createLeafTextColliders(host,onChange=()=>{}){
       lastFrame=frame;lastSize=size;
       const title=film?.querySelector('[data-leaf-surface]');
       const key=`${title?.dataset.leafSurface??'none'}:${title?.dataset.leafPose??0}:${size}`;
-      if(dirty||key!==candidateKey){candidateKey=key;publishedKey='';settle=title?.12:0;dirty=false;}
+      if(dirty||key!==candidateKey){candidateKey=key;publishedKey='';settle=title ? .12 : 0;dirty=false;}
       if(settle>0){
         settle=Math.max(0,settle-Math.min(.1,delta));
         if(boxes.length){boxes=[];return {boxes,key:`moving:${++revision}`};}
         if(settle>0)return null;
       }
       if(key===publishedKey)return null;
-      publishedKey=key;boxes=[];
+      publishedKey=key;boxes=[];const parts=[];
       if(title){
         // Layout reads occur only at a stable chapter boundary, font load, or
         // viewport resize. No layout reads, rasterization, or rebuilding at idle.
@@ -72,13 +72,19 @@ export function createLeafTextColliders(host,onChange=()=>{}){
               const w=r.width*scale,h=r.height*scale;
               if(left+w<0||left>width||top+h<0||top>height)continue;
               const halfY=Math.max(.025,h*unit/2);
-              next.push({center:[(left+w/2-width/2)*unit,(height/2-top)*unit-halfY,0],halfExtents:[w*unit/2,halfY,.35]});
+              next.push({center:[(left+w/2-width/2)*unit,(height/2-top)*unit-halfY,-.45],halfExtents:[w*unit/2,halfY,.45]});
             }
           }
           boxes=next;if(boxes.length<=512)break;
         }
+        // The visible edge is sampled more finely than the collision proxy.
+        // A real top surface and depth mask make a resting leaf read as placed.
+        for(const {text,style,rect} of glyphs){
+          const ink=glyphInk(text,style,192),scale=parseFloat(style.fontSize)/192;
+          parts.push({ink,unit:scale*unit,left:(rect.left-origin.left-ink.pad*scale-width/2)*unit,top:(height/2-rect.top+origin.top+ink.pad*scale)*unit});
+        }
       }
-      return {boxes,key:`${key}:${++revision}`};
+      return {boxes,parts,key:`${key}:${++revision}`};
     },
     invalidate(){dirty=true;},
     dispose(){disposed=true;glyphCache.clear();boxes=[];document.fonts?.removeEventListener('loadingdone',fontReady);},

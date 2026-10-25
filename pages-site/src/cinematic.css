@@ -4,6 +4,16 @@
 .cinematic-film { isolation:isolate; }
 .cinematic-film::after { z-index:8; }
 .life-tone { position:absolute; inset:0; background:radial-gradient(ellipse at 72% 24%,#fff 0%,#effbff 29%,#d6edf7 65%,#acd3e9 100%); z-index:0; }
+.courtyard-tone { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; background:linear-gradient(155deg,#ebf5f8 0%,#e0edf5 33%,#d4e7ef 58%,#f4f9fc 86%); }
+.courtyard-daylight { position:absolute; inset:-20%; background:radial-gradient(ellipse at 28% 28%,#fff 0%,#fbfeffef 12%,#effaff62 35%,transparent 60%); }
+.courtyard-distance { position:absolute; inset:0; width:102%; height:100%; transform:translateX(var(--drift)); }
+.courtyard-cast-shade { position:absolute; left:-7%; top:4%; width:39%; height:94%; opacity:.11; filter:blur(13px); transform:rotate(-14deg); mask-image:linear-gradient(120deg,#000 12%,transparent 69%); }
+.courtyard-ground-air { position:absolute; inset:42% 0 0; background:linear-gradient(180deg,transparent,#f4f9fcbb 29%,#f4f9fc 82%); }
+@media (max-width:899px) {
+  .courtyard-distance { width:190%; left:-45%; height:68%; }
+  .courtyard-cast-shade { width:70%; height:55%; left:-28%; opacity:.09; }
+  .courtyard-ground-air { inset:25% 0 0; background:linear-gradient(180deg,transparent,#f4f9fceb 29%,#f4f9fc 64%); }
+}
 .depth-title { position:absolute; left:0; right:0; top:10%; text-align:center; font:700 14vw/.98 var(--serif); white-space:pre; letter-spacing:-.055em; pointer-events:none; perspective:950px; color:var(--ink); }
 .depth-title span { display:inline-block; transform-style:preserve-3d; }
 .depth-title-0 { font-size:19vw; top:7%; letter-spacing:.09em; }

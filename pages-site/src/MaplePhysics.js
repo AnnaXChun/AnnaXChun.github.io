@@ -145,11 +145,10 @@ export function createMaplePhysics({
   const textMaterial = new Material('extruded-glyph');
   const contactMaterial = new ContactMaterial(leafMaterial, textMaterial, {
     // cannon-es 0.20 GSSolver clamps its per-step lambda directly to maxForce.
-    // Scale this Coulomb impulse budget by dt; an unscaled .28 pins very light
-    // leaves until wind is many times gravity, instead of allowing a breeze
-    // to slide them. Four lobe contacts may share the visible support.
-    friction: .28 * MAPLE_PHYSICS_STEP,
-    restitution: .025,
+    // Scale this Coulomb impulse budget by dt. The dry, curled leaf can settle
+    // under a gentle breeze; gravity/contact still decide its resting pose.
+    friction: .55 * MAPLE_PHYSICS_STEP,
+    restitution: .01,
     contactEquationStiffness: 1e7,
     contactEquationRelaxation: 4,
     frictionEquationStiffness: 1e7,
@@ -179,6 +178,7 @@ export function createMaplePhysics({
   let paused = false;
   let disposed = false;
   let didPrime = !primeOnFirstText;
+  let supportDepth = -.45;
   let bounds = { halfWidth, halfHeight, portrait: Boolean(portrait) };
 
   function syncPoses() {
@@ -210,7 +210,10 @@ export function createMaplePhysics({
 
   function placeLeaf(leaf, state) {
     const body = leaf.body;
-    const p = state?.position ?? [(random() * 1.7 - .85) * bounds.halfWidth, bounds.halfHeight + .7 + random() * bounds.halfHeight * 1.6, (leaf.index % 3 === 0 ? .65 : .12) * (random() * 2 - 1)];
+    // Four leaves travel through the word's physical depth. The remaining
+    // leaves pass in front of it, maintaining a falling stream without a
+    // contact timer, collision-mask switch or an ever-growing pile.
+    const p = state?.position ?? [(random() * 1.7 - .85) * bounds.halfWidth, bounds.halfHeight + .7 + random() * bounds.halfHeight * 1.6, leaf.depth + (random() - .5) * .12];
     body.position.set(...vector(p, null, 'position'));
     body.velocity.set(...vector(state?.velocity, [.08 * (random() - .5), -.12 - random() * .16, 0], 'velocity'));
     body.angularVelocity.set(...vector(state?.angularVelocity, [(random() - .5) * .4, (random() - .5) * .4, (random() - .5) * .3], 'angularVelocity'));
@@ -234,9 +237,9 @@ export function createMaplePhysics({
   }
 
   for (let i = 0; i < count; i += 1) {
-    const body = new Body({ mass: .026, material: leafMaterial, allowSleep: false, linearDamping: .03, angularDamping: .23, collisionFilterGroup: LEAF_GROUP, collisionFilterMask: TEXT_GROUP });
+    const body = new Body({ mass: .026, material: leafMaterial, allowSleep: false, linearDamping: .06, angularDamping: .65, collisionFilterGroup: LEAF_GROUP, collisionFilterMask: TEXT_GROUP });
     const variation = random();
-    const leaf = { body, index: i, variation, phase: random() * Math.PI * 2, scale: 1 };
+    const leaf = { body, index: i, variation, phase: random() * Math.PI * 2, scale: 1, supportLane: i < 4, depth: i < 4 ? supportDepth : 2.1 + .6 * variation };
     leaves.push(leaf);
     poses.push({ position: [0, 0, 0], quaternion: [0, 0, 0, 1], velocity: [0, 0, 0], angularVelocity: [0, 0, 0], scale: 1, contact: false, supported: false, contactCount: 0 });
     setScale(leaf, initialStates?.[i]?.scale ?? (bounds.portrait ? .38 + .17 * variation : .7 + .4 * variation));
@@ -260,18 +263,18 @@ export function createMaplePhysics({
     if (didPrime || !boxes.length) return;
     didPrime = true;
     // Only the initial entrance is staged. Select actual exposed upper strokes
-    // at three separated X positions; later section changes never teleport a
+    // at four separated X positions; later section changes never teleport a
     // visible leaf onto a new word. All subsequent landings are emergent.
     const upper = [...boxes].sort((a, b) => (b.center[1] + b.halfExtents[1]) - (a.center[1] + a.halfExtents[1]));
     const topY = upper[0].center[1] + upper[0].halfExtents[1];
     const topBand = upper.filter((box) => box.center[1] + box.halfExtents[1] > topY - .55).sort((a, b) => a.center[0] - b.center[0]);
     const candidates = topBand.filter((box, index) => index === 0 || Math.abs(box.center[0] - topBand[index - 1].center[0]) > EPSILON);
-    const slots = [.18, .5, .82];
-    for (let i = 0; i < Math.min(3, count); i += 1) {
+    const slots = [.12, .37, .63, .88];
+    for (let i = 0; i < Math.min(4, count); i += 1) {
       const leaf = leaves[i];
       if (leaf.body.position.y < bounds.halfHeight + leaf.scale * .5) continue;
       const box = candidates[Math.round((candidates.length - 1) * slots[i])];
-      placeLeaf(leaf, { position: [box.center[0], box.center[1] + box.halfExtents[1] + .95 + i * .2, box.center[2] - .045], velocity: [0, -.12, 0], angularVelocity: [.02, -.025, (i - 1) * .025], quaternion: [0, 0, 0, 1] });
+      placeLeaf(leaf, { position: [box.center[0], box.center[1] + box.halfExtents[1] + .95 + i * .2, box.center[2]], velocity: [0, -.12, 0], angularVelocity: [.02, -.025, (i - 1.5) * .025], quaternion: [0, 0, 0, 1] });
     }
     syncPoses();
   }
@@ -287,6 +290,10 @@ export function createMaplePhysics({
       if (half.some((n) => n <= 0)) throw new RangeError('Box half extents must be positive');
     }
     clearText();
+    if (boxes.length) {
+      supportDepth = boxes.reduce((sum, box) => sum + box.center[2], 0) / boxes.length;
+      for (const leaf of leaves) if (leaf.supportLane) leaf.depth = supportDepth;
+    }
     for (const { center, halfExtents } of boxes) {
       const body = new Body({ mass: 0, type: Body.STATIC, material: textMaterial, position: new Vec3(...center), shape: new Box(new Vec3(...halfExtents)), collisionFilterGroup: TEXT_GROUP, collisionFilterMask: LEAF_GROUP });
       textBodies.push(body);
@@ -343,8 +350,6 @@ export function createMaplePhysics({
 
   function fixedStep() {
     const time = simulatedTime;
-    const cycle = Math.max(0, time - 3.5) % 10;
-    const gust = time < 3.5 ? 0 : Math.exp(-(((cycle - 3) / 1.1) ** 2));
     for (const leaf of leaves) {
       const body = leaf.body;
       capVector(body.velocity, MAPLE_PHYSICS_LIMITS.speed);
@@ -352,20 +357,22 @@ export function createMaplePhysics({
       body.quaternion.vmult(localNormal, scratchNormal);
       const speed = body.velocity.length();
       const faceDrag = speed > EPSILON ? Math.abs(scratchNormal.dot(body.velocity)) / speed : 0;
-      const drag = 1.1 + .8 * faceDrag;
+      const drag = 1.25 + .9 * faceDrag;
       const phase = leaf.phase;
-      const windX = windStrength * (.08 * Math.sin(time * .7 + phase) + 4.4 * gust * (.85 + .3 * leaf.variation));
-      // Horizontal wind alone traps thin leaves inside a Chinese counterform.
-      // A gust has real lift and depth: the broad face catches an updraft, then
-      // falls again as it passes. These forces act on every body, independent
-      // of contact age/state; neither the pose nor collision mask is changed.
-      const liftArea=.75+.25*Math.abs(scratchNormal.y);
-      const windY = windStrength * (.06 * Math.sin(time * 1.1 + phase) + 4.2 * gust * liftArea);
-      const windZ = windStrength * (.07 * Math.sin(time * .8 + phase) + 1.4 * gust * (.85+.3*leaf.variation));
-      scratchForce.set(body.mass * (windX - drag * body.velocity.x), body.mass * (windY - drag * body.velocity.y), body.mass * (windZ - .25 * body.position.z - 1.2 * body.velocity.z));
+      // A continuous mild breeze never periodically overpowers gravity. The
+      // front stream has a wider crosswind; word-depth leaves can physically
+      // lie on the stroke's top surface for a sustained, readable interval.
+      // Depth is a soft airflow lane, not a position constraint: all six DOFs
+      // remain in Cannon's solver and support disappears with the real boxes.
+      const breeze = leaf.supportLane ? .045 : .38;
+      const windX = windStrength * breeze * (Math.sin(time * .47 + phase) + .35 * Math.sin(time * 1.2 + phase));
+      const windY = windStrength * .045 * Math.sin(time * .63 + phase);
+      const windZ = windStrength * .025 * Math.sin(time * .71 + phase);
+      scratchForce.set(body.mass * (windX - drag * body.velocity.x), body.mass * (windY - drag * body.velocity.y), body.mass * (windZ - .65 * (body.position.z - leaf.depth) - 1.5 * body.velocity.z));
       body.applyForce(scratchForce);
       const torqueScale = body.mass * leaf.scale * leaf.scale * windStrength;
-      scratchTorque.set(torqueScale * (.009 * Math.sin(time * 1.4 + phase) + .09 * gust), torqueScale * (.008 * Math.cos(time * .9 + phase) + .035 * gust), torqueScale * (.008 * Math.sin(time * 1.2 + phase) - .05 * gust));
+      const flutter = leaf.supportLane ? .002 : .012;
+      scratchTorque.set(torqueScale * flutter * Math.sin(time * 1.4 + phase), torqueScale * flutter * Math.cos(time * .9 + phase), torqueScale * flutter * Math.sin(time * 1.2 + phase));
       body.applyTorque(scratchTorque);
     }
     world.step(MAPLE_PHYSICS_STEP);
@@ -431,6 +438,7 @@ export function createMaplePhysics({
       textBoxes: textBodies.length, leafShapes: disposed ? 0 : leaves.reduce((sum, leaf) => sum + leaf.body.shapes.length, 0),
       textRevision, contactCount, frictionEquations: world.frictionEquations.length, touchingLeaves: poses.filter((pose) => pose.contact).length,
       supportedLeaves: poses.filter((pose) => pose.supported).length, contactEvents, contactSteps,
+      supportLaneLeaves: leaves.filter((leaf) => leaf.supportLane).length,
       fixedSteps, simulatedTime, accumulator, droppedTime, recycled, paused, disposed,
     };
   }
