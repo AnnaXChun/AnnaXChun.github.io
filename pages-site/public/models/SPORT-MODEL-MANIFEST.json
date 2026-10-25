@@ -1,0 +1,122 @@
+{
+  "blender": "4.5.13 LTS",
+  "compressed": false,
+  "assets": [
+    {
+      "file": "kin-chen-racket.glb",
+      "sourceSha256": "b02f1cc56e85482f2e5e6ae676e04c019376c5e649e0867a200783c4a7f1db2f",
+      "sha256": "5747e8807634affe4c81753f0b3c16bcad9222e9172f177ab2b0414036a1e3ad",
+      "bytes": 7508144,
+      "meshObjects": 6,
+      "bakedTextures": [
+        {
+          "material": "tape",
+          "channel": "normal",
+          "size": 1024
+        },
+        {
+          "material": "net",
+          "channel": "baseColor",
+          "size": 512
+        },
+        {
+          "material": "net",
+          "channel": "normal",
+          "size": 1024
+        },
+        {
+          "material": "straps",
+          "channel": "baseColor",
+          "size": 512
+        },
+        {
+          "material": "straps",
+          "channel": "normal",
+          "size": 1024
+        }
+      ],
+      "sourceBoundsBlender": [
+        [
+          -0.09758679568767548,
+          -0.29818347096443176,
+          -0.0006101485341787338
+        ],
+        [
+          0.09758680313825607,
+          0.3662382662296295,
+          0.027310095727443695
+        ]
+      ],
+      "sourceLongAxis": 1,
+      "sourceLength": 0.6644217371940613,
+      "boundsGltf": [
+        [
+          -0.1468747854232788,
+          -0.5,
+          -0.021010898053646088
+        ],
+        [
+          0.1468747854232788,
+          0.5,
+          0.021010974422097206
+        ]
+      ],
+      "dimensionsGltf": [
+        0.2937495708465576,
+        1.0,
+        0.042021872475743294
+      ],
+      "axis": "+Y is racket head / shuttle cork; centered at origin; Y length 1",
+      "stringBedCenterGltf": [
+        0,
+        0.3105351962149143,
+        -0.011762466747313738
+      ],
+      "stringBedNormalGltf": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "file": "kyle1003-shuttlecock.glb",
+      "sourceSha256": "fa4daf959230ce76fee30f381843d780804e4f0777a25b500e42fa19753d9471",
+      "sha256": "6905c669068aeec724a8882db4d2ee7418414533777643a37ee2ac8337a4283f",
+      "bytes": 6256832,
+      "meshObjects": 27,
+      "bakedTextures": [],
+      "sourceBoundsBlender": [
+        [
+          -0.00037499991594813764,
+          -0.0003750000614672899,
+          4.207366146147251e-06
+        ],
+        [
+          0.0003750001487787813,
+          0.000375000003259629,
+          0.0010067539988085628
+        ]
+      ],
+      "sourceLongAxis": 2,
+      "sourceLength": 0.0010025466326624155,
+      "boundsGltf": [
+        [
+          -0.37404748797416687,
+          -0.5,
+          -0.3740474581718445
+        ],
+        [
+          0.3740474581718445,
+          0.4999999403953552,
+          0.3740474581718445
+        ]
+      ],
+      "dimensionsGltf": [
+        0.7480949461460114,
+        0.9999999403953552,
+        0.748094916343689
+      ],
+      "axis": "+Y is racket head / shuttle cork; centered at origin; Y length 1"
+    }
+  ]
+}

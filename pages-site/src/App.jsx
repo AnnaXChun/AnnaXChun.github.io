@@ -208,7 +208,7 @@ function Story() {
 function Contact(){
   const [copied,setCopied]=useState('');
   const copy=async()=>{try{await navigator.clipboard.writeText('mshuwhu@whu.edu.cn');setCopied('已复制');}catch{setCopied('请直接选择邮箱复制');}};
-  return <section id="contact" className="contact-end"><div className="contact-rule"><span>NEXT / TO BE CONTINUED</span><span>继续下一步</span><i>+</i></div><div className="contact-grid"><div><p>从一次连接开始。</p><h2>下一个想法，<br/>一起做出来。</h2></div><div className="contact-methods"><a href="mailto:mshuwhu@whu.edu.cn"><small>写封邮件</small><strong>mshuwhu@whu.edu.cn</strong><span>↗</span></a><a href="tel:+8618289423880"><small>打个电话</small><strong>+86 182 8942 3880</strong><span>↗</span></a><button onClick={copy}>复制邮箱 ⧉</button><span role="status">{copied}</span></div></div><footer><a href="#top">椿襄 <small>CHUNXIANG</small></a><span>工程、探索与生活，还在继续。</span><a href="#top">回到起点 ↑</a></footer></section>;
+  return <section id="contact" className="contact-end"><div className="contact-rule"><span>NEXT / TO BE CONTINUED</span><span>继续下一步</span><i>+</i></div><div className="contact-grid"><div><p>从一次连接开始。</p><h2>下一个想法，<br/>一起做出来。</h2></div><div className="contact-methods"><a href="mailto:mshuwhu@whu.edu.cn"><small>写封邮件</small><strong>mshuwhu@whu.edu.cn</strong><span>↗</span></a><a href="tel:+8618289423880"><small>打个电话</small><strong>+86 182 8942 3880</strong><span>↗</span></a><button onClick={copy}>复制邮箱 ⧉</button><span role="status">{copied}</span></div></div><footer><a href="#top">椿襄 <small>CHUNXIANG</small></a><span>工程、探索与生活，还在继续。</span><a href="/model-credits.html">素材署名</a><a href="#top">回到起点 ↑</a></footer></section>;
 }
 
 export default function App(){

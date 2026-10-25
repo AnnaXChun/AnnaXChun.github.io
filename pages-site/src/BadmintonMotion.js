@@ -25,7 +25,7 @@ export function badmintonShot(frame) {
   const racketPosition=sample(positions,t),racketRotation=sample(rotations,t);
   let shuttlePosition,shuttleQuaternion;
   if(t<=IMPACT) {
-    shuttlePosition=sample([[0,[.9,1.12,.65]],[.24,[.15,1.05,.5]],[IMPACT,centre.toArray()]],t);
+    shuttlePosition=sample([[0,[.9,.98,.65]],[.24,[.15,1.05,.5]],[IMPACT,centre.toArray()]],t);
     const arrival=new Quaternion().setFromEuler(new Euler(.3,-1.4+t*4,-.7));
     shuttleQuaternion=arrival.slerp(incoming,ease(t/IMPACT));
   } else {

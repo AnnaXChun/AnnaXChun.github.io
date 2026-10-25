@@ -1,30 +1,49 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {Box3,Vector3,Quaternion} from 'three';
-import {createBadmintonModel} from '../src/BadmintonModel.js';
+import {Vector3,Quaternion} from 'three';
+import {readFileSync} from 'node:fs';
 import {badmintonShot,LIFE_START,LIFE_END,IMPACT} from '../src/BadmintonMotion.js';
 
-test('macro model has finite curved feathers, woven strings, grommets and a helical grip',()=>{
-  const model=createBadmintonModel();
-  try {
-    let meshes=0,vertices=0;
-    for(const group of [model.shuttle,model.racket]) {
-      const size=new Box3().setFromObject(group).getSize(new Vector3());
-      assert.ok(size.x>1&&size.y>1&&size.z>.05);
-      group.traverse(node=>{if(node.isMesh){
-        meshes++;vertices+=node.geometry.attributes.position.count;
-        for(const name of ['position','normal'])assert.ok(Array.from(node.geometry.attributes[name].array).every(Number.isFinite));
-        if(node.material.map||node.material.bumpMap)assert.ok(node.geometry.attributes.uv&&Array.from(node.geometry.attributes.uv.array).every(Number.isFinite),'textured surfaces need finite UVs');
-      }});
+function readGlb(name) {
+  const buffer=readFileSync(new URL(`../public/models/${name}.glb`,import.meta.url));
+  assert.equal(buffer.toString('utf8',0,4),'glTF');assert.equal(buffer.readUInt32LE(8),buffer.length);
+  const jsonLength=buffer.readUInt32LE(12),gltf=JSON.parse(buffer.toString('utf8',20,20+jsonLength));
+  const binaryOffset=28+jsonLength;
+  function positions(accessorIndex){
+    const a=gltf.accessors[accessorIndex],v=gltf.bufferViews[a.bufferView];assert.equal(a.componentType,5126);assert.equal(a.type,'VEC3');
+    const stride=v.byteStride||12,start=binaryOffset+(v.byteOffset||0)+(a.byteOffset||0);
+    return Array.from({length:a.count},(_,i)=>[0,4,8].map(c=>buffer.readFloatLE(start+i*stride+c)));
+  }
+  return {gltf,positions,bytes:buffer.length};
+}
+
+test('imported models retain detailed finite geometry and self-contained material textures',()=>{
+  let triangles=0,totalBytes=0;
+  for(const name of ['kin-chen-racket','kyle1003-shuttlecock','libhand']) {
+    const {gltf,positions,bytes}=readGlb(name);totalBytes+=bytes;
+    assert.ok(!gltf.extensionsRequired?.includes('KHR_draco_mesh_compression'),'no remote decoder dependency');
+    for(const mesh of gltf.meshes)for(const primitive of mesh.primitives){
+      const values=positions(primitive.attributes.POSITION);
+      assert.ok(values.flat().every(Number.isFinite),`${name} has finite geometry`);
+      triangles+=(primitive.indices===undefined?values.length:gltf.accessors[primitive.indices].count)/3;
     }
-    const racketSize=new Box3().setFromObject(model.racket).getSize(new Vector3());
-    assert.ok(racketSize.y/racketSize.x>3&&racketSize.y/racketSize.x<3.8,'long-shaft badminton proportions');
-    assert.ok(meshes<=28&&vertices<450000,'macro details stay within the model budget');
-    for(const name of ['sixteen-curved-feathers','feather-barbs','feather-shafts','binding-knots','rounded-cork'])assert.ok(model.shuttle.getObjectByName(name),name);
-    for(const name of ['woven-string-bed','string-grommets','helical-grip-seam','aerodynamic-frame'])assert.ok(model.racket.getObjectByName(name),name);
-    const bed=model.racket.getObjectByName('woven-string-bed').geometry;
-    bed.computeBoundingBox();assert.ok(bed.boundingBox.max.z-bed.boundingBox.min.z>.01,'strings interweave in depth');
-  }finally{model.dispose();}
+    for(const image of gltf.images||[])assert.ok(image.bufferView!==undefined,'all model textures embedded');
+    if(name!=='kyle1003-shuttlecock')assert.ok(gltf.images?.length>0,'skin and grip retain authored texture detail');
+  }
+  assert.ok(triangles>400000&&triangles<550000,'preserve real feather branches and authored anatomy within budget');
+  assert.ok(totalBytes<19000000,'deferred assets stay under 19 MB');
+});
+
+test('authored racket string bed and shuttle cork align with the scroll contact contract',()=>{
+  const {gltf,positions}=readGlb('kin-chen-racket');
+  const net=gltf.meshes[gltf.nodes.find(n=>n.name==='KinChen_net')?.mesh];assert.ok(net,'authored string bed exists');
+  const all=net.primitives.flatMap(p=>positions(p.attributes.POSITION));
+  const min=[0,1,2].map(k=>Math.min(...all.map(v=>v[k]))),max=[0,1,2].map(k=>Math.max(...all.map(v=>v[k])));
+  const bed=new Vector3(...min.map((v,k)=>(v+max[k])/2)).multiplyScalar(4.64).add(new Vector3(0,-.310535196*4.64,.011762467*4.64));
+  assert.ok(bed.length()<.00001,'actual imported bed is at the motion pivot');
+  const shuttle=readGlb('kyle1003-shuttlecock');
+  const corkTip=Math.max(...shuttle.gltf.accessors.filter(a=>a.type==='VEC3'&&a.max).map(a=>a.max[1]));
+  assert.ok(Math.abs(-corkTip*1.46+.07+.66)<.00001,'actual cork tip matches the -0.66 contact point');
 });
 
 test('scroll score meets the string bed and is continuous, deterministic and reversible',()=>{

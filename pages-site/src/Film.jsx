@@ -67,7 +67,7 @@ function EvidenceCards({frame}) {
 export default function Film() {
   const frame=useCurrentFrame(),chapter=Math.max(0,STARTS.findLastIndex(f=>frame>=f));
   const warmLife=frame>800;
-  useEffect(()=>{if(warmLife)loadBadminton().catch(()=>{});},[warmLife]);
+  useEffect(()=>{if(warmLife)loadBadminton().then(m=>m.preloadSportAssets()).catch(()=>{});},[warmLife]);
   const life=range(frame,1015,1080),travel=range(frame,440,485)*(1-range(frame,535,585));
   return <AbsoluteFill className={`ink-film cinematic-film scene-${chapter}`}>
     <div className="life-tone" style={{opacity:life}}/>
