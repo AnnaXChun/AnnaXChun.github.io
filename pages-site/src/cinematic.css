@@ -164,21 +164,24 @@
   .depth-title-2 { top:40%; font-size:25vw; }
   .depth-title-3 { top:8%; font-size:19vw; }
   .depth-title-4 { top:8%; font-size:23vw; }
-  .cinematic-film .ink-landscape { left:18%; top:8%; width:90%; height:90%; }
+  .cinematic-film .ink-landscape { left:32%; top:8%; width:90%; height:90%; }
   .cinematic-film.scene-1 .ink-landscape { left:-10%; top:16%; width:90%; height:80%; }
   .cinematic-film.scene-2 .ink-landscape { left:0; top:0; width:100%; height:100%; }
   .cinematic-film .life-visual { height:100%; }
   .shot-copy { width:40%; top:35%; left:7%; }
   .shot-copy-1,.shot-copy-2,.shot-copy-4 { left:auto; right:5%; width:34%; top:32%; }
-  .shot-copy-3 { top:60%; left:52%; width:42%; }
+  .shot-copy-1 { top:43%; width:35%; }
+  .shot-copy-1 .shot-description,.shot-copy-2 .shot-description { line-height:1.5; }
+  .shot-copy-2 { top:12%; width:35%; padding:14px; background:#f4f9fcf7; box-shadow:0 0 24px 16px #f4f9fcd9; }
+  .shot-copy-3 { top:62%; left:52%; width:43%; }
   .shot-copy-3 .shot-description { display:none; }
   .shot-copy-4 .shot-title { font-size:26px; }
   .shot-copy-4 .shot-description { font-size:16px; line-height:1.5; }
   .shot-copy-0 .shot-title { font-size:20px; }
   .shot-copy-0 .shot-description { font-size:16px; line-height:1.5; }
-  .cinema-evidence-primary { left:8%; top:25%; width:35%; }
-  .cinema-evidence-secondary { left:57%; top:16%; width:19%; }
-  .cinema-evidence .evidence-mount img { max-height:42svh; }
+  .cinema-evidence-primary { left:8%; top:23%; width:33%; }
+  .cinema-evidence-secondary { left:57%; top:14%; width:18%; }
+  .cinema-evidence .evidence-mount img { max-height:32svh; }
   .scroll-cue { left:7%; top:70%; }
 }
 /* Full-stage canvas: camera viewports reproduce the architectural composition;

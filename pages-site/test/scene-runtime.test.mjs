@@ -4,7 +4,7 @@ import {renderPixelRatio,minnanViewport,createSceneRuntime} from '../src/SceneRu
 import {autumnRetreat,fallingLeafVisibility} from '../src/MinnanAtmosphere.js';
 
 test('render targets have a pixel budget while the physical doorway remains continuous',()=>{
-  for(const [w,h] of [[2048,1040],[1440,960],[390,844],[3840,2160]]){
+  for(const [w,h] of [[2048,1040],[1440,960],[735,387],[390,844],[3840,2160]]){
     const dpr=renderPixelRatio(w,h,2);assert.ok(w*h*dpr*dpr<=2_800_001);
     for(let frame=440;frame<=585;frame++){
       const view=minnanViewport(frame,w,h);assert.ok(Object.values(view).every(Number.isFinite));

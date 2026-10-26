@@ -8,7 +8,9 @@ export function minnanViewport(frame,width,height) {
   let box=chapter===1?[-14*(1-travel),17*(1-travel),88+12*travel,83+17*travel]:chapter===2?[-4,-3,108,105]:[23*(1-travel),9*(1-travel),81+19*travel,91+9*travel];
   if(width<900){
     box=chapter===1?[-25,13,140,44]:chapter===2?[-15,0,130,height<=650?47:51]:[-12,12,124,44];
-    if(width>=600&&height<=520)box=chapter===1?[-10,16,90,80]:chapter===2?[0,0,100,100]:[18,8,90,90];
+    // Short landscape includes a desktop browser at 200% zoom. Preserve the
+    // model's size while leaving the hero paragraph a clear reading column.
+    if(width>=600&&height<=520)box=chapter===1?[-10,16,90,80]:chapter===2?[0,0,100,100]:[32,8,90,90];
   }
   return {x:box[0]*width/100,y:(100-box[1]-box[3])*height/100,width:box[2]*width/100,height:box[3]*height/100};
 }
