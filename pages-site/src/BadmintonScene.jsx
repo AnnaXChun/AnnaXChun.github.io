@@ -8,9 +8,9 @@ import {badmintonShot} from './BadmintonMotion';
 import {createStudioEnvironment,createStudioShadows} from './StudioLighting';
 import {createProductLights} from './ProductLights';
 
-export default function BadmintonScene({frame=1050,still=false,active=true}) {
-  const host=useRef(null),runtime=useRef(null),current=useRef(frame),[failed,setFailed]=useState(false);
-  current.current=frame;
+export default function BadmintonScene({frame=1050,still=false,active=true,motion=null}) {
+  const host=useRef(null),runtime=useRef(null),current=useRef(motion?.frame??frame),[failed,setFailed]=useState(false);
+  if(!motion)current.current=frame;
   useLayoutEffect(()=>{
     const container=host.current;
     let renderer,model,loop,environment,lights,shadows,finish,halo,alive=true;
@@ -43,10 +43,16 @@ export default function BadmintonScene({frame=1050,still=false,active=true}) {
         camera.updateProjectionMatrix();audit.draw(()=>finish.render(scene,camera));
       };
       loop=createSceneRuntime({host:container,renderer,render:draw,active,onResize(w,h){audit.resize();finish.resize(w,h);}});runtime.current=loop;
+      // Three's parallel shader compilation runs after imported materials,
+      // lighting and environment exist. Warm one hidden frame before entry.
+      model.ready.then(()=>{if(alive)return renderer.compileAsync(scene,camera);}).then(()=>{if(alive)loop.prewarm();}).catch(error=>{if(alive)console.warn('Sport shader warmup:',error.message);});
     }catch(error){setFailed(true);console.warn('Badminton scene unavailable:',error.message);}
     return()=>{alive=false;loop?.dispose();runtime.current=null;model?.dispose();finish?.dispose();halo?.dispose();shadows?.dispose();lights?.dispose();environment?.dispose();renderer?.dispose();renderer?.forceContextLoss();renderer?.domElement.remove();};
   },[still]);
-  useLayoutEffect(()=>{runtime.current?.setActive(active);runtime.current?.request();},[frame,active]);
+  useLayoutEffect(()=>{
+    if(motion)return motion.subscribe(f=>{current.current=f;runtime.current?.setActive(f>975);runtime.current?.request();});
+    runtime.current?.setActive(active);runtime.current?.request();
+  },[motion,frame,active]);
   return <div className="badminton-scene" ref={host}>{failed&&<div className="badminton-fallback">羽毛球 · 预判与节奏</div>}</div>;
 }
 

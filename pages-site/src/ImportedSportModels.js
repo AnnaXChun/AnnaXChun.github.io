@@ -26,8 +26,8 @@ export function createImportedSportModels(onReady,onError) {
     configure(gltf.scene);gltf.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;for(const m of Array.isArray(o.material)?o.material:[o.material]){if(m.map)m.map.anisotropy=8;}}});target.add(gltf.scene);onReady();
   }).catch(onError);
   // Converted source files are normalized by the reproducible Blender script.
-  load('kin-chen-racket',racket,root=>{root.scale.setScalar(4.64);root.position.set(0,-.310535196*4.64,.011762467*4.64);});
-  load('kyle1003-shuttlecock',shuttle,root=>{
+  const racketReady=load('kin-chen-racket',racket,root=>{root.scale.setScalar(4.64);root.position.set(0,-.310535196*4.64,.011762467*4.64);});
+  const shuttleReady=load('kyle1003-shuttlecock',shuttle,root=>{
     root.rotation.z=Math.PI;root.scale.setScalar(1.46);root.position.y=.07;
     root.traverse(o=>{if(!o.isMesh)return;const m=o.material;m.envMapIntensity=.35;
       if(m.name==='DefaultSG'){m.color.set(0xbdcbd3);m.roughness=.84;}
@@ -45,7 +45,7 @@ export function createImportedSportModels(onReady,onError) {
       }
     });
   });
-  load('libhand',hand,root=>{
+  const handReady=load('libhand',hand,root=>{
     root.rotation.z=Math.PI;
     const box=new THREE.Box3().setFromObject(root),center=box.getCenter(new THREE.Vector3());
     root.position.set(-center.x,.9-box.max.y,-center.z);
@@ -58,5 +58,5 @@ export function createImportedSportModels(onReady,onError) {
       };
     }});
   });
-  return {racket,shuttle,hand,fit(aspect){handFade.bottom.value=aspect<1?.18:.035;handFade.top.value=aspect<1?.34:.18;},dispose(){if(disposed)return;disposed=true;residentScenes--;roots.forEach(disposeTree);}};
+  return {racket,shuttle,hand,ready:Promise.all([racketReady,shuttleReady,handReady]),fit(aspect){handFade.bottom.value=aspect<1?.18:.035;handFade.top.value=aspect<1?.34:.18;},dispose(){if(disposed)return;disposed=true;residentScenes--;roots.forEach(disposeTree);}};
 }

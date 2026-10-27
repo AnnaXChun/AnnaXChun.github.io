@@ -1,0 +1,12 @@
+import {cp,mkdir,readFile,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('../../',import.meta.url));
+const label=process.argv[2];
+if(!/^[a-z0-9-]+$/.test(label||''))throw new Error('Pass a build label, e.g. baseline');
+const destination=`${root}outputs/performance/${label}`;
+await mkdir(destination,{recursive:true});
+await cp(`${root}dist-pages`,destination,{recursive:true});
+await cp(new URL('./performance-probe.js',import.meta.url),`${destination}/performance-probe.js`);
+const html=await readFile(`${destination}/index.html`,'utf8');
+await writeFile(`${destination}/index.html`,html.replace('<html','<html data-benchmark-build="'+label+'"').replace('</body>','<script type="module" src="./performance-probe.js"></script></body>'));
+console.log(destination);

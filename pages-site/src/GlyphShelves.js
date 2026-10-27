@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
+import {glyphSideGeometry} from './GlyphGeometry.js';
 
 // An off-axis photographic lens sees the top of each stroke, while every point
 // on its z=0 front retains the exact DOM projection. No tilted/rasterized text.
@@ -11,48 +11,66 @@ export function frameAutumnCamera(camera,aspect){
   camera.updateMatrixWorld();
 }
 
-export function glyphSideGeometry({ink,unit,left,top},depth=.9){
-  const vertices=[];
-  const edge=(ax,ay,bx,by)=>{
-    const a=[left+ax*unit,top-ay*unit,0],b=[left+bx*unit,top-by*unit,0];
-    vertices.push(...a,b[0],b[1],-depth,...b,...a,a[0],a[1],-depth,b[0],b[1],-depth);
-  };
-  // Interpolate the anti-aliased outline instead of extruding pixel steps.
-  // Counterforms become inner walls, with no full-word platform or stair teeth.
-  const pairs=[[],[[3,0]],[[0,1]],[[3,1]],[[1,2]],[[3,0],[1,2]],[[0,2]],[[3,2]],[[2,3]],[[2,0]],[[0,1],[2,3]],[[2,1]],[[1,3]],[[1,0]],[[0,3]],[]];
-  for(let y=0;y<ink.height-1;y++)for(let x=0;x<ink.width-1;x++){
-    const values=[ink.alpha[y*ink.width+x],ink.alpha[y*ink.width+x+1],ink.alpha[(y+1)*ink.width+x+1],ink.alpha[(y+1)*ink.width+x]];
-    const code=values.reduce((n,v,i)=>n+(v>120?1<<i:0),0);if(!pairs[code].length)continue;
-    const corners=[[x+.5,y+.5],[x+1.5,y+.5],[x+1.5,y+1.5],[x+.5,y+1.5]];
-    const point=e=>{const j=(e+1)%4,t=(120-values[e])/(values[j]-values[e]);return [corners[e][0]+(corners[j][0]-corners[e][0])*t,corners[e][1]+(corners[j][1]-corners[e][1])*t];};
-    for(const [a,b] of pairs[code])edge(...point(a),...point(b));
-  }
-  const geometry=new THREE.BufferGeometry();
-  geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
-  const continuous=mergeVertices(geometry,1e-5);geometry.dispose();continuous.computeVertexNormals();
-  return continuous;
-}
+// Geometry is built in a worker once per font/glyph, then reused across all
+// chapter visits. Positions/scales stay in the scene graph, not baked buffers.
+export {glyphSideGeometry};
 
-export function createGlyphShelves(){
+export function createGlyphShelves(onReady=()=>{}){
   const group=new THREE.Group();group.name='solid letter strokes / resting surfaces';
   const material=new THREE.MeshStandardMaterial({color:0x7c919f,roughness:.74,metalness:.05,side:THREE.DoubleSide});
-  let resources=[];
-  const clear=()=>{group.clear();resources.forEach(r=>r.dispose());resources=[];};
+  const plane=new THREE.PlaneGeometry(1,1),templates=new Map();
+  let worker;
+  try{worker=new Worker(new URL('./GlyphGeometry.worker.js',import.meta.url),{type:'module'});}catch{worker=null;}
+  let parts=[],disposed=false,fallbackTimer=0;
+  const buildFallback=()=>{
+    if(disposed)return;
+    const template=[...templates.values()].find(t=>!t.geometry);
+    if(!template)return;
+    template.geometry=glyphSideGeometry({ink:template.ink,unit:1,left:0,top:0});show();onReady();
+    fallbackTimer=setTimeout(buildFallback,32);
+  };
+  const scheduleFallback=()=>{clearTimeout(fallbackTimer);fallbackTimer=setTimeout(buildFallback,32);};
+  function show(){
+    group.clear();
+    for(const part of parts){
+      const {ink,unit,left,top}=part,template=templates.get(ink.key);
+      if(!template?.geometry)continue;
+      const mesh=new THREE.Mesh(template.geometry,material);
+      mesh.position.set(left,top,0);mesh.scale.set(unit,unit,1);
+      mesh.layers.set(1);mesh.receiveShadow=true;group.add(mesh);
+      const front=new THREE.Mesh(plane,template.depthMaterial);
+      front.scale.set(ink.width*unit,ink.height*unit,1);
+      front.position.set(left+ink.width*unit/2,top-ink.height*unit/2,.002);
+      front.renderOrder=-10;front.layers.enable(1);group.add(front);
+    }
+  }
+  const disposeTemplate=t=>{t.geometry?.dispose();t.texture.dispose();t.depthMaterial.dispose();};
+  if(worker)worker.onmessage=({data})=>{
+    if(disposed)return;
+    const template=templates.get(data.key);if(!template||template.geometry)return;
+    const geometry=new THREE.BufferGeometry();
+    geometry.setAttribute('position',new THREE.BufferAttribute(data.position,3));
+    geometry.setAttribute('normal',new THREE.BufferAttribute(data.normal,3));
+    geometry.setIndex(new THREE.BufferAttribute(data.index,1));
+    template.geometry=geometry;show();onReady();
+  };
+  if(worker)worker.onerror=()=>{worker.terminate();worker=null;scheduleFallback();};
   return {group,
     update(surface){
-      clear();
-      for(const part of surface?.parts??[]){
-        const {ink,unit,left,top}=part;
-        const sides=glyphSideGeometry(part),mesh=new THREE.Mesh(sides,material);
-        mesh.layers.set(1);mesh.receiveShadow=true;group.add(mesh);resources.push(sides);
+      parts=surface?.parts??[];
+      const activeKeys=new Set(parts.map(p=>p.ink.key));
+      for(const {ink} of parts){
+        if(templates.has(ink.key))continue;
         const texture=new THREE.CanvasTexture(ink.canvas);texture.minFilter=THREE.LinearFilter;texture.generateMipmaps=false;
         const depthMaterial=new THREE.MeshBasicMaterial({map:texture,alphaTest:.5,colorWrite:false,depthWrite:true});
-        const frontGeometry=new THREE.PlaneGeometry(ink.width*unit,ink.height*unit);
-        const front=new THREE.Mesh(frontGeometry,depthMaterial);
-        front.position.set(left+ink.width*unit/2,top-ink.height*unit/2,.002);front.renderOrder=-10;front.layers.enable(1);
-        group.add(front);resources.push(texture,depthMaterial,frontGeometry);
+        templates.set(ink.key,{ink,texture,depthMaterial,geometry:null});
+        if(worker){const alpha=ink.alpha.slice();worker.postMessage({key:ink.key,alpha,width:ink.width,height:ink.height},[alpha.buffer]);}
+        else scheduleFallback();
       }
+      // Fixed cache bound, including font changes. Never evict a visible glyph.
+      for(const [key,template] of templates){if(templates.size<=32)break;if(!activeKeys.has(key)){disposeTemplate(template);templates.delete(key);}}
+      show();
     },
-    dispose(){clear();material.dispose();},
+    dispose(){disposed=true;clearTimeout(fallbackTimer);worker?.terminate();group.clear();parts=[];templates.forEach(disposeTemplate);templates.clear();plane.dispose();material.dispose();},
   };
 }

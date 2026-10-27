@@ -1,5 +1,5 @@
-export function renderPixelRatio(width,height,dpr=1) {
-  return Math.min(dpr,1.5,Math.sqrt(2_800_000/Math.max(1,width*height)));
+export function renderPixelRatio(width,height,dpr=1,pixelBudget=2_800_000) {
+  return Math.min(dpr,1.5,Math.sqrt(pixelBudget/Math.max(1,width*height)));
 }
 
 export function minnanViewport(frame,width,height) {
@@ -17,17 +17,20 @@ export function minnanViewport(frame,width,height) {
 
 // One render request per browser frame. CSS camera framing may resize the host,
 // but only a real viewport resize reallocates the drawing buffer.
-export function createSceneRuntime({host,renderer,render,onResize,active=true,idleFps=60}) {
+export function createSceneRuntime({host,renderer,render,onResize,active=true,idleFps=60,maxFps=Infinity,pixelBudget=2_800_000}) {
   const viewport=host.closest('.film-viewport')||host;
   let width=1,height=1,viewWidth=1,viewHeight=1,raf=0,intersecting=true,disposed=false;
-  let bufferKey='',awake=false,requested=false,lastDraw=-Infinity,lastTick=null,elapsed=0;
-  const runnable=()=>active&&intersecting&&!document.hidden&&!disposed;
+  let bufferKey='',awake=false,requested=false,warming=false,lastDraw=-Infinity,nextDraw=-Infinity,cadence=0,lastTick=null,elapsed=0;
+  const runnable=()=>(active||warming)&&intersecting&&!document.hidden&&!disposed;
   const allocate=()=>{
-    const enabled=runnable(),key=enabled?`${viewWidth}:${viewHeight}`:'sleep';
+    // Keep the bounded targets warm across adjacent chapters. Reallocating
+    // multisampled targets at each crossing stalls the GPU on reverse scroll.
+    // Leaving the viewport or hiding the tab still releases their storage.
+    const enabled=intersecting&&!document.hidden&&(active||warming||awake),key=enabled?`${viewWidth}:${viewHeight}`:'sleep';
     if(key===bufferKey)return;
-    bufferKey=key;awake=enabled;host.dataset.renderState=enabled?'active':'suspended';
+    bufferKey=key;awake=enabled;
     const w=enabled?viewWidth:1,h=enabled?viewHeight:1;
-    renderer.setPixelRatio(enabled?renderPixelRatio(w,h,devicePixelRatio||1):1);
+    renderer.setPixelRatio(enabled?renderPixelRatio(w,h,devicePixelRatio||1,pixelBudget):1);
     renderer.setSize(w,h,false);onResize?.(w,h,enabled);
   };
   const schedule=()=>{if(runnable()&&!raf)raf=requestAnimationFrame(flush);};
@@ -35,14 +38,22 @@ export function createSceneRuntime({host,renderer,render,onResize,active=true,id
     raf=0;if(!runnable())return;
     // Ambient wind has a modest cadence; a scroll/pointer update always gets
     // the next frame. Hidden time never accumulates into a large resumed jump.
-    if(!requested&&now-lastDraw<1000/idleFps-.5){schedule();return;}
+    const interval=1000/(requested?maxFps:Math.min(idleFps,maxFps));
+    if(interval!==cadence){cadence=interval;nextDraw=lastDraw+interval;}
+    if(now<nextDraw-.5){schedule();return;}
+    // Preserve the fractional deadline on 75 / 90 / 144 Hz displays. Resetting
+    // it to `now` after every draw would accidentally halve a 90 Hz screen.
+    nextDraw=interval>0&&Number.isFinite(nextDraw)?nextDraw+(Math.max(1,Math.floor((now-nextDraw)/interval)+1))*interval:now+interval;
     requested=false;allocate();const delta=lastTick===null?0:Math.max(0,Math.min(.1,(now-lastTick)/1000));
     lastTick=now;lastDraw=now;elapsed+=delta;
-    if(render(width,height,{time:elapsed,delta}))schedule();else lastTick=null;
+    const continuous=render(width,height,{time:elapsed,delta});
+    if(warming){warming=false;host.dataset.renderState=active?'active':'suspended';}
+    if(continuous)schedule();else lastTick=null;
   };
   const request=()=>{if(runnable()){requested=true;schedule();}};
   const visibility=()=>{
-    if(!runnable()){cancelAnimationFrame(raf);raf=0;lastTick=null;allocate();}
+    host.dataset.renderState=runnable()?'active':'suspended';
+    if(!runnable()){cancelAnimationFrame(raf);raf=0;lastTick=null;nextDraw=-Infinity;allocate();}
     else {bufferKey=awake?bufferKey:'';request();}
   };
   const sizes=new ResizeObserver(entries=>{
@@ -55,5 +66,5 @@ export function createSceneRuntime({host,renderer,render,onResize,active=true,id
   sizes.observe(host);if(viewport!==host)sizes.observe(viewport);
   const intersection=new IntersectionObserver(entries=>{intersecting=entries[0].isIntersecting;visibility();});
   intersection.observe(host);document.addEventListener('visibilitychange',visibility);
-  return {request,get active(){return runnable();},setActive(value){if(active!==value){active=value;visibility();}},dispose(){disposed=true;cancelAnimationFrame(raf);sizes.disconnect();intersection.disconnect();document.removeEventListener('visibilitychange',visibility);}};
+  return {request,prewarm(){if(!awake){warming=true;request();}},get active(){return runnable();},setActive(value){if(active!==value){active=value;visibility();}},dispose(){disposed=true;cancelAnimationFrame(raf);sizes.disconnect();intersection.disconnect();document.removeEventListener('visibilitychange',visibility);}};
 }

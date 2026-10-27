@@ -1,10 +1,45 @@
 # 个人网站调研与独立验收
 
-日期：2026-10-26。评审者：研究与验收 subagent。**当前状态：长期承托新标准第 3 轮 PASS。** 桌面树冠遮挡和实际200%短横屏排版缺陷均已修复并在Chrome复验。 用户明确否定上一轮“阵风清空”的方向；当前要求叶片像放在桌面上一样长期被文字托住。旧 PASS 仅保留为历史，不能代表本轮通过。
+日期：2026-10-27—28。评审者：研究与验收 subagent。**当前状态：滚动运行时迁移第 3 轮视觉与交互 PASS。** 本轮已发现并修复整串 transform 未生效、成果后半段题注重叠两项交付阻断；旧 PASS 不自动覆盖新运行时。最终性能 A/B 与线上发布由主代理在本次交还 Chrome 后执行，本文不把候选版旧测量或 CPU 提交时间当作最终 GPU FPS。
 
-**已验证范围：** 实际 Chrome 默认1470×775下同一批叶片31.7秒持续安放、空中叶持续经过；1440穿门/实习/成果/体育；390与320五章可读；体育退场、反向及资料区双场景暂停。**续验已完成：** 解锁后默认桌面/1440姓名与OPD+RL树冠避让、实际200%五章及成果61%/生活81%后续段、DevTools reduce静态路径。未把模型单测或CPU样本当作这些未测项目通过的依据。
+## 当前轮：GSAP 滚动运行时与性能改造（2026-10-27—28）
 
-## 当前轮：真实文字顶面与长期安放（2026-10-26）
+### 独立代码审查 — P2 已修复
+
+- 第一方方案与许可、Remotion host 取舍见 [open-source-motion-performance.md](./open-source-motion-performance.md)。审查 App / Film / StoryMotion / SceneRuntime / GlyphShelves 的响应式 refresh、正反滚动、清理和 worker 有界缓存。
+- 发现原 `maxFps` 调度丢弃 deadline 余数：60 Hz 上限在 75 / 90 / 144 Hz 时间戳下只提交约37.6 /45 /48次每秒。主代理改为保留节拍余数，并新增60 /75 /90 /120 /144 Hz五秒回归，各299–301次绘制；完整28项测试、生产构建通过。该问题已关闭；假时钟测试不代表浏览器呈现帧率。
+
+### 第 1 轮 — FAIL（整串 transform 未写入）
+
+- Chrome 独立标签1859663782，实际CSS1470×775 /DPR2，开发页 `4173/?renderAudit=1`。成果导航52%处，副证书题注与正文标题相撞；DOM确认卡片与逐字标题的 authored transform 为空、computed transform 为 `none`。GSAP quickSetter对这里的完整字符串没有完成预期写入，旋转、层次和透视离场均丢失。证据：`perf-r1-desktop-awards-settled.png`。
+- 主代理改为缓存元素引用后直接赋 `node.style.transform`，GSAP继续管理进度和opacity。复验52%可见副证书约translateY(-8.06%)/rotate(5.69deg)，63%逐字退出约332px Z位移，恢复前后景透视。证据：`perf-r2-awards.png`、`perf-r2-title-perspective.png`。
+- 本轮实际同叶安放采样：`perf-r1-dwell-1.png`→`perf-r1-dwell-2.png`，墙钟94.349秒，模拟35.40→129.73秒。姓名上同4片叶子保持平躺位置，其他前景叶经过；主建筑backgroundDraws始终2。数据 `perf-r1-dwell.json`。这验证迁移后的持续物理和背景缓存；后续transform修复没有修改稳定0%姓名位姿或物理。
+
+### 第 2 轮 — FAIL（成果运动包络仍相撞）
+
+- 原导航52%重叠消除，但真实向下滚到60%并稳定后，副证书下移的“数字孪生 · 三维重建”与上移正文“与伙伴，一起探索。”再次重叠。不能只验导航落点。证据：`perf-r2-awards-60.png`。
+- 主代理为整个运动范围留位：桌面成果正文top69%→76%，600–899短横屏62%→68%，手机纵屏规则不变。未缩小证书。
+
+### 第 3 轮 — PASS（实际 Chrome 回归）
+
+- 默认1470×775 /DPR2：五章前后切换、15%研究、约27%真实穿门、36%实习、成果52/60/64%均实看。研究标题OPD+RL和SOTA正文可读，常驻树冠不遮R/L。成果修后副题注与正文、正文与个人详录分开；64%可见透视退场和庭院返回，没有丢失整串transform。
+- 体育68%入口→80%接拍→87%近景，再向上回68%：手部释放、球拍/羽球相对姿态和滚动反向恢复正常；羽枝、线床、拍框亮边与局部玻璃弧光保留。此处没有以模型面数代替画面验收。证据：`perf-r2-life-68.png`、`perf-r2-life-macro.png`。
+- 390×844与320×568均以Chrome viewport模拟，DOM核实实际尺寸/DPR1；五章稳定落点均实看。身份、研究重点、实习正文、证书题注、生活正文和导航未出现新重叠，320正文仍为正常可读粗体；章节切换后建筑/字面能按新尺寸恢复。
+- 真实Chrome原生菜单快捷键200%，工具栏明确200%；DOM735×387 /DPR4。五章均实看，另滚至成果61/63%检查副题注与正文的间距。首页正文不进入建筑，研究正文与巨字分开，实习冷白阅读底完整，生活手部让出正文。证据：`perf-r3-200-{hero,research,internship,awards-52,awards-60,life}.png`；文件名awards-60的实际进度是61%。
+- 完全进入资料区后两次间隔14.58秒读取：庭院draws1225 /fixedSteps2453、体育draws1均不变；两场景suspended且canvas1×1。`perf-r3-offscreen.json`。正常休眠保留最后一次physics快照，旧paused=false不代表时钟仍运行。相邻章节暂停允许保留有界targets，本轮不以其非1×1判失败。
+- DevTools实际设置reduce，matchMedia=true，出现静态简介，仅一庭院canvas；入口span/h1/h2/p computed字重均700。间隔52.146秒draws/backgroundDraws均3、fixedSteps0、paused=true保持不变。`perf-r3-reduced.png`、`perf-r3-reduced.json`。随后取消模拟，关闭DevTools，恢复100%和默认视口。
+
+**结论与边界：PASS。** 本轮发现的视觉阻断均修复，真实3D穿门、粗体阅读、稳定字面承托、持续前景风、滚动体育与静态模式保留。没有新做1440×960独立视口、真实触摸设备、低端GPU、低带宽或长时内存泄漏测试；本次暂停实测是完整离屏路径，未单独重复后台标签计数。最终生产页首页已确认hash `index-CgJ1lyl9.js`；主代理将在完整transform已恢复的最终build上重跑同窗A/B，不沿用修复前候选数值。
+
+**最终证据与交接：** Chrome恢复CSS1470×775 /DPR2、100%、reduce=false、DevTools关闭；普通生产预览 `http://127.0.0.1:4180/` 已markDeliverable。2026-10-28明确停止Chrome操作并交回主代理。
+
+- `outputs/visual-review/perf-final-desktop.png`：干净生产首页，可见字面平躺叶及3D庭院。
+- `outputs/visual-review/perf-r2-390-hero.png`、`perf-r2-390-research.png`、`perf-r2-390-life.png`：手机实际画面。
+- `outputs/visual-review/perf-r3-awards-60.png`、`perf-r3-awards-63.png`：修后成果；后者实际进度64%。
+- `outputs/visual-review/perf-r2-life-macro.png`：体育材质近景。
+- 可复用经验：性能改造必须同时核验 authored transform 实际写入，不能只看JS循环更快；动画排版按整个运动范围验收，导航落点通过不足以代表章节通过。
+
+## 历史：真实文字顶面与长期安放（2026-10-26）
 
 ### 第 1 轮 — FAIL（桌面树冠遮挡研究标题）
 

@@ -1,6 +1,9 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Player} from '@remotion/player';
-import Film, {CHAPTERS, FPS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {gsap} from 'gsap';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import Film, {CHAPTERS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
+import {createStoryMotion} from './StoryMotion';
+gsap.registerPlugin(ScrollTrigger);
 import Dossier from './Dossier';
 import {profile} from './data';
 import MinnanScene from './MinnanScene';
@@ -11,196 +14,60 @@ const getChapter = frame => Math.max(0,STARTS.findLastIndex(start=>frame>=start)
 const contentHash = () => Boolean(window.location.hash && !['#top','#story'].includes(window.location.hash));
 
 function Story() {
-  const [initial] = useState(()=>({intro:!contentHash() && window.scrollY<8}));
-  const initialFrame=initial.intro?0:INTRO_END_FRAME;
-  const story=useRef(null),stage=useRef(null),viewport=useRef(null),player=useRef(null);
-  const progress=useRef(null),progressTrack=useRef(null);
-  const driverRef=useRef(initial.intro?'intro':'scroll'),isPlaying=useRef(false);
-  const pendingIntroRef=useRef(initial.intro);
-  const lastFrame=useRef(initialFrame),currentChapter=useRef(0);
-  const [driver,setDriverState]=useState(driverRef.current);
-  const [playing,setPlaying]=useState(false),[chapter,setChapter]=useState(0);
-  const [size,setSize]=useState(()=>{
-    return {width:window.innerWidth,height:window.innerHeight};
-  });
-
-  const setDriver=useCallback(value=>{driverRef.current=value;setDriverState(value);},[]);
-  const pause=useCallback(()=>{
-    isPlaying.current=false;
-    player.current?.pause();
-    setPlaying(false);
-  },[]);
-  const scrollTopForFrame=useCallback(frame=>{
-    const element=story.current;
-    if(!element) return window.scrollY;
-    const top=element.getBoundingClientRect().top+window.scrollY;
-    const height=stage.current?.getBoundingClientRect().height || window.innerHeight;
-    const travel=Math.max(1,element.offsetHeight-height);
-    const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1);
-    return top+travel*fraction;
-  },[]);
-  const scrollToFrame=useCallback((frame,behavior='instant')=>{
-    const top=scrollTopForFrame(frame);
-    window.scrollTo({top,behavior});
-  },[scrollTopForFrame]);
-  const finishIntro=useCallback(()=>{
-    pendingIntroRef.current=false;
-    pause();
-    setDriver('scroll');
-    lastFrame.current=INTRO_END_FRAME;
-    player.current?.seekTo(INTRO_END_FRAME);
-  },[pause,setDriver]);
-  const takeOver=useCallback(()=>{
-    pendingIntroRef.current=false;
-    if(driverRef.current==='scroll') return;
-    if(driverRef.current==='intro'){finishIntro();return;}
-    pause();
-    setDriver('scroll');
-    if(lastFrame.current<INTRO_END_FRAME){
-      lastFrame.current=INTRO_END_FRAME;
-      player.current?.seekTo(INTRO_END_FRAME);
-    }
-  },[finishIntro,pause,setDriver]);
-  const leaveStory=useCallback(()=>{pendingIntroRef.current=false;pause();setDriver('scroll');},[pause,setDriver]);
-
-  useEffect(()=>{
-    const element=viewport.current;
-    if(!element) return;
-    const observer=new ResizeObserver(entries=>{
-      const rect=entries[0].contentRect;
-      if(rect.width<=0 || rect.height<=0) return;
-      // Typography uses real CSS pixels, independent of the illustration resolution.
-      const width=Math.max(1,Math.round(rect.width));
-      const height=Math.max(1,Math.round(rect.height));
-      setSize(previous=>previous.width===width&&previous.height===height?previous:{width,height});
-    });
-    observer.observe(element);
-    return ()=>observer.disconnect();
-  },[]);
-
-  useEffect(()=>{
-    const p=player.current;
-    if(!p) return;
-    let scrollRaf=0,startRaf=0;
+  const story=useRef(null),stage=useRef(null),progress=useRef(null),progressTrack=useRef(null),controls=useRef(null);
+  const [motion]=useState(()=>createStoryMotion(!contentHash()&&window.scrollY<8?0:INTRO_END_FRAME));
+  const [chapter,setChapter]=useState(0);
+  useLayoutEffect(()=>{
+    let currentChapter=-1,lastPercent=-1,intro;
+    const playhead={frame:INTRO_END_FRAME};
     const report=frame=>{
-      lastFrame.current=frame;
-      const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1);
-      if(progress.current) progress.current.style.width=`${fraction*100}%`;
-      const next=getChapter(frame);
-      if(progressTrack.current){
-        progressTrack.current.setAttribute('aria-valuenow',String(Math.round(fraction*100)));
+      const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1),next=getChapter(frame),percent=Math.round(fraction*100);
+      progress.current.style.transform=`scaleX(${fraction})`;
+      if(percent!==lastPercent){progressTrack.current.setAttribute('aria-valuenow',String(percent));lastPercent=percent;}
+      if(next!==currentChapter){
+        currentChapter=next;setChapter(next);story.current.dataset.chapter=String(next);
         progressTrack.current.setAttribute('aria-valuetext',CHAPTERS[next].title);
       }
-      if(next!==currentChapter.current){currentChapter.current=next;setChapter(next);}
-      if(story.current){story.current.dataset.chapter=String(next);story.current.dataset.opening=String(frame<INTRO_END_FRAME);}
+      story.current.dataset.opening=String(frame<INTRO_END_FRAME);
     };
-    const updateFromScroll=()=>{
-      scrollRaf=0;
-      if(driverRef.current!=='scroll' || !story.current) return;
-      const rect=story.current.getBoundingClientRect();
-      const height=stage.current?.getBoundingClientRect().height || window.innerHeight;
-      const fraction=clamp(-rect.top/Math.max(1,rect.height-height),0,1);
-      const frame=Math.round(INTRO_END_FRAME+fraction*(LAST_FRAME-INTRO_END_FRAME));
-      if(frame!==lastFrame.current) p.seekTo(frame);
-    };
-    const scheduleScroll=()=>{if(!scrollRaf) scrollRaf=requestAnimationFrame(updateFromScroll);};
-    const tryStartPendingIntro=()=>{
-      if(!pendingIntroRef.current) return;
-      if(driverRef.current!=='intro' || contentHash() || window.scrollY>=8){
-        pendingIntroRef.current=false;
-        setDriver('scroll');
-        updateFromScroll();
-        return;
-      }
-      if(document.hidden) return;
-      pendingIntroRef.current=false;
-      p.play();
-    };
-    const onFrame=event=>{
-      const frame=event.detail.frame;
-      report(frame);
-      if(driverRef.current==='intro' && frame>=INTRO_END_FRAME){finishIntro();return;}
-    };
-    const onPlay=()=>{pendingIntroRef.current=false;isPlaying.current=true;setPlaying(true);};
-    const onPause=()=>{isPlaying.current=false;setPlaying(false);};
-    const onEnded=()=>{onPause();setDriver('scroll');report(LAST_FRAME);};
-    const onScroll=()=>{
-      if(driverRef.current==='intro' && Math.abs(window.scrollY-scrollTopForFrame(INTRO_END_FRAME))>3) takeOver();
-      scheduleScroll();
-    };
-    const onUserScroll=()=>{takeOver();scheduleScroll();};
-    const onKeyScroll=event=>{
-      if(event.altKey || event.ctrlKey || event.metaKey) return;
-      if(!['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)) return;
-      if(event.target instanceof Element){
-        if(event.target.closest('input,textarea,select,[contenteditable="true"]')) return;
-        if(event.key===' ' && event.target.closest('button,a,[role="button"]')) return;
-      }
-      onUserScroll();
-    };
-    const onNavigate=event=>{
-      if(event.target instanceof Element && event.target.closest('a[href]')) leaveStory();
-    };
-    const onHashChange=()=>{leaveStory();scheduleScroll();};
-    const onVisibility=()=>{if(document.hidden) pause();else tryStartPendingIntro();};
-    p.addEventListener('frameupdate',onFrame);
-    p.addEventListener('play',onPlay);
-    p.addEventListener('pause',onPause);
-    p.addEventListener('ended',onEnded);
-    window.addEventListener('scroll',onScroll,{passive:true});
-    window.addEventListener('resize',scheduleScroll,{passive:true});
-    window.addEventListener('wheel',onUserScroll,{passive:true});
-    window.addEventListener('touchmove',onUserScroll,{passive:true});
-    window.addEventListener('keydown',onKeyScroll);
-    window.addEventListener('hashchange',onHashChange);
-    document.addEventListener('click',onNavigate,true);
-    document.addEventListener('visibilitychange',onVisibility);
-    report(initialFrame);
-    startRaf=requestAnimationFrame(()=>{
-      if(pendingIntroRef.current) tryStartPendingIntro();
-      else if(driverRef.current==='scroll') updateFromScroll();
-    });
-    return ()=>{
-      cancelAnimationFrame(scrollRaf);cancelAnimationFrame(startRaf);
-      p.removeEventListener('frameupdate',onFrame);p.removeEventListener('play',onPlay);
-      p.removeEventListener('pause',onPause);p.removeEventListener('ended',onEnded);
-      window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',scheduleScroll);
-      window.removeEventListener('wheel',onUserScroll);window.removeEventListener('touchmove',onUserScroll);
-      window.removeEventListener('keydown',onKeyScroll);window.removeEventListener('hashchange',onHashChange);
-      document.removeEventListener('click',onNavigate,true);
-      document.removeEventListener('visibilitychange',onVisibility);
-      p.pause();
-    };
-  },[finishIntro,initial,initialFrame,leaveStory,pause,scrollToFrame,scrollTopForFrame,setDriver,takeOver]);
-
-  const toggleOpening=event=>{
-    if(isPlaying.current) pause();
-    else player.current?.play(event);
-  };
-  const seekChapter=index=>{
-    pendingIntroRef.current=false;
-    pause();setDriver('scroll');
-    const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+(index===2?80:45),INTRO_END_FRAME,LAST_FRAME);
-    const top=scrollTopForFrame(target);
-    if(Math.abs(window.scrollY-top)<1) player.current?.seekTo(target);
-    scrollToFrame(target,window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth');
-  };
-
-  return <section id="story" className="story-scroll cinematic-story" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver={driver}>
+    const unsubscribe=motion.subscribe(report);
+    const context=gsap.context(()=>{
+      // The documented ScrollTrigger pattern caches document geometry at
+      // refresh. No seekTo(), React frame state or layout reads on each scroll.
+      const scrollTween=gsap.fromTo(playhead,{frame:INTRO_END_FRAME},{frame:LAST_FRAME,ease:'none',paused:true,
+        onUpdate:()=>{if(!intro?.isActive())motion.setFrame(playhead.frame);},
+        scrollTrigger:{trigger:story.current,start:'top top',end:()=>`+=${Math.max(1,story.current.offsetHeight-stage.current.offsetHeight)}`,
+          scrub:.22,invalidateOnRefresh:true,
+          onUpdate:self=>{if(self.progress>0&&intro?.isActive()){intro.kill();motion.setFrame(playhead.frame);}},
+        },
+      });
+      const trigger=scrollTween.scrollTrigger;
+      controls.current={seek(index){
+        intro?.kill();
+        const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+(index===2?80:45),INTRO_END_FRAME,LAST_FRAME);
+        const fraction=(target-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME);
+        window.scrollTo({top:trigger.start+(trigger.end-trigger.start)*fraction,behavior:'smooth'});
+        if(Math.abs(window.scrollY-trigger.start-(trigger.end-trigger.start)*fraction)<1)motion.setFrame(target);
+      }};
+      if(motion.frame<INTRO_END_FRAME){
+        const opening={frame:motion.frame};
+        intro=gsap.to(opening,{frame:INTRO_END_FRAME,duration:1.4,ease:'power2.out',onUpdate:()=>motion.setFrame(opening.frame)});
+      }else motion.setFrame(playhead.frame);
+      document.fonts?.ready.then(()=>{if(controls.current)trigger.refresh();});
+    },story);
+    const visibility=()=>{if(document.hidden)intro?.pause();else if(intro?.paused())intro.resume();};
+    document.addEventListener('visibilitychange',visibility);
+    return()=>{controls.current=null;unsubscribe();context.revert();document.removeEventListener('visibilitychange',visibility);};
+  },[motion]);
+  return <section id="story" className="story-scroll cinematic-story" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver="scrolltrigger">
     <div className="story-stage" ref={stage}>
-      <div className="film-viewport" ref={viewport} aria-hidden="true">
-        <Player ref={player} component={Film} compositionWidth={size.width} compositionHeight={size.height} durationInFrames={TOTAL_FRAMES} fps={FPS} initialFrame={initialFrame} controls={false} autoPlay={false} initiallyMuted clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} moveToBeginningWhenEnded={false} numberOfSharedAudioTags={0} style={{width:'100%',height:'100%'}} errorFallback={()=> <div className="film-error">动画暂时无法播放，请向下阅读完整档案。</div>}/>
-      </div>
+      <div className="film-viewport" aria-hidden="true"><Film motion={motion}/></div>
       <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。生活章节的三维球拍随滚动蓄势、击球，羽毛球掠过镜头；向上滚动可沿原路径回退。三维水墨古厝随滚动切换视角，朱砂线随镜头穿门，连接研究书案、开发笔记本与 Skills / Bad Case 卷宗架；也可切换章节或直接阅读下方完整资料。</p></div>
       <div className="story-controls">
-        <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>seekChapter(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
-        {driver==='intro'&&<div className="story-actions">
-          <button type="button" className="journey-toggle" onClick={toggleOpening}>{playing?'暂停开场':'继续开场'}</button>
-          <button type="button" className="skip-intro" onClick={finishIntro}>跳过开场 ↗</button>
-        </div>}
-        {driver!=='intro'&&<a className="story-dossier-link" href="#dossier">个人详录 <span aria-hidden="true">↗</span></a>}
+        <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>controls.current?.seek(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
+        <a className="story-dossier-link" href="#dossier">个人详录 <span aria-hidden="true">↗</span></a>
       </div>
-      <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress}/></div>
+      <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress} style={{width:'100%',transform:'scaleX(0)',transformOrigin:'left'}}/></div>
     </div>
   </section>;
 }

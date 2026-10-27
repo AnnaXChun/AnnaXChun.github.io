@@ -10,10 +10,12 @@ import {createSceneRuntime,minnanViewport} from './SceneRuntime';
 import {createSceneDiagnostics} from './SceneDiagnostics';
 import {createAutumnFrame,createCourtyardWater,autumnRetreat} from './MinnanAtmosphere';
 import {createLeafTextColliders} from './LeafTextColliders';
+import {courtyardOpacity} from './StoryMotion';
 
-export default function MinnanScene({frame=90,still=false,active=true,opacity=1}) {
-  const host=useRef(null),runtime=useRef(null),current=useRef(frame),fade=useRef(opacity);
-  const [failed,setFailed]=useState(false);current.current=frame;fade.current=opacity;
+export default function MinnanScene({frame=90,still=false,active=true,opacity=1,motion=null}) {
+  const host=useRef(null),runtime=useRef(null),current=useRef(motion?.frame??frame),fade=useRef(opacity);
+  const [failed,setFailed]=useState(false);
+  if(!motion){current.current=frame;fade.current=opacity;}
   useLayoutEffect(()=>{
     const container=host.current;
     let renderer,model,studio,journey,environment,water,autumn,composite,letterColliders,loop,alive=true,backgroundDirty=true;
@@ -82,7 +84,7 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
         });
         return (!still&&autumnRetreat(f)>0)||(shot.pointer>0&&moving);
       };
-      loop=createSceneRuntime({host:container,renderer,render:draw,active,idleFps:30,onResize(w,h,enabled){
+      loop=createSceneRuntime({host:container,renderer,render:draw,active,idleFps:30,maxFps:60,pixelBudget:2_000_000,onResize(w,h,enabled){
         // Read layout only when the viewport changes/restores, never per frame.
         // Native browser zoom changes the nav's footprint independently of 3D.
         const nav=enabled?container.closest('.story-stage')?.querySelector('.chapter-nav'):null;
@@ -101,6 +103,9 @@ export default function MinnanScene({frame=90,still=false,active=true,opacity=1}
       letterColliders?.dispose();composite?.dispose();autumn?.dispose();water?.dispose();journey?.dispose();studio?.dispose();model?.dispose();environment?.dispose();resources.forEach(r=>r.dispose());renderer?.dispose();renderer?.forceContextLoss();renderer?.domElement.remove();
     };
   },[still]);
-  useLayoutEffect(()=>{runtime.current?.loop.setActive(active);runtime.current?.loop.request();},[frame,active,opacity]);
+  useLayoutEffect(()=>{
+    if(motion)return motion.subscribe(f=>{current.current=f;fade.current=courtyardOpacity(f);runtime.current?.loop.setActive(f<1080);runtime.current?.loop.request();});
+    runtime.current?.loop.setActive(active);runtime.current?.loop.request();
+  },[motion,frame,active,opacity]);
   return <div ref={host} className="minnan-scene">{failed&&<p className="scene-unavailable">三维场景暂不可用，个人资料仍可正常阅读。</p>}</div>;
 }

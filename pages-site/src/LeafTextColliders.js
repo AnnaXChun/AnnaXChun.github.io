@@ -19,12 +19,12 @@ export function inkRectangles(alpha,width,height,threshold=120){
 
 export function createLeafTextColliders(host,onChange=()=>{}){
   let lastFrame=-1,lastSize='',candidateKey='',publishedKey='',settle=0,revision=0,dirty=true,disposed=false,boxes=[];
-  const glyphCache=new Map(),film=host.closest('.cinematic-film');
-  const fontReady=()=>{if(!disposed){dirty=true;glyphCache.clear();onChange();}};
+  const glyphCache=new Map(),film=host.closest('.cinematic-film');let fontRevision=0;
+  const fontReady=()=>{if(!disposed){fontRevision++;dirty=true;glyphCache.clear();onChange();}};
   document.fonts?.ready.then(fontReady);document.fonts?.addEventListener('loadingdone',fontReady);
 
   function glyphInk(text,style,resolution){
-    const cacheKey=`${text}|${style.fontFamily}|${style.fontWeight}|${resolution}`;
+    const cacheKey=`${fontRevision}|${text}|${style.fontFamily}|${style.fontWeight}|${resolution}`;
     if(glyphCache.has(cacheKey))return glyphCache.get(cacheKey);
     const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
     const font=`${style.fontStyle} ${style.fontWeight} ${resolution}px ${style.fontFamily}`;
@@ -36,7 +36,7 @@ export function createLeafTextColliders(host,onChange=()=>{}){
     ctx.fillText(text,pad,pad+(lineHeight+ascent-descent)/2);
     const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data,alpha=new Uint8Array(canvas.width*canvas.height);
     for(let i=0;i<alpha.length;i++)alpha[i]=pixels[i*4+3];
-    const result={rects:inkRectangles(alpha,canvas.width,canvas.height),pad,resolution,canvas,alpha,width:canvas.width,height:canvas.height};
+    const result={key:cacheKey,rects:resolution<192?inkRectangles(alpha,canvas.width,canvas.height):[],pad,resolution,canvas,alpha,width:canvas.width,height:canvas.height};
     glyphCache.set(cacheKey,result);return result;
   }
 

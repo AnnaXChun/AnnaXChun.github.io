@@ -59,8 +59,42 @@ test('draw requests coalesce, CSS framing does not reallocate buffers, hidden sc
     runtime.request();runtime.request();tick();assert.equal(draws,1);assert.equal(allocations,1);
     sizeCallback([{target:host,contentRect:{width:1440,height:960}}]);runtime.request();tick();assert.equal(draws,2);assert.equal(allocations,1);
     runtime.setActive(false);runtime.request();tick();assert.equal(draws,2);assert.equal(host.dataset.renderState,'suspended');
-    runtime.setActive(true);tick();assert.equal(draws,3);
+    assert.equal(allocations,1,'chapter suspension keeps the existing bounded targets');
+    runtime.setActive(true);tick();assert.equal(draws,3);assert.equal(allocations,1);
     intersectionCallback([{isIntersecting:false}]);runtime.request();tick();assert.equal(draws,3);
+    assert.equal(allocations,2,'leaving the viewport shrinks GPU storage');
     intersectionCallback([{isIntersecting:true}]);tick();assert.equal(draws,4);
   }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
+});
+
+test('GPU cadence coalesces 120 Hz input without losing its final pose, and prewarm draws once',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map();let next=0,draws=0,allocations=0;
+  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};globalThis.devicePixelRatio=1;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{observe(){}disconnect(){}};globalThis.IntersectionObserver=class{observe(){}disconnect(){}};
+  const host={dataset:{},closest:()=>null},renderer={setPixelRatio(){},setSize(){allocations++;}};
+  const tick=t=>{const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(t));};let runtime;
+  try{
+    runtime=createSceneRuntime({host,renderer,active:false,maxFps:60,render(){draws++;}});
+    runtime.prewarm();tick(0);assert.equal(draws,1);assert.equal(frames.size,0);assert.equal(runtime.active,false);
+    runtime.setActive(true);runtime.request();tick(8);assert.equal(draws,1);
+    tick(16.7);assert.equal(draws,2);assert.equal(allocations,1);
+    runtime.request();tick(25);assert.equal(draws,2);tick(33.4);assert.equal(draws,3);assert.equal(frames.size,0);
+  }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
+});
+
+test('60 Hz draw budget preserves phase on 75, 90 and 144 Hz displays',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map();let next=0;
+  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};globalThis.devicePixelRatio=1;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{observe(){}disconnect(){}};globalThis.IntersectionObserver=class{observe(){}disconnect(){}};
+  try{
+    for(const hz of [60,75,90,120,144]){
+      let draws=0;const runtime=createSceneRuntime({host:{dataset:{},closest:()=>null},renderer:{setPixelRatio(){},setSize(){}},maxFps:60,render(){draws++;}});
+      for(let i=0;i<hz*5;i++){runtime.request();const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(i*1000/hz));}
+      assert.ok(draws>=299&&draws<=301,`${hz} Hz produced ${draws/5} draws/s`);runtime.dispose();
+    }
+  }finally{for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
 });

@@ -23,7 +23,7 @@ export function createAutumnFrame(onReady=()=>{}){
   sun.castShadow=true;sun.shadow.mapSize.set(512,512);sun.shadow.camera.layers.enable(1);
   Object.assign(sun.shadow.camera,{left:-9,right:9,top:6,bottom:-6,near:1,far:24});
   sun.shadow.normalBias=.008;sun.shadow.bias=-.0001;sun.shadow.radius=2;sun.shadow.blurSamples=4;
-  const shelves=createGlyphShelves();scene.add(shelves.group);
+  const shelves=createGlyphShelves(onReady);scene.add(shelves.group);
   const releaseShadow=()=>{sun.shadow.map?.dispose();sun.shadow.mapPass?.dispose();sun.shadow.map=null;sun.shadow.mapPass=null;};
   const branch=new THREE.Group();scene.add(branch);
   const wood=new THREE.MeshStandardMaterial({color:0x503a32,roughness:.94});
