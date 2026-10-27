@@ -3,7 +3,7 @@
 export const profile = {
   name: '椿襄',
   romanizedName: 'CHUNXIANG',
-  role: '软件开发工程师',
+  role: 'Agent 开发、后训练算法工程师',
   education: '武汉大学软件工程背景',
   personality: 'ENFP',
   portrait: './assets/chunxiang-casual-portrait-v1.png',
@@ -11,10 +11,45 @@ export const profile = {
   phone: '+86 182 8942 3880',
   phoneHref: 'tel:+8618289423880',
   introduction: '我喜欢有反馈的事情。代码会报错，球会落地，镜头会告诉你哪里拖沓。观察、调整，再试一次，这是我熟悉的节奏。',
-  biography: '从后端研发、支付链路到智能体训练，我关心一个想法如何经过设计、协作与验证，成为真正可用的东西。主动建立连接，把讨论变成行动计划；交付之前，保留测试、日志和回滚。',
+  biography: '我关注 OPD + RL 后训练与智能体开发，在开源 benchmark 上取得 SOTA。2026 年 9 月 20 日起，在字节跳动国际商业化部门实习，从事 Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio 相关开发。',
 };
 
 export const projects = [
+  {
+    id: 'post-training',
+    title: 'OPD + RL 智能体后训练',
+    category: '重点研究 · 后训练',
+    organization: '开源 benchmark · SOTA',
+    period: null,
+    featured: true,
+    summary: '围绕 OPD + RL 开展智能体后训练研究，在开源 benchmark 上取得 SOTA。',
+    stack: ['OPD', 'RL', 'Agent Post-training', 'Benchmark'],
+    proof: '开源 benchmark SOTA',
+  },
+  {
+    id: 'bytedance-agent',
+    title: '字节跳动 · Agent 开发实习',
+    category: '实习经历 · 国际商业化',
+    organization: '字节跳动国际商业化部门',
+    period: '2026.09.20 — 至今',
+    summary: '在字节跳动国际商业化部门从事 Agent 开发，将 Claude Code 内核接入公司内部 Agent，适配业务流程。',
+    details: '开展 Skill 优化与 Bad Case Studio 相关开发，围绕实际业务完善智能体工作流。',
+    stack: ['Agent 开发', 'Claude Code', 'Skill 优化', 'Bad Case Studio'],
+  },
+  {
+    id: 'agent',
+    title: 'SFT / GRPO 与生命科学推理',
+    category: '项目 · 生命科学推理智能体',
+    organization: '生命科学多步推理',
+    period: null,
+    image: './assets/verl-architecture.webp',
+    imageAlt: 'VeRL 官方架构参考图：模型引擎、智能体循环、推理服务和训练控制器',
+    imageCredit: 'VeRL 官方架构参考',
+    summary: '基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。',
+    details: '从模型训练延伸到工具协议、沙箱执行和推理评估，将推理能力接入可执行的智能体系统。',
+    stack: ['Verl', 'Agent Loop', 'Python', 'SFT', 'GRPO', 'Docker'],
+    proof: '工具调用循环、安全执行和推理评估共同构成可验证的研发过程。',
+  },
   {
     id: 'taikang',
     title: '从数据库设计，到完整上线。',
@@ -44,20 +79,6 @@ export const projects = [
     supportingLabel: '支付链路示意图',
   },
   {
-    id: 'agent',
-    title: '生命科学推理智能体',
-    category: '毕业设计 · 人工智能原生工程',
-    organization: '生命科学多步推理',
-    period: null,
-    image: './assets/verl-architecture.webp',
-    imageAlt: 'VeRL 官方架构参考图：模型引擎、智能体循环、推理服务和训练控制器',
-    imageCredit: 'VeRL 官方架构参考',
-    summary: '基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。',
-    details: '从模型训练延伸到工具协议、沙箱执行和推理评估，将推理能力接入可执行的智能体系统。',
-    stack: ['Verl', 'Agent Loop', 'Python', 'SFT', 'GRPO', 'Docker'],
-    proof: '工具调用循环、安全执行和推理评估共同构成可验证的研发过程。',
-  },
-  {
     id: 'digital-twin',
     title: '数字孪生三维重建',
     category: '团队项目 · 空间计算',
@@ -73,9 +94,9 @@ export const projects = [
 ];
 
 export const capabilities = [
+  { title: '后训练与智能体', items: ['OPD + RL / 开源 benchmark SOTA', 'Claude Code 内核接入 / Agent Loop', 'Skill 优化 / Bad Case Studio', 'Verl / SFT / GRPO'] },
   { title: '人工智能协作', items: ['Codex / Claude Code', 'LangChain / Llama', 'Skill / MCP / 上下文工程', '原型、重构、测试与部署'] },
   { title: '全栈与数据', items: ['Java / Python / C++', 'ThinkPHP / Vue 3 / Spring Boot', 'MySQL 表结构、SQL 与索引治理', '前后端联调、功能与回归测试'] },
-  { title: '智能体与训练', items: ['Agent Loop / 多工具路由', 'Verl / SFT / GRPO', '提示工程与垂直知识组织', '自动评测与异常回退'] },
   { title: '表达与协作', items: ['需求澄清、边界定义与任务拆分', '演示叙事、视频剪辑与信息取舍', '团队分工、节点推进与风险沟通', '知识内容沉淀与 SOP 复用'] },
 ];
 

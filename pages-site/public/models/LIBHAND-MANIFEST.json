@@ -1,0 +1,21 @@
+{
+  "author": "Marin Šarić (Marin Saric)",
+  "license": "CC BY 3.0",
+  "source": "https://github.com/libhand/libhand/tree/master/hand_model/blender",
+  "sourceFiles": {
+    "hand.blend": "6a4ad9aa78a57fa3c30b3da4c126b66df4dd209d9d2ec201c98b513d93210086",
+    "hand_texture.png": "41644727b471ab2f5be7d106002b86062036a61245788586356fdb7129317479"
+  },
+  "file": "libhand.glb",
+  "bytes": 4194844,
+  "sha256": "35ab72014d01a488ffb55afc2ce60bba66df300a6c6d656d5e561aba8f19592a",
+  "triangles": 70297,
+  "images": 1,
+  "changes": [
+    "posed author rig for a loose release",
+    "extended source wrist below frame",
+    "PBR skin using original UV and photo texture",
+    "coordinate conversion",
+    "GLB conversion"
+  ]
+}

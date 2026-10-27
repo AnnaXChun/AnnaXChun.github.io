@@ -1,134 +1,20 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f1e9">
-  <meta name="description" content="椿襄的个人网站。武汉大学软件工程背景，关注高并发后端、智能体与人工智能协作开发，也热爱羽毛球、健身和视频剪辑。">
-  <title>椿襄 · 个人图纸｜工程、探索与生活</title>
-  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css">
-  <noscript><style>.archive-filter,#drawing-toggle,#copy-email,.menu-toggle{display:none!important}.site-header nav{display:flex!important}@media(max-width:760px){.site-header{margin-bottom:55px}}</style></noscript>
-  <script src="./app.js" defer></script>
-</head>
-<body>
-  <a class="skip-link" href="#main">跳到正文</a>
-  <div class="reading-progress" aria-hidden="true"></div>
-  <header class="site-header">
-    <a class="wordmark" href="#home" aria-label="椿襄，返回首页"><span class="seal">椿</span><span>椿襄<span class="wordmark-en">CHUNXIANG</span></span></a>
-    <nav aria-label="主导航" id="navigation"><a href="#profile">关于</a><a href="#work">作品</a><a href="#skills">能力</a><a href="#life">生活</a><a href="#archive">成果</a></nav>
-    <a class="header-contact" href="#contact">聊一聊 <span>↗</span></a>
-    <button class="menu-toggle" aria-expanded="false" aria-controls="navigation" aria-label="展开导航"><span></span><span></span></button>
-  </header>
-  <main id="main">
-    <section class="hero drawing-sheet" id="home" aria-labelledby="hero-title">
-      <div class="sheet-meta"><span>PERSONAL PORTFOLIO / 个人图纸</span><span>工程 · 探索 · 生活</span><span class="sheet-no">SHEET 01 — 06</span></div>
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <div class="eyebrow"><span class="red-dot"></span> 软件开发工程师 · 武汉大学</div>
-          <h1 id="hero-title">椿<span>襄</span><span class="name-stamp" aria-hidden="true">在<br>构建</span></h1>
-          <div class="name-en">CHUNXIANG <span>↗</span></div>
-          <h2>把系统做稳，<br>让好奇心继续生长。</h2>
-          <p class="hero-description">用代码构建可靠的系统，用智能体探索新的可能。<br class="desktop-br">也在球场、训练和镜头里，练习观察与判断。</p>
-          <a class="button-solid" href="#work">翻开我的作品 <span aria-hidden="true">↓</span></a>
-          <a class="hero-text-link" href="#profile">认识我 <span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="hero-art">
-          <div class="drawing-top"><span>FIG. 01 / 多面的我</span><span>AXONOMETRIC VIEW</span></div>
-          <div class="pavilion" id="pavilion"><img src="./assets/pavilion.svg" alt="原创等轴测建筑图纸，用层叠的结构表现工程、探索与生活" width="760" height="620" fetchpriority="high"></div>
-          <div class="art-note"><span class="note-cross">+</span><span>结构有秩序<br>探索无边界</span></div>
-          <div class="drawing-bottom"><span id="view-caption">A—A / 结构视图</span><button id="drawing-toggle" type="button" aria-pressed="false">展开图纸 <span>↗</span></button></div>
-        </div>
-      </div>
-      <div class="hero-footer"><span class="scroll-cue"><i></i> 向下阅读</span><span>BACKEND / AI AGENTS / CREATIVE LIFE</span><span class="coordinates" aria-hidden="true">X <b id="coord-x">000</b>　Y <b id="coord-y">000</b></span></div>
-    </section>
-
-    <section class="section profile-section" id="profile" aria-labelledby="profile-title">
-      <div class="section-kicker"><span>01 / ABOUT</span><span>关于我</span><span class="cross">+</span></div>
-      <div class="profile-layout">
-        <figure class="portrait reveal"><div class="image-registration"><img src="./assets/chunxiang-casual-portrait-v1.png" alt="椿襄的手绘风格肖像" width="1122" height="1402" loading="lazy"></div><figcaption><span>椿襄 / CHUNXIANG</span><span>ENFP ↗</span></figcaption></figure>
-        <div class="profile-copy reveal"><p class="small-label">保持热情，也把事情做完。</p><h2 id="profile-title">兴奋地开始，<br><em>冷静地收尾。</em></h2><p class="intro-text">我喜欢有反馈的事情。代码会报错，球会落地，镜头会告诉你哪里拖沓。观察、调整，再试一次，这是我熟悉的节奏。</p><p>武汉大学软件工程背景。从后端研发、支付链路到智能体训练，我关心一个想法如何经过设计、协作与验证，成为真正可用的东西。</p><div class="profile-notes"><div><span>做工程</span><p>说清边界，保留测试、日志和回滚。</p></div><div><span>与人协作</span><p>主动建立连接，把讨论变成行动计划。</p></div><div><span>做表达</span><p>整理信息的顺序，让重点被看见。</p></div></div></div>
-      </div>
-    </section>
-
-    <section class="section work-section" id="work" aria-labelledby="work-title">
-      <div class="section-kicker"><span>02 / SELECTED WORK</span><span>代表作品</span><span class="cross">+</span></div>
-      <div class="section-heading reveal"><h2 id="work-title">想法，<br>逐一落地。</h2><p>从业务系统到智能体，<br>把问题拆清楚，再把每一环接起来。</p><span class="huge-index" aria-hidden="true">04</span></div>
-      <div class="project-grid">
-        <article class="project reveal">
-          <div class="project-image code-image"><img src="./assets/taikang-code-review.webp" alt="泰康实习中的后端代码、MySQL 执行计划与测试结果" width="1280" height="1600" loading="lazy"><span class="image-label">01 / ENGINEERING</span><span class="corner-cross">+</span></div>
-          <div class="project-meta"><span>企业实习 · 后端开发</span><time>2025.03 — 2025.07</time></div>
-          <h3>从数据库设计，到完整上线。</h3><p>在武汉泰康科技，参与需求评审、业务表结构和 RESTful API 设计，完成页面联调、测试与部署。用 EXPLAIN、联合索引和查询重构处理慢查询。</p>
-          <div class="tags"><span>MySQL</span><span>RESTful API</span><span>EXPLAIN</span></div>
-          <details><summary>查看工程细节 <span>+</span></summary><div class="project-details"><p>编写并调优复杂 SQL，与前端核对页面交互和接口契约，覆盖功能测试、回归测试、部署及问题跟踪。</p><p><b>交付范围</b>　需求评审 → 技术方案 → 数据库设计 → 开发联调 → 测试部署。</p></div></details>
-        </article>
-        <article class="project reveal">
-          <div class="project-image sailing-image"><img src="./assets/chinasailing-site.webp" alt="中国帆船帆板运动协会官网页面及帆船赛事画面" width="2840" height="1632" loading="lazy"><span class="image-label">02 / PRODUCTION</span><span class="corner-cross">+</span></div>
-          <div class="project-meta"><span>国家级生产项目</span><time>2023.05 — 2025.07</time></div>
-          <h3>中帆协官网与支付链路</h3><p>持续迭代中国帆船帆板运动协会官网，接入支付宝与微信支付。以锁机制、状态机和熔断策略，保障关键交易链路。</p>
-          <div class="tags"><span>ThinkPHP / Vue 3</span><span>Spring Boot</span><span>支付系统</span></div>
-          <details><summary>查看工程细节 <span>+</span></summary><div class="project-details"><p>围绕高流量场景设计稳定的接口、数据和降级策略，持续承担研发、维护、排障与交付。</p><img src="./assets/payment-flow.webp" alt="支付链路示意图" loading="lazy" width="1200" height="1500"></div></details>
-        </article>
-        <article class="project reveal">
-          <div class="project-image agent-image"><img src="./assets/verl-architecture.webp" alt="VeRL 官方架构参考图：模型引擎、智能体循环、推理服务和训练控制器" width="1072" height="830" loading="lazy"><span class="image-label">03 / AI AGENTS</span><span class="corner-cross">+</span><span class="image-credit">VeRL 官方架构参考</span></div>
-          <div class="project-meta"><span>毕业设计 · 人工智能原生工程</span><span>AGENT LOOP</span></div>
-          <h3>生命科学推理智能体</h3><p>基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。</p>
-          <div class="tags"><span>Verl</span><span>SFT / GRPO</span><span>工具调用</span></div>
-          <details><summary>查看工程细节 <span>+</span></summary><div class="project-details"><p>从模型训练延伸到工具协议、沙箱执行和推理评估，将推理能力接入可执行的智能体系统。</p></div></details>
-        </article>
-        <article class="project reveal">
-          <div class="project-image twin-image"><svg viewBox="0 0 600 340" aria-hidden="true"><defs><pattern id="twin-grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" fill="none" stroke="currentColor" opacity=".09"/></pattern></defs><rect width="600" height="340" fill="url(#twin-grid)"/><g class="twin-drawing" fill="none" stroke="currentColor"><ellipse cx="300" cy="280" rx="100" ry="35" stroke-dasharray="3 5"/><path d="M165 135l135-67 135 67v115l-135 67-135-67Z M165 135l135 67 135-67 M300 202v115" opacity=".3"/><circle cx="300" cy="104" r="24"/><path d="M273 137l-21 77m75-77 21 77m-75-77 27 20 27-20m-54 0 5 83 22 11 22-11 5-83m-49 83-14 65m58-65 14 65m-36-54v-74M281 150h38m-40 16h42m-41 17h40m-40 18h40"/><circle cx="300" cy="202" r="67" stroke="#b8422f" stroke-dasharray="2 6"/><path d="M195 202h210M300 40v270" stroke-dasharray="3 7" opacity=".35"/></g><g fill="currentColor" font-family="monospace" font-size="10"><text x="47" y="88">PHYSICAL</text><text x="478" y="276">DIGITAL</text></g></svg><span class="image-label">04 / SPATIAL COMPUTING</span><span class="corner-cross">+</span></div>
-          <div class="project-meta"><span>团队项目 · 空间计算</span><span>三维重建</span></div>
-          <h3>数字孪生三维重建</h3><p>围绕三维人体重建完成虚实融合系统，负责技术路线、团队协作与交付推进，以工程实现验证空间计算方案。</p>
-          <div class="tags"><span>数字孪生</span><span>三维重建</span><span>系统集成</span></div>
-          <details><summary>查看项目成果 <span>+</span></summary><div class="project-details"><p>「虚实智联：基于数字孪生的三维人体重建系统」获 2025 年计算机设计大赛中南地区赛一等奖。</p><a href="#archive">查看成果档案 ↗</a></div></details>
-        </article>
-      </div>
-      <aside class="lab-note reveal"><span class="lab-symbol" aria-hidden="true">✳</span><div><span class="small-label">IN THE MAKING / 个人实验场</span><h3>让想法尽快接受真实反馈。</h3><p>用人工智能协作开发类似 Carrd 的个人建站产品，从需求、页面到测试、部署持续迭代。同时经营知识星球与个人技术内容，记录开发日志、疑难问题、Skill 和 SOP。</p></div><span class="lab-tag">持续探索中</span></aside>
-    </section>
-
-    <section class="section skills-section" id="skills" aria-labelledby="skills-title">
-      <div class="section-kicker"><span>03 / TOOLBOX</span><span>技术与方法</span><span class="cross">+</span></div>
-      <div class="skills-layout"><div class="skills-intro reveal"><h2 id="skills-title">可靠交付，<br>有迹可循。</h2><p>先理解业务和异常路径，再确定验收条件。用测试、日志和页面验收复核结果，把经验整理成可复用的工作流。</p><div class="process-line"><span>拆解</span><i></i><span>构建</span><i></i><span>验证</span></div></div><div class="skill-list">
-        <details class="skill-row reveal" open><summary><span class="skill-number">01</span><span>人工智能协作</span><span class="skill-plus">+</span></summary><div><p>让工具参与调研、原型、重构与排障，保留审查和人工验收。</p><ul><li>Codex / Claude Code</li><li>LangChain / Llama</li><li>Skill / MCP / 上下文工程</li><li>从原型、测试到部署的协作流程</li></ul></div></details>
-        <details class="skill-row reveal"><summary><span class="skill-number">02</span><span>全栈与数据工程</span><span class="skill-plus">+</span></summary><div><p>覆盖页面、接口、数据库与部署，完成业务闭环。</p><ul><li>Java / Python / C++</li><li>ThinkPHP / Vue 3 / Spring Boot</li><li>MySQL 表结构、SQL 与索引治理</li><li>前后端联调、功能与回归测试</li></ul></div></details>
-        <details class="skill-row reveal"><summary><span class="skill-number">03</span><span>智能体与模型训练</span><span class="skill-plus">+</span></summary><div><p>把模型的推理能力接入工具、执行环境与评测。</p><ul><li>Agent Loop / 多工具路由</li><li>Verl / SFT / GRPO</li><li>提示工程与垂直知识组织</li><li>自动评测与异常回退</li></ul></div></details>
-        <details class="skill-row reveal"><summary><span class="skill-number">04</span><span>表达与团队推进</span><span class="skill-plus">+</span></summary><div><p>把复杂问题讲清楚，让协作者知道下一步。</p><ul><li>需求澄清、边界定义与任务拆分</li><li>演示叙事、视频剪辑与信息取舍</li><li>团队分工、节点推进与风险沟通</li><li>知识内容沉淀与 SOP 复用</li></ul></div></details>
-      </div></div>
-    </section>
-
-    <section class="section life-section" id="life" aria-labelledby="life-title">
-      <div class="section-kicker"><span>04 / OFF THE CLOCK</span><span>工作之外</span><span class="cross">+</span></div>
-      <div class="section-heading reveal"><h2 id="life-title">图纸之外，<br>生活之中。</h2><p>技术是主业。球场、训练与镜头，<br>是我保持状态的另一种方式。</p><span class="life-doodle" aria-hidden="true">↗</span></div>
-      <div class="life-grid">
-        <article class="life-item reveal"><div class="life-art"><svg viewBox="0 0 300 200" aria-hidden="true"><g transform="rotate(32 150 100)" fill="none" stroke="currentColor" stroke-width="1.2"><ellipse cx="146" cy="66" rx="35" ry="45"/><ellipse cx="146" cy="66" rx="30" ry="40"/><path d="M146 111v64m-5-64v64m0 0h5m-21-142v66m10-74v82m11-85v88m11-85v82m10-74v67m-50-56h58m-61 12h64m-64 12h64m-61 12h58m-53 12h48"/></g><path d="M230 48l-18 22 22 10 6-33-10 1Zm-18 22 7 11 15-1M230 48l-4 27M237 48l-6 29" fill="none" stroke="#b8422f"/><path d="M64 169c18-61 86-101 155-79" fill="none" stroke="currentColor" stroke-dasharray="3 6" opacity=".3"/></svg></div><span class="small-label">01 / BADMINTON</span><h3>羽毛球<span>预判与节奏</span></h3><p>读拍面、看重心，再决定下一步。享受单打的节奏，也重视双打里的补位和默契。</p></article>
-        <article class="life-item reveal"><div class="life-art"><svg viewBox="0 0 300 200" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(-20 150 100)"><rect x="98" y="56" width="15" height="88"/><rect x="83" y="68" width="15" height="64"/><rect x="187" y="56" width="15" height="88"/><rect x="202" y="68" width="15" height="64"/><path d="M113 95h74v10h-74M67 95h16v10H67Zm150 0h16v10h-16Z"/></g><circle cx="150" cy="100" r="77" fill="none" stroke="currentColor" stroke-dasharray="2 6" opacity=".25"/><path d="M150 19v15m-7-7h14" stroke="#b8422f"/></svg></div><span class="small-label">02 / TRAINING</span><h3>健身<span>动作与状态</span></h3><p>根据恢复调整重量与组数，优先保证动作质量。稳定出勤，认真对待长期状态。</p></article>
-        <article class="life-item reveal"><div class="life-art"><svg viewBox="0 0 300 200" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><rect x="79" y="62" width="144" height="91" rx="4"/><path d="M102 62V48h47l10 14M79 83h144m-131-12h23"/><circle cx="156" cy="110" r="31"/><circle cx="156" cy="110" r="23"/><circle cx="207" cy="73" r="3" fill="#b8422f" stroke="#b8422f"/><path d="M53 43h18m-9-9v18m167 111h18m-9-9v18" opacity=".35"/></g><path d="m150 99 17 11-17 11Z" fill="#b8422f"/></svg></div><span class="small-label">03 / FILMMAKING</span><h3>视频剪辑<span>叙事与取舍</span></h3><p>先找故事落点，再选素材、音乐和节奏。愿意删掉喜欢却多余的镜头，让表达更清楚。</p></article>
-      </div>
-    </section>
-
-    <section class="section archive-section" id="archive" aria-labelledby="archive-title">
-      <div class="section-kicker"><span>05 / ARCHIVE</span><span>成果档案</span><span class="cross">+</span></div>
-      <div class="section-heading reveal"><h2 id="archive-title">一路走来，<br>留下的凭据。</h2><p>记录那些组队、研究和交付的时刻。<br>点击条目，翻看原始材料。</p></div>
-      <div class="archive-filter" role="group" aria-label="筛选成果"><button type="button" data-filter="all" aria-pressed="true">全部 <span>08</span></button><button type="button" data-filter="competition" aria-pressed="false">竞赛 <span>06</span></button><button type="button" data-filter="research" aria-pressed="false">研究与专利 <span>02</span></button></div>
-      <div class="archive-list">
-        <a class="archive-row" href="./assets/xiaomi-2025-first.webp" data-category="competition" data-image="xiaomi-2025-first.webp" data-title="小米杯全国一等奖" data-description="2025 · 队长。全国大学生计算机系统能力大赛智能系统创新设计赛，DeepDog 项目。"><span>2025</span><strong>小米杯全国一等奖</strong><span class="award-type">队长 · DeepDog</span><span class="archive-arrow">↗</span><span class="sr-only">2025 · 队长。全国大学生计算机系统能力大赛智能系统创新设计赛，DeepDog 项目。</span></a>
-        <a class="archive-row" href="./assets/patent-acceptance.webp" data-category="research" data-image="patent-acceptance.webp" data-title="发明专利申请受理" data-description="2025 · 国家知识产权局。非接触式货币真伪检测方法、系统、装置及存储介质。当前材料为申请受理通知。"><span>2025</span><strong>发明专利申请受理</strong><span class="award-type">国家知识产权局</span><span class="archive-arrow">↗</span><span class="sr-only">2025 · 国家知识产权局。非接触式货币真伪检测方法、系统、装置及存储介质。当前材料为申请受理通知。</span></a>
-        <a class="archive-row" href="./assets/mobicom-paper.webp" data-category="research" data-image="mobicom-paper.webp" data-title="MobiCom 论文成果" data-description="CCF-A · 学术研究。基于眨眼运动学与临床知识蒸馏的居家干眼评估研究。"><span>RESEARCH</span><strong>MobiCom 论文成果</strong><span class="award-type">CCF-A · 学术研究</span><span class="archive-arrow">↗</span><span class="sr-only">CCF-A · 学术研究。基于眨眼运动学与临床知识蒸馏的居家干眼评估研究。</span></a>
-        <a class="archive-row" href="./assets/mcm-finalist.webp" data-category="competition" data-image="mcm-finalist.webp" data-title="数学建模竞赛 Finalist" data-description="2025 · 美国大学生数学建模竞赛 MCM Finalist，完成复杂问题建模与协作交付。"><span>2025</span><strong>数学建模竞赛 Finalist</strong><span class="award-type">MCM</span><span class="archive-arrow">↗</span><span class="sr-only">2025 · 美国大学生数学建模竞赛 MCM Finalist，完成复杂问题建模与协作交付。</span></a>
-        <a class="archive-row" href="./assets/design-digital-twin-first.webp" data-category="competition" data-image="design-digital-twin-first.webp" data-title="计算机设计大赛一等奖" data-description="2025 · 中南地区赛。虚实智联：基于数字孪生的三维人体重建系统。"><span>2025</span><strong>计算机设计大赛一等奖</strong><span class="award-type">中南地区赛 · 数字孪生</span><span class="archive-arrow">↗</span><span class="sr-only">2025 · 中南地区赛。虚实智联：基于数字孪生的三维人体重建系统。</span></a>
-        <a class="archive-row" href="./assets/design-poetry-second.webp" data-category="competition" data-image="design-poetry-second.webp" data-title="计算机设计大赛二等奖" data-description="2025 · 中南地区赛。诗品：人工智能诗词创作助手。"><span>2025</span><strong>计算机设计大赛二等奖</strong><span class="award-type">中南地区赛 · 诗品</span><span class="archive-arrow">↗</span><span class="sr-only">2025 · 中南地区赛。诗品：人工智能诗词创作助手。</span></a>
-        <a class="archive-row" href="./assets/polardb-award.webp" data-category="competition" data-image="polardb-award.webp" data-title="PolarDB 外卡优胜奖" data-description="2024 · 全国大学生计算机系统能力大赛 PolarDB 数据库创新设计赛。"><span>2024</span><strong>PolarDB 外卡优胜奖</strong><span class="award-type">数据库创新设计赛</span><span class="archive-arrow">↗</span><span class="sr-only">2024 · 全国大学生计算机系统能力大赛 PolarDB 数据库创新设计赛。</span></a>
-        <a class="archive-row" href="./assets/xiaomi-2024-third.webp" data-category="competition" data-image="xiaomi-2024-third.webp" data-title="小米杯全国三等奖" data-description="2024 · 全国大学生计算机系统能力大赛智能系统创新设计赛。"><span>2024</span><strong>小米杯全国三等奖</strong><span class="award-type">智能系统创新设计赛</span><span class="archive-arrow">↗</span><span class="sr-only">2024 · 全国大学生计算机系统能力大赛智能系统创新设计赛。</span></a>
-      </div><p class="filter-status sr-only" role="status" aria-live="polite">显示全部 8 项成果</p>
-    </section>
-
-    <section class="section contact-section" id="contact" aria-labelledby="contact-title">
-      <div class="section-kicker"><span>06 / NEXT CHAPTER</span><span>下一次连接</span><span class="cross">+</span></div>
-      <div class="contact-layout reveal"><div><p class="small-label">有想法，就聊一聊。</p><h2 id="contact-title">聊聊系统，<br>或约一场<span class="outlined-word">球。</span></h2><p>工作邀约、项目协作、技术交流。<br>期待和你一起，把下一个想法做出来。</p></div><div class="contact-links"><a href="mailto:mshuwhu@whu.edu.cn"><span>写封邮件</span><strong>mshuwhu@whu.edu.cn</strong><span>↗</span></a><a href="tel:+8618289423880"><span>打个电话</span><strong>+86 182 8942 3880</strong><span>↗</span></a><button type="button" id="copy-email">复制邮箱 <span>⧉</span></button><span id="copy-status" role="status" aria-live="polite"></span></div></div>
-      <footer><a class="footer-wordmark" href="#home">椿襄 <span>CHUNXIANG</span></a><span>热情可以很广，交付必须具体。</span><a href="#home">回到起点 ↑</a></footer>
-    </section>
-  </main>
-  <dialog id="archive-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><span class="small-label">ARCHIVE / 原始材料</span><button class="dialog-close" aria-label="关闭成果预览" autofocus>关闭 ×</button></div><div class="dialog-content"><div class="dialog-image"><img id="dialog-image" alt=""></div><div class="dialog-caption"><h2 id="dialog-title"></h2><p id="dialog-description"></p><a id="dialog-original" target="_blank" rel="noopener">打开原图 ↗</a></div></div></dialog>
-</body>
-</html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>椿襄｜Agent 开发、后训练算法工程师</title>
+<meta name="description" content="椿襄的后训练项目、Agent 开发实习与个人成果。">
+<link rel="icon" href="./assets/favicon.svg">
+<style>
+:root{color-scheme:light;background:#f7f4eb;color:#2c302c;font:17px/1.85 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1050px;margin:auto;padding:70px 6vw}h1,h2,h3{font-family:"Songti SC",serif;font-weight:500}h1{font-size:clamp(60px,10vw,110px);line-height:1.2;margin:20px 0}h2{font-size:36px;margin-top:65px}h3{font-size:25px}p{max-width:45em}a{color:#a34f3e;text-underline-offset:5px}a:focus-visible{outline:2px solid #a34f3e;outline-offset:4px}img{display:block;max-width:100%;height:auto}.hero-art{mix-blend-mode:multiply;max-width:800px;margin:30px auto}article{border-top:1px solid #d1d0c4;padding:24px 0}.meta{font-size:14px;color:#73776d}.role{font-size:24px}.project-image{max-height:480px;object-fit:contain;margin-top:20px}li{padding:10px 0}footer{border-top:1px solid #d1d0c4;margin-top:50px;padding-top:25px}small{font-size:14px}article:first-of-type h3{color:#a34f3e}
+</style></head><body><main>
+<p class="meta">CHUNXIANG / PORTFOLIO</p><h1>椿襄</h1><p class="role">Agent 开发、后训练算法工程师</p><p>武汉大学软件工程背景</p>
+<h2>研究与经历</h2>
+<article><p class="meta">重点研究 · 后训练 · 开源 benchmark · SOTA</p><h3>OPD + RL 智能体后训练</h3><p>围绕 OPD + RL 开展智能体后训练研究，在开源 benchmark 上取得 SOTA。</p><p class="meta">OPD / RL / Agent Post-training / Benchmark</p><p>开源 benchmark SOTA</p></article>
+<article><p class="meta">实习经历 · 国际商业化 · 2026.09.20 — 至今</p><h3>字节跳动 · Agent 开发实习</h3><p>在字节跳动国际商业化部门从事 Agent 开发，将 Claude Code 内核接入公司内部 Agent，适配业务流程。</p><p>开展 Skill 优化与 Bad Case Studio 相关开发，围绕实际业务完善智能体工作流。</p><p class="meta">Agent 开发 / Claude Code / Skill 优化 / Bad Case Studio</p></article>
+<article><p class="meta">项目 · 生命科学推理智能体 · 生命科学多步推理</p><h3>SFT / GRPO 与生命科学推理</h3><p>基于 Verl 重写工具调用循环，识别 Python Markdown 代码块并触发安全执行，以 SFT 与 GRPO 增强垂直领域多步推理。</p><p>从模型训练延伸到工具协议、沙箱执行和推理评估，将推理能力接入可执行的智能体系统。</p><p class="meta">Verl / Agent Loop / Python / SFT / GRPO / Docker</p><p>工具调用循环、安全执行和推理评估共同构成可验证的研发过程。</p><a href="./assets/verl-architecture.webp"><img class="project-image" src="./assets/verl-architecture.webp" alt="VeRL 官方架构参考图：模型引擎、智能体循环、推理服务和训练控制器" loading="lazy"></a><small>VeRL 官方架构参考</small></article>
+<article><p class="meta">企业实习 · 后端开发 · 2025.03 — 2025.07</p><h3>从数据库设计，到完整上线。</h3><p>参与需求评审、业务表结构和 RESTful API 设计，完成页面联调、测试与部署。用 EXPLAIN、联合索引和查询重构处理慢查询。</p><p>编写并调优复杂 SQL，与前端核对页面交互和接口契约，覆盖功能测试、回归测试、部署及问题跟踪。</p><p class="meta">MySQL / RESTful API / EXPLAIN / 联合索引 / 前后端联调</p><p>覆盖需求评审、技术方案、数据库设计、编码、联调、测试与部署的完整研发周期。</p><a href="./assets/taikang-code-review.webp"><img class="project-image" src="./assets/taikang-code-review.webp" alt="泰康实习中的后端代码、MySQL 执行计划与测试结果" loading="lazy"></a><small>武汉泰康科技有限公司</small></article>
+<article><p class="meta">国家级生产项目 · 2023.05 — 2025.07</p><h3>中帆协官网与支付链路</h3><p>持续迭代协会官网，接入支付宝与微信支付。以锁机制、状态机和熔断策略保障关键交易链路。</p><p>围绕高流量场景设计稳定的接口、数据和降级策略，持续承担研发、维护、排障与交付。</p><p class="meta">ThinkPHP / Vue 3 / Spring Boot / MySQL / 支付系统</p><p>真实生产系统，覆盖研发、维护、排障与持续交付。</p><a href="./assets/chinasailing-site.webp"><img class="project-image" src="./assets/chinasailing-site.webp" alt="中国帆船帆板运动协会官网页面及帆船赛事画面" loading="lazy"></a><small>中国帆船帆板运动协会</small></article>
+<article><p class="meta">团队项目 · 空间计算 · 虚实智联</p><h3>数字孪生三维重建</h3><p>围绕三维人体重建完成虚实融合系统，负责技术路线、团队协作与交付推进，以工程实现验证空间计算方案。</p><p>项目名称为「虚实智联：基于数字孪生的三维人体重建系统」。</p><p class="meta">三维重建 / 数字孪生 / 人工智能 / 系统集成</p><p>获 2025 年计算机设计大赛中南地区赛一等奖。</p><a href="./assets/design-digital-twin-first.webp"><img class="project-image" src="./assets/design-digital-twin-first.webp" alt="数字孪生三维人体重建项目的计算机设计大赛中南地区赛一等奖证书" loading="lazy"></a><small>虚实智联</small></article>
+<h2>成果原件</h2><ul><li><a href="./assets/xiaomi-2025-first.webp">小米杯全国一等奖</a> <small>队长 · DeepDog</small></li><li><a href="./assets/patent-acceptance.webp">发明专利申请受理</a> <small>国家知识产权局</small></li><li><a href="./assets/mobicom-paper.webp">MobiCom 论文成果</a> <small>CCF-A · 学术研究</small></li><li><a href="./assets/mcm-finalist.webp">数学建模竞赛 Finalist</a> <small>MCM</small></li><li><a href="./assets/design-digital-twin-first.webp">计算机设计大赛一等奖</a> <small>中南地区赛 · 数字孪生</small></li><li><a href="./assets/design-poetry-second.webp">计算机设计大赛二等奖</a> <small>中南地区赛 · 诗品</small></li><li><a href="./assets/polardb-award.webp">PolarDB 外卡优胜奖</a> <small>数据库创新设计赛</small></li><li><a href="./assets/xiaomi-2024-third.webp">小米杯全国三等奖</a> <small>智能系统创新设计赛</small></li></ul>
+<h2>关于与生活</h2><p>我喜欢有反馈的事情。代码会报错，球会落地，镜头会告诉你哪里拖沓。观察、调整，再试一次，这是我熟悉的节奏。</p><p>我关注 OPD + RL 后训练与智能体开发，在开源 benchmark 上取得 SOTA。2026 年 9 月 20 日起，在字节跳动国际商业化部门实习，从事 Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio 相关开发。</p><article><h3>羽毛球</h3><p>读拍面、看重心，再决定下一步。享受单打的节奏，也重视双打里的补位、喊球和默契。</p></article><article><h3>健身</h3><p>根据恢复调整重量与组数，优先保证动作质量。稳定出勤，认真对待长期状态。</p></article><article><h3>视频剪辑</h3><p>先找故事落点，再选素材、音乐和节奏。愿意删掉喜欢却多余的镜头，让表达更清楚。</p></article>
+<footer><p><a href="mailto:mshuwhu@whu.edu.cn">mshuwhu@whu.edu.cn</a> · <a href="tel:+8618289423880">+86 182 8942 3880</a></p><a href="./">返回个人主页 ↗</a></footer>
+</main></body></html>

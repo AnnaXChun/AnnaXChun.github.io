@@ -2,10 +2,11 @@
 
 Live site: https://annaxchun.github.io/
 
-The current GitHub Pages website lives in `pages-site/`. It uses React,
-Remotion and Three.js for a cream-and-blue architectural desk, a camera move
-into a notebook portrait, and a scroll-controlled personal story. A complete
-static profile is also available at `/profile.html`.
+The current GitHub Pages website lives in `pages-site/`. React owns the page;
+GSAP ScrollTrigger drives a continuous personal story through a real Three.js
+Minnan courtyard and a photographic badminton scene. Cannon-es simulates
+maple leaves resting on the solid title strokes. The palette is cool white,
+ice blue and blue-black. A complete static profile is available at `/profile.html`.
 
 ## Develop and build the current website
 
@@ -22,6 +23,18 @@ npm run preview:pages
 The build output is `dist-pages/`, including `.nojekyll`. Personal content is in
 `pages-site/src/data.js`; the illustrated portrait and supporting images are in
 `pages-site/public/assets/`.
+
+Animation references and license distinctions are recorded in
+`docs/open-source-motion-performance.md`. Scroll does not update a video
+player or rerender the story through React. Glyph geometry is built in a
+worker and cached; scene render targets are bounded, stay warm between
+chapters, and shrink when offscreen or hidden.
+
+For a local production benchmark, run `node pages-site/scripts/prepare-benchmark.mjs <label>`
+after building, serve `outputs/performance/<label>/`, then use the visible
+benchmark button in Chrome. The 19-second forward/reverse scroll records rAF
+cadence and long tasks. It is not a GPU frame-rate measurement. The probe is
+injected only into that disposable copy, never `dist-pages/`.
 
 ## Publish to GitHub Pages
 
