@@ -41,7 +41,7 @@ function Hero({reduced}){
     return()=>{alive=false;context?.revert();observer.disconnect();element.removeEventListener('pointermove',move);element.removeEventListener('pointerleave',leave);setters.forEach(set=>set.tween.kill());gsap.set([head,body,eyes],{clearProps:'transform'});};
   },[reduced]);
   return <section className="retro-hero" id="top" ref={root} data-visible="true" aria-labelledby="hero-title">
-    <div className="hero-wordmark">椿襄<sup>®</sup><span aria-hidden="true">✳</span></div>
+    <div className="hero-wordmark">椿襄<span aria-hidden="true">✳</span></div>
     <a className="hero-contact" href="#contact">打个招呼 <span>↗</span></a>
     <div className="hero-edition">CHUNXIANG<br/>HUMAN × AI / 2026</div>
     <div className="hero-copy">
@@ -84,7 +84,7 @@ function Archive(){
   </section>;
 }
 function About(){return <section id="about" className="about section-pad" aria-labelledby="about-title"><SectionLabel number="04" aside="BEHIND THE SCREEN">THE HUMAN SIDE</SectionLabel><div className="about-grid" data-tilt-stage><figure className="about-photo" data-tilt><img src={profile.portrait} alt="椿襄的手绘风格肖像" width="1122" height="1402" loading="lazy"/><figcaption>CHUNXIANG / ENFP</figcaption></figure><div className="about-copy" data-reveal><p className="eyebrow">屏幕之外，我是椿襄。</p><h2 id="about-title">保持好奇。<br/>认真投入。</h2><p>{profile.introduction}</p><p className="about-education">{profile.education}<br/>Agent 开发、后训练算法工程师</p><div className="tags"><span>羽毛球</span><span>健身</span><span>视频剪辑</span></div><a className="text-link" href="#life">下一站，球场见 ↓</a></div></div></section>;}
-function Contact(){return <section id="contact" className="contact section-pad"><SectionLabel number="06" aside="TO BE CONTINUED">SAY HELLO</SectionLabel><div className="contact-heading"><h2>下个想法，<br/>一起做出来。</h2><a className="contact-arrow" href={`mailto:${profile.email}`} aria-label="发邮件给椿襄">↗</a></div><div className="contact-links"><a href={`mailto:${profile.email}`}>{profile.email} ↗</a><a href="https://github.com/AnnaXChun" target="_blank" rel="noreferrer">GitHub ↗</a><a href={profile.phoneHref}>{profile.phone} ↗</a></div><div className="life-notes">{interests.slice(1).map(i=><p key={i.id}><strong>{i.title}</strong>{i.description}</p>)}</div><footer><a href="#top">椿襄® <span>CHUNXIANG</span></a><a href="./model-credits.html">素材署名 ↗</a><a href="#top">回到顶部 ↑</a></footer></section>;}
+function Contact(){return <section id="contact" className="contact section-pad"><SectionLabel number="06" aside="TO BE CONTINUED">SAY HELLO</SectionLabel><div className="contact-heading"><h2>下个想法，<br/>一起做出来。</h2><a className="contact-arrow" href={`mailto:${profile.email}`} aria-label="发邮件给椿襄">↗</a></div><div className="contact-links"><a href={`mailto:${profile.email}`}>{profile.email} ↗</a><a href="https://github.com/AnnaXChun" target="_blank" rel="noreferrer">GitHub ↗</a><a href={profile.phoneHref}>{profile.phone} ↗</a></div><div className="life-notes">{interests.slice(1).map(i=><p key={i.id}><strong>{i.title}</strong>{i.description}</p>)}</div><footer><a href="#top">椿襄 <span>CHUNXIANG</span></a><a href="./model-credits.html">素材署名 ↗</a><a href="#top">回到顶部 ↑</a></footer></section>;}
 export default function App(){
   const reduced=useReducedMotion(),root=useRef(null);
   useLayoutEffect(()=>{

@@ -56,3 +56,23 @@
 .crt-entrance{transform-style:flat;isolation:isolate}
 .crt-body{position:relative;z-index:1}
 .crt-head{z-index:2}
+@media(min-width:600px) and (max-width:1199px){
+  .training-composition{min-height:clamp(520px,66vw,800px);padding-top:15px}
+  .training-type{display:block;font-size:clamp(154px,22vw,250px);line-height:1.03}
+  .training-type>span{display:block}
+  .training-type em{position:absolute;left:52%;top:5%;font-size:.65em}
+  .reel-depth{width:51%;right:-3%;top:26%}
+  .sota-stamp{left:0;right:auto;bottom:0;width:140px}
+}
+@media(min-width:900px) and (max-width:1299px){
+  .crt-parallax{width:55%;height:auto;right:-4%;bottom:-5%;aspect-ratio:3/4}
+  .hero-copy{width:46%;top:30%}
+  .hero-copy h1{font-size:clamp(42px,4.6vw,60px)}
+  .hero-role{font-size:18px}
+  .hero-intro{font-size:16px}
+  .hero-links{max-width:90%}
+}
+
+.experience{overflow-x:clip}
+
+.training-type{z-index:3;pointer-events:none}
