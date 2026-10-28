@@ -1,114 +1,112 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {gsap} from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import Film, {CHAPTERS, INTRO_END_FRAME, STARTS, TOTAL_FRAMES} from './Film';
-import {createStoryMotion} from './StoryMotion';
+import SportChapter from './SportChapter';
+import {profile,projects,awards,interests} from './data';
+import {pointerPose} from './RetroMotion';
 gsap.registerPlugin(ScrollTrigger);
-import Dossier from './Dossier';
-import {profile} from './data';
-import MinnanScene from './MinnanScene';
 
-const LAST_FRAME = TOTAL_FRAMES - 1;
-const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
-const getChapter = frame => Math.max(0,STARTS.findLastIndex(start=>frame>=start));
-const contentHash = () => Boolean(window.location.hash && !['#top','#story'].includes(window.location.hash));
-
-function Story() {
-  const story=useRef(null),stage=useRef(null),progress=useRef(null),progressTrack=useRef(null),controls=useRef(null);
-  const [motion]=useState(()=>createStoryMotion(!contentHash()&&window.scrollY<8?0:INTRO_END_FRAME));
-  const [chapter,setChapter]=useState(0);
+function useReducedMotion(){
+  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(()=>{const media=matchMedia('(prefers-reduced-motion: reduce)');const update=()=>setReduced(media.matches);media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[]);
+  return reduced;
+}
+function SectionLabel({number,children,aside}){return <div className="section-label"><span>{number} / {children}</span>{aside&&<span>{aside}</span>}</div>;}
+function Hero({reduced}){
+  const root=useRef(null);
   useLayoutEffect(()=>{
-    let currentChapter=-1,lastPercent=-1,intro;
-    const playhead={frame:INTRO_END_FRAME};
-    const report=frame=>{
-      const fraction=clamp((frame-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME),0,1),next=getChapter(frame),percent=Math.round(fraction*100);
-      progress.current.style.transform=`scaleX(${fraction})`;
-      if(percent!==lastPercent){progressTrack.current.setAttribute('aria-valuenow',String(percent));lastPercent=percent;}
-      if(next!==currentChapter){
-        currentChapter=next;setChapter(next);story.current.dataset.chapter=String(next);
-        progressTrack.current.setAttribute('aria-valuetext',CHAPTERS[next].title);
-      }
-      story.current.dataset.opening=String(frame<INTRO_END_FRAME);
+    const element=root.current;
+    if(reduced)return;
+    let alive=true,context;
+    Promise.all([document.fonts.ready,element.querySelector('img').decode().catch(()=>{})]).then(()=>{
+      if(!alive)return;
+      context=gsap.context(()=>{
+        gsap.from('.hero-line > span',{yPercent:105,duration:1.05,ease:'power3.out',stagger:.1,clearProps:'transform'});
+        gsap.from('.hero-detail',{y:16,opacity:0,duration:.8,delay:.2,stagger:.07,clearProps:'all'});
+        gsap.from('.crt-entrance',{y:45,opacity:0,scale:1.025,duration:1.25,ease:'power3.out',clearProps:'all'});
+        gsap.to('.crt-parallax',{yPercent:9,rotation:2,ease:'none',scrollTrigger:{trigger:element,start:'top top',end:'bottom top',scrub:.35}});
+        gsap.to('.hero-copy',{yPercent:-12,ease:'none',scrollTrigger:{trigger:element,start:'top top',end:'bottom top',scrub:.35}});
+      },element);
+    });
+    const observer=new IntersectionObserver(([entry])=>{element.dataset.visible=String(entry.isIntersecting);});observer.observe(element);
+    const head=element.querySelector('.crt-head'),body=element.querySelector('.crt-body'),eyes=element.querySelector('.crt-eyes');
+    const targets=[[head,'rotationY',.65],[head,'rotationX',.65],[head,'rotation',.7],[head,'x',.7],[body,'x',.95],[eyes,'x',.4],[eyes,'y',.4]];
+    const setters=targets.map(([node,key,duration])=>gsap.quickTo(node,key,{duration,ease:'power3.out'}));
+    const move=event=>{
+      if(event.pointerType==='touch')return;
+      const pose=pointerPose(event.clientX/innerWidth,event.clientY/innerHeight);
+      [pose.yaw,pose.pitch,pose.roll,pose.shift,pose.shift*.25,pose.eyeX,pose.eyeY].forEach((value,i)=>setters[i](value));
     };
-    const unsubscribe=motion.subscribe(report);
-    const context=gsap.context(()=>{
-      // The documented ScrollTrigger pattern caches document geometry at
-      // refresh. No seekTo(), React frame state or layout reads on each scroll.
-      const scrollTween=gsap.fromTo(playhead,{frame:INTRO_END_FRAME},{frame:LAST_FRAME,ease:'none',paused:true,
-        onUpdate:()=>{if(!intro?.isActive())motion.setFrame(playhead.frame);},
-        scrollTrigger:{trigger:story.current,start:'top top',end:()=>`+=${Math.max(1,story.current.offsetHeight-stage.current.offsetHeight)}`,
-          scrub:.22,invalidateOnRefresh:true,
-          onUpdate:self=>{if(self.progress>0&&intro?.isActive()){intro.kill();motion.setFrame(playhead.frame);}},
-        },
-      });
-      const trigger=scrollTween.scrollTrigger;
-      controls.current={seek(index){
-        intro?.kill();
-        const target=index===0?INTRO_END_FRAME:clamp(STARTS[index]+(index===2?80:45),INTRO_END_FRAME,LAST_FRAME);
-        const fraction=(target-INTRO_END_FRAME)/(LAST_FRAME-INTRO_END_FRAME);
-        window.scrollTo({top:trigger.start+(trigger.end-trigger.start)*fraction,behavior:'smooth'});
-        if(Math.abs(window.scrollY-trigger.start-(trigger.end-trigger.start)*fraction)<1)motion.setFrame(target);
-      }};
-      if(motion.frame<INTRO_END_FRAME){
-        const opening={frame:motion.frame};
-        intro=gsap.to(opening,{frame:INTRO_END_FRAME,duration:1.4,ease:'power2.out',onUpdate:()=>motion.setFrame(opening.frame)});
-      }else motion.setFrame(playhead.frame);
-      document.fonts?.ready.then(()=>{if(controls.current)trigger.refresh();});
-    },story);
-    const visibility=()=>{if(document.hidden)intro?.pause();else if(intro?.paused())intro.resume();};
-    document.addEventListener('visibilitychange',visibility);
-    return()=>{controls.current=null;unsubscribe();context.revert();document.removeEventListener('visibilitychange',visibility);};
-  },[motion]);
-  return <section id="story" className="story-scroll cinematic-story" ref={story} aria-label="椿襄的个人故事" data-chapter={chapter} data-driver="scrolltrigger">
-    <div className="story-stage" ref={stage}>
-      <div className="film-viewport" aria-hidden="true"><Film motion={motion}/></div>
-      <div className="film-accessible sr-only"><h1>椿襄 · {profile.role}</h1><p>武汉大学软件工程背景。重点介绍 OPD + RL 后训练与开源 benchmark SOTA，以及自 2026 年 9 月 20 日起在字节跳动国际商业化部门的 Agent 开发实习：Claude Code 内核接入、业务流程适配、Skill 优化与 Bad Case Studio。随后是团队成果与生活。生活章节的三维球拍随滚动蓄势、击球，羽毛球掠过镜头；向上滚动可沿原路径回退。三维水墨古厝随滚动切换视角，朱砂线随镜头穿门，连接研究书案、开发笔记本与 Skills / Bad Case 卷宗架；也可切换章节或直接阅读下方完整资料。</p></div>
-      <div className="story-controls">
-        <div className="chapter-nav" role="group" aria-label="故事章节">{CHAPTERS.map((item,index)=><button key={item.title} type="button" aria-pressed={chapter===index} onClick={()=>controls.current?.seek(index)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}</span></button>)}</div>
-        <a className="story-dossier-link" href="#dossier">个人详录 <span aria-hidden="true">↗</span></a>
-      </div>
-      <div className="story-progress" ref={progressTrack} role="progressbar" aria-label="故事进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i ref={progress} style={{width:'100%',transform:'scaleX(0)',transformOrigin:'left'}}/></div>
+    const leave=()=>setters.forEach(set=>set(0));element.addEventListener('pointermove',move);element.addEventListener('pointerleave',leave);
+    return()=>{alive=false;context?.revert();observer.disconnect();element.removeEventListener('pointermove',move);element.removeEventListener('pointerleave',leave);setters.forEach(set=>set.tween.kill());gsap.set([head,body,eyes],{clearProps:'transform'});};
+  },[reduced]);
+  return <section className="retro-hero" id="top" ref={root} data-visible="true" aria-labelledby="hero-title">
+    <div className="hero-wordmark">椿襄<sup>®</sup><span aria-hidden="true">✳</span></div>
+    <a className="hero-contact" href="#contact">打个招呼 <span>↗</span></a>
+    <div className="hero-edition">CHUNXIANG<br/>HUMAN × AI / 2026</div>
+    <div className="hero-copy">
+      <p className="hero-kicker hero-detail"><i/> 你好，我是椿襄。</p>
+      <h1 id="hero-title"><span className="hero-line"><span>与智能一起，</span></span><span className="hero-line"><span>做点新东西。</span></span></h1>
+      <p className="hero-role hero-detail">Agent 开发、后训练算法工程师</p>
+      <p className="hero-intro hero-detail">从 OPD + RL 到真实业务中的 Agent。<br/>让研究有结果，让想法能运行。</p>
+      <div className="hero-links hero-detail"><a className="pill" href="#research">看看我的研究 <span>↗</span></a><a className="pill" href="#experience">现在在字节 <span>↗</span></a><a className="pill pill-outline" href="#about">认识我 <span>↓</span></a></div>
     </div>
+    <div className="crt-parallax" aria-hidden="true"><div className="crt-entrance"><img className="crt-person crt-body" src="./assets/retro-body.webp" alt="" width="1086" height="1448" fetchPriority="high"/><div className="crt-head"><img className="crt-person crt-head-image" src="./assets/retro-agent.webp" alt="" width="1086" height="1448"/><div className="crt-face"><div className="crt-eyes"><i/><i/></div></div></div></div></div>
+    <div className="hero-bottom"><span>武汉大学 · 软件工程</span><a href="#research">向下探索 <span>↓</span></a><span>一点好奇，一直向前。</span></div>
   </section>;
 }
-
-function Contact(){
-  const [copied,setCopied]=useState('');
-  const copy=async()=>{try{await navigator.clipboard.writeText('mshuwhu@whu.edu.cn');setCopied('已复制');}catch{setCopied('请直接选择邮箱复制');}};
-  return <section id="contact" className="contact-end"><div className="contact-rule"><span>NEXT / TO BE CONTINUED</span><span>继续下一步</span><i>+</i></div><div className="contact-grid"><div><p>从一次连接开始。</p><h2>下一个想法，<br/>一起做出来。</h2></div><div className="contact-methods"><a href="mailto:mshuwhu@whu.edu.cn"><small>写封邮件</small><strong>mshuwhu@whu.edu.cn</strong><span>↗</span></a><a href="tel:+8618289423880"><small>打个电话</small><strong>+86 182 8942 3880</strong><span>↗</span></a><button onClick={copy}>复制邮箱 ⧉</button><span role="status">{copied}</span></div></div><footer><a href="#top">椿襄 <small>CHUNXIANG</small></a><span>工程、探索与生活，还在继续。</span><a href="/model-credits.html">素材署名</a><a href="#top">回到起点 ↑</a></footer></section>;
+function Research(){return <section id="research" className="research section-pad" aria-labelledby="research-title">
+  <SectionLabel number="01" aside="SELECTED RESEARCH">POST-TRAINING</SectionLabel>
+  <div className="research-heading"><h2 id="research-title" data-reveal>让模型，<br/>更进一步。</h2><p data-reveal>我关注智能体后训练，<br/>从训练方法到真实评测，<br/>持续追问能力的下一步。</p></div>
+  <div className="training-composition" data-tilt-stage aria-label="OPD 加强化学习，开源 benchmark SOTA"><div className="training-type" data-drift><span>OPD</span><em>+</em><span>RL</span></div><div className="reel-depth" data-tilt><div className="reel-scroll"><img src="./assets/retro-reel.webp" alt="" width="1280" height="1280" loading="lazy"/></div></div><div className="sota-stamp"><span>OPEN BENCHMARK</span><strong>SOTA</strong><span>AGENT POST-TRAINING ↗</span></div><div className="training-horizon" aria-hidden="true"><i/><i/><i/><i/><i/></div></div>
+  <div className="research-bottom"><p>围绕 OPD + RL 开展智能体后训练研究，<br/>在开源 benchmark 上取得 SOTA。</p><span>探索 → 训练 → 评测</span></div>
+</section>;}
+function Experience(){return <section className="experience section-pad" id="experience" aria-labelledby="experience-title">
+  <SectionLabel number="02" aside="2026.09.20 — 至今">IN PRACTICE</SectionLabel>
+  <div className="experience-grid"><div className="experience-title" data-reveal><p>字节跳动 · 国际商业化</p><h2 id="experience-title">Agent,<br/>in practice<span>.</span></h2><span className="experience-role">Agent 开发实习</span><p className="experience-intro">把模型能力接入业务，<br/>让 Agent 在真实流程里工作。</p></div>
+  <div className="experience-list" data-tilt-stage>{[
+    ['01','Claude Code','内核接入','将 Claude Code 内核接入公司内部 Agent，连接模型与工具执行。'],
+    ['02','Workflow','业务流程适配','围绕国际商业化场景，适配 Agent 工作流与业务流程。'],
+    ['03','Skills','能力优化','开展 Skill 优化，让智能体能力更贴合实际任务。'],
+    ['04','Bad Case Studio','问题分析与迭代','参与 Bad Case Studio 相关开发，从实际问题推进系统改进。'],
+  ].map(([n,en,title,body])=><article key={n} className="experience-file" data-file><span>{n}</span><div><h3>{en}</h3><h4>{title}</h4><p>{body}</p></div><i aria-hidden="true">↗</i></article>)}</div></div>
+</section>;}
+function Archive(){
+  const [selected,setSelected]=useState(null);const dialog=useRef(null),opener=useRef(null);
+  useEffect(()=>{if(!selected)return;dialog.current.showModal();const previous=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=previous;};},[selected]);
+  const open=(event,award)=>{if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button!==0||!dialog.current?.showModal)return;event.preventDefault();opener.current=event.currentTarget;setSelected(award);};
+  const close=()=>{setSelected(null);opener.current?.focus({preventScroll:true});};
+  return <section id="work" className="work section-pad" aria-labelledby="work-title"><SectionLabel number="03" aside="IDEAS INTO REALITY">SELECTED WORK</SectionLabel><div className="work-heading"><h2 id="work-title" data-reveal>一起，把想法做成。</h2><p>项目、协作，和看得见的成果。</p></div>
+    <div className="award-featured">{[awards[0],awards[4]].map((a,index)=><a key={a.id} href={a.image} onClick={e=>open(e,a)} aria-haspopup="dialog" className={`award-print award-print-${index}`}><div className="award-image"><img src={a.image} alt={`${a.title}原始获奖证书`} loading="lazy"/></div><div className="award-caption"><span><strong>{a.title}</strong><small>{a.meta}</small></span><span aria-hidden="true">↗</span></div></a>)}</div>
+    <div className="project-register"><h3>更多研究与经历 <span>INDEX / 04</span></h3>{projects.slice(2).map((p,i)=><details key={p.id}><summary><span>0{i+1}</span><div><strong>{p.title}</strong><small>{p.period||p.organization}</small></div><b aria-hidden="true">+</b></summary><div className="project-detail"><p>{p.summary}</p>{p.details&&<p>{p.details}</p>}<div className="tags">{p.stack.map(s=><span key={s}>{s}</span>)}</div>{p.proof&&<p>{p.proof}</p>}{p.image&&<a href={p.image} target="_blank" rel="noreferrer"><img src={p.image} alt={p.imageAlt} loading="lazy"/><span>{p.imageCredit||'查看原始材料'} ↗</span></a>}</div></details>)}</div>
+    <details className="award-register"><summary>查看完整成果档案 <span>08 RECORDS <b>+</b></span></summary><div>{awards.map(a=><a key={a.id} href={a.image} onClick={e=>open(e,a)} aria-haspopup="dialog"><span>{a.year||'研究'}</span><strong>{a.title}<small>{a.meta}</small></strong><span>↗</span></a>)}</div></details>
+    <dialog ref={dialog} className="archive-dialog" aria-labelledby="archive-title" onClose={close} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.current.close();}}}><div className="dialog-top"><span>ARCHIVE / 原始材料</span><button autoFocus onClick={()=>dialog.current.close()}>关闭 ×</button></div>{selected&&<><img src={selected.image} alt={`${selected.title}原始材料`}/><h3 id="archive-title">{selected.title}</h3><p>{selected.description}</p><a href={selected.image} target="_blank" rel="noreferrer">打开原图 ↗</a></>}</dialog>
+  </section>;
 }
-
+function About(){return <section id="about" className="about section-pad" aria-labelledby="about-title"><SectionLabel number="04" aside="BEHIND THE SCREEN">THE HUMAN SIDE</SectionLabel><div className="about-grid" data-tilt-stage><figure className="about-photo" data-tilt><img src={profile.portrait} alt="椿襄的手绘风格肖像" width="1122" height="1402" loading="lazy"/><figcaption>CHUNXIANG / ENFP</figcaption></figure><div className="about-copy" data-reveal><p className="eyebrow">屏幕之外，我是椿襄。</p><h2 id="about-title">保持好奇。<br/>认真投入。</h2><p>{profile.introduction}</p><p className="about-education">{profile.education}<br/>Agent 开发、后训练算法工程师</p><div className="tags"><span>羽毛球</span><span>健身</span><span>视频剪辑</span></div><a className="text-link" href="#life">下一站，球场见 ↓</a></div></div></section>;}
+function Contact(){return <section id="contact" className="contact section-pad"><SectionLabel number="06" aside="TO BE CONTINUED">SAY HELLO</SectionLabel><div className="contact-heading"><h2>下个想法，<br/>一起做出来。</h2><a className="contact-arrow" href={`mailto:${profile.email}`} aria-label="发邮件给椿襄">↗</a></div><div className="contact-links"><a href={`mailto:${profile.email}`}>{profile.email} ↗</a><a href="https://github.com/AnnaXChun" target="_blank" rel="noreferrer">GitHub ↗</a><a href={profile.phoneHref}>{profile.phone} ↗</a></div><div className="life-notes">{interests.slice(1).map(i=><p key={i.id}><strong>{i.title}</strong>{i.description}</p>)}</div><footer><a href="#top">椿襄® <span>CHUNXIANG</span></a><a href="./model-credits.html">素材署名 ↗</a><a href="#top">回到顶部 ↑</a></footer></section>;}
 export default function App(){
-  const [motion,setMotion]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  useEffect(()=>{
-    const preference=window.matchMedia('(prefers-reduced-motion: reduce)');
-    let raf=0;
-    const onChange=event=>{
-      if(!event.matches) return;
-      setMotion(false);
-      raf=requestAnimationFrame(()=>document.getElementById('dossier')?.scrollIntoView({behavior:'instant'}));
-    };
-    preference.addEventListener('change',onChange);
-    return ()=>{preference.removeEventListener('change',onChange);cancelAnimationFrame(raf);};
-  },[]);
-  useEffect(()=>{
-    if(!['#dossier','#contact'].includes(window.location.hash)) return;
-    const raf=requestAnimationFrame(()=>document.getElementById(window.location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));
-    return ()=>cancelAnimationFrame(raf);
-  },[]);
-  return <>
-    <a className="skip-link" href="#dossier">跳到完整资料</a>
-    <div id="top" />
-    <main>
-      {motion ? <Story /> : <section className="static-intro">
-        <span>CHUNXIANG / PORTFOLIO</span>
-        <h1>椿襄</h1>
-        <h2>{profile.role}</h2>
-        <p>专注智能体工具调用、强化学习后训练与多步推理。这里记录我的研究、实习与作品。</p>
-        <div className="static-model" role="img" aria-label="闽南红砖古厝与燕尾脊的三维建筑"><MinnanScene still /></div>
-      </section>}
-      <Dossier />
-      <Contact />
-    </main>
-  </>;
+  const reduced=useReducedMotion(),root=useRef(null);
+  useLayoutEffect(()=>{
+    if(reduced)return;
+    const context=gsap.context(()=>{
+      gsap.utils.toArray('[data-reveal]').forEach(node=>gsap.from(node,{y:38,opacity:0,duration:.85,ease:'power3.out',scrollTrigger:{trigger:node,start:'top 94%',once:true}}));
+      gsap.fromTo('.reel-scroll',{rotation:-28,y:65},{rotation:35,y:-35,ease:'none',scrollTrigger:{trigger:'.training-composition',start:'top bottom',end:'bottom top',scrub:.55}});
+      gsap.utils.toArray('[data-file]').forEach((node,i)=>gsap.from(node,{x:i%2?-65:65,y:60,rotation:i%2?-8:8,opacity:0,duration:1,ease:'power3.out',scrollTrigger:{trigger:node,start:'top 94%',once:true},clearProps:'all'}));
+      gsap.utils.toArray('[data-drift]').forEach(node=>gsap.fromTo(node,{xPercent:-3},{xPercent:3,ease:'none',scrollTrigger:{trigger:node,start:'top bottom',end:'bottom top',scrub:.4}}));
+    },root);
+    const tiltCleanup=gsap.utils.toArray('[data-tilt-stage]',root.current).map(stage=>{
+      const nodes=[...stage.querySelectorAll('[data-tilt],[data-file]')];let bounds;
+      const setters=nodes.map(node=>({node,x:gsap.quickTo(node,'rotationY',{duration:.8,ease:'power3.out'}),y:gsap.quickTo(node,'rotationX',{duration:.8,ease:'power3.out'})}));
+      const enter=()=>{bounds=stage.getBoundingClientRect();};
+      const move=event=>{if(event.pointerType==='touch')return;if(!bounds)enter();const pose=pointerPose((event.clientX-bounds.left)/bounds.width,(event.clientY-bounds.top)/bounds.height);setters.forEach((set,i)=>{set.x(pose.yaw*(.55+i*.06));set.y(pose.pitch*.7);});};
+      const leave=()=>{bounds=null;setters.forEach(set=>{set.x(0);set.y(0);});};
+      stage.addEventListener('pointerenter',enter);stage.addEventListener('pointermove',move);stage.addEventListener('pointerleave',leave);
+      return()=>{stage.removeEventListener('pointerenter',enter);stage.removeEventListener('pointermove',move);stage.removeEventListener('pointerleave',leave);setters.forEach(set=>{set.x.tween.kill();set.y.tween.kill();gsap.set(set.node,{clearProps:'transform'});});};
+    });
+    let raf;const refresh=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>ScrollTrigger.refresh());};
+    const observer=new ResizeObserver(refresh);observer.observe(root.current);document.fonts.ready.then(refresh);
+    return()=>{tiltCleanup.forEach(cleanup=>cleanup());context.revert();observer.disconnect();cancelAnimationFrame(raf);};
+  },[reduced]);
+  return <><a className="skip-link" href="#research">跳到研究与经历</a><main ref={root}><Hero reduced={reduced}/><Research/><Experience/><Archive/><About/><SportChapter reduced={reduced}/><Contact/></main></>;
 }

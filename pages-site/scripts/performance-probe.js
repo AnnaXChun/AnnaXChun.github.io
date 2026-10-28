@@ -8,14 +8,16 @@ document.body.append(panel);
 const button=panel.querySelector('button'),output=panel.querySelector('output');
 let run=0;
 button.onclick=()=>{
-  const story=document.querySelector('#story');
+  const legacy=Boolean(document.querySelector('#story'));
+  const story=document.querySelector('#story')||document.querySelector('main');
   if(!story){output.textContent='Motion story unavailable (check reduced motion).';return;}
   button.disabled=true;run++;
   const initialViewport=[innerWidth,innerHeight,devicePixelRatio];let interrupted=document.hidden;
   const validate=()=>{if(document.hidden||innerWidth!==initialViewport[0]||innerHeight!==initialViewport[1]||devicePixelRatio!==initialViewport[2])interrupted=true;};
   document.addEventListener('visibilitychange',validate);window.addEventListener('resize',validate);
   const rect=story.getBoundingClientRect(),top=rect.top+scrollY;
-  const travel=rect.height-document.querySelector('.story-stage').getBoundingClientRect().height;
+  const travel=legacy?rect.height-document.querySelector('.story-stage').getBoundingClientRect().height:Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  const sportsTop=legacy ? 0.68 :(document.querySelector('#life').getBoundingClientRect().top+scrollY)/travel;
   const samples=[],longTasks=[],longFrames=[];
   const observe=(type,entries)=>{
     if(!PerformanceObserver.supportedEntryTypes.includes(type))return null;
@@ -43,8 +45,9 @@ button.onclick=()=>{
       const at=p=>+(values[Math.floor((values.length-1)*p)]||0).toFixed(2);
       return {samples:values.length,rafHz:+(1000*values.length/total).toFixed(1),p50Ms:at(.5),p95Ms:at(.95),p99Ms:at(.99),over25ms:values.filter(n=>n>25).length,over50ms:values.filter(n=>n>50).length};
     };
-    const authoredTransforms=[...document.querySelectorAll('.depth-title span,.shot-copy,.cinema-evidence-primary,.cinema-evidence-secondary')].every(node=>node.style.transform&&getComputedStyle(node).transform!=='none');
-    const result={run,build:document.documentElement.dataset.benchmarkBuild,valid:!interrupted,authoredTransforms,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,visibility:document.visibilityState,...summarize(samples),courtyard:summarize(samples.filter(s=>s.fraction<.63)),sports:summarize(samples.filter(s=>s.fraction>=.68)),longTasks:longTasks.filter(e=>e.start>=start+1000),longAnimationFrames:longFrames.filter(e=>e.start>=start+1000)};
+    const authoredNodes=[...document.querySelectorAll(legacy?'.depth-title span,.shot-copy,.cinema-evidence-primary,.cinema-evidence-secondary':'.crt-parallax,.reel-scroll')];
+    const authoredTransforms=authoredNodes.length>0&&authoredNodes.every(node=>node.style.transform&&getComputedStyle(node).transform!=='none');
+    const result={run,build:document.documentElement.dataset.benchmarkBuild,valid:!interrupted,authoredTransforms,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,visibility:document.visibilityState,...summarize(samples),front:summarize(samples.filter(s=>s.fraction<sportsTop)),sports:summarize(samples.filter(s=>s.fraction>=sportsTop)),longTasks:longTasks.filter(e=>e.start>=start+1000),longAnimationFrames:longFrames.filter(e=>e.start>=start+1000)};
     output.textContent=JSON.stringify(result,null,2);panel.dataset.result=JSON.stringify(result);button.disabled=false;
   };
   requestAnimationFrame(tick);

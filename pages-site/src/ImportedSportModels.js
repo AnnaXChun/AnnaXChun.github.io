@@ -58,5 +58,5 @@ export function createImportedSportModels(onReady,onError) {
       };
     }});
   });
-  return {racket,shuttle,hand,ready:Promise.all([racketReady,shuttleReady,handReady]),fit(aspect){handFade.bottom.value=aspect<1?.18:.035;handFade.top.value=aspect<1?.34:.18;},dispose(){if(disposed)return;disposed=true;residentScenes--;roots.forEach(disposeTree);}};
+  return {racket,shuttle,hand,ready:Promise.all([racketReady,shuttleReady,handReady]),fit(aspect){handFade.bottom.value=aspect<1?.18:.12;handFade.top.value=aspect<1?.34:.28;},dispose(){if(disposed)return;disposed=true;residentScenes--;roots.forEach(disposeTree);}};
 }
