@@ -50,3 +50,11 @@ Chrome 实际观看公开 animated WebP：大 CRT 头部人像、灰摄影底、
 旧版本的手动 gh-pages 大包上传失败，没有沿用失败操作声称发布成功。本次采用官方 GitHub Pages Actions 的构建→验证→artifact→deploy流程；所有actions固定到实查release的commit。只deploy job授予pages/id-token权限。来源：[upload-pages-artifact](https://github.com/actions/upload-pages-artifact)、[deploy-pages](https://github.com/actions/deploy-pages)、[setup-node](https://github.com/actions/setup-node)。
 
 待独立审查通过后合并、运行正式部署，并核对公开HTML资源与Chrome画面。部署前不将本地预览称为在线交付。
+
+## 2026-10-29 交付检查点
+
+- 生产候选提交：`f55014dc7bb21d5a1b96a39d63fd6597c2162883`；[PR #2](https://github.com/AnnaXChun/AnnaXChun.github.io/pull/2) 为 draft，未合并。
+- [官方构建 40737185058](https://github.com/AnnaXChun/AnnaXChun.github.io/actions/runs/40737185058) 成功完成安装、11项测试、构建及artifact上传；PR上的deploy按设计跳过。这不是线上发布证明。
+- 正式候选资源为 `index-BYrEuUFz.js` / `index-ldHwYBAS.css`；生产预览4182，独立测试副本4184。性能probe只存在本地测试副本。
+- 已通过的Chrome尺寸、整头指针变化、体育动作与减少动态证据，以及R8剩余边界见独立评审文档。Mac锁屏阻断最后915/1200/1440研究构图、两次性能采样及最终线上复验，未将静态源码审查升级为最终视觉通过。
+- Pages配置仍为旧legacy模式。解锁后先完成剩余审查与性能测量，再切换workflow发布、合并和线上核验；旧的失败gh-pages工作树不作为发布源。
