@@ -22,7 +22,7 @@
 
 ## 工程与验证
 
-GSAP ScrollTrigger，主页面只有transform/opacity动画，无React逐帧更新或每次scroll读layout。前半页不启动WebGL/树叶物理/字形Worker；体育临近再加载，保留像素预算、离屏/后台暂停。纯视觉素材aria-hidden，不影响阅读顺序。
+GSAP ScrollTrigger，主页面只有transform/opacity动画，无React逐帧更新或每次scroll读layout。不启动旧树叶物理/字形Worker；手绘页面使用DOM图层。性能充足桌面可在首屏就绪后的空闲期初始化同一个体育场景，以1×1目标预热一次后暂停，模型内存会更早持有；节省流量、慢网、低内存、触屏或reduce仍在临近体育时加载。正常像素预算和离屏/后台暂停保留。纯视觉素材aria-hidden，不影响阅读顺序。
 
 Chrome默认尺寸、1440、390/320、900–1200与真实200%检查；手机自然文档流，不用缩小桌面画布。检查中间运动帧与稳定阅读点、头身接缝、纸飞机与文字、证书和体育衔接。独立评审见`storybook-review.md`；旧retro审查只作历史，不沿用PASS。构建和测试不代替视觉判断；不把rAF间隔称作GPU FPS。
 

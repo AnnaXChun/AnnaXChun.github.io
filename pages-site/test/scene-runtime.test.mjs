@@ -98,3 +98,68 @@ test('60 Hz draw budget preserves phase on 75, 90 and 144 Hz displays',()=>{
     }
   }finally{for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
 });
+
+test('offscreen prewarm submits once at 1×1 then entry restores the original pixel budget',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map(),sizes=[],ratios=[],draws=[],transmissions=[];let next=0,sizeCallback,intersectionCallback;
+  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};globalThis.devicePixelRatio=2;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{constructor(fn){sizeCallback=fn;}observe(){}disconnect(){}};
+  globalThis.IntersectionObserver=class{constructor(fn){intersectionCallback=fn;}observe(){}disconnect(){}};
+  const host={dataset:{},closest:()=>null},renderer={transmissionResolutionScale:.25,setPixelRatio(value){ratios.push(value);},setSize(w,h){sizes.push([w,h]);}};
+  const tick=t=>{const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(t));};let runtime;
+  try{
+    runtime=createSceneRuntime({host,renderer,render(w,h){draws.push([w,h]);transmissions.push(renderer.transmissionResolutionScale);return true;}});
+    sizeCallback([{target:host,contentRect:{width:1440,height:960}}]);
+    intersectionCallback([{isIntersecting:false}]);
+    runtime.prewarm();runtime.prewarm();tick(0);
+    assert.deepEqual(draws,[[1440,960]],'logical camera framing is unchanged while warming');
+    assert.deepEqual(sizes,[[1,1]],'offscreen warming never allocates viewport targets');
+    assert.deepEqual(ratios,[1]);assert.equal(frames.size,0,'even a continuous renderer stops after the warm frame');
+    assert.deepEqual(transmissions,[1]);assert.equal(renderer.transmissionResolutionScale,.25,'temporary transmission minimum is restored');
+    assert.equal(host.dataset.renderState,'suspended');assert.equal(runtime.active,false);
+    runtime.prewarm();runtime.request();tick(16);assert.equal(draws.length,1,'a completed warmup is not repeated');
+    intersectionCallback([{isIntersecting:true}]);tick(32);
+    assert.equal(draws.length,2);assert.deepEqual(sizes.at(-1),[1440,960]);
+    assert.equal(ratios.at(-1),renderPixelRatio(1440,960,2));assert.equal(host.dataset.renderState,'active');
+    assert.equal(transmissions.at(-1),.25,'normal entry uses the original transmission scale');
+    intersectionCallback([{isIntersecting:false}]);assert.equal(frames.size,0);assert.deepEqual(sizes.at(-1),[1,1]);
+  }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
+});
+
+test('an interrupted warm render restores transmission settings and remains suspended',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map();let next=0,intersectionCallback;
+  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};globalThis.devicePixelRatio=2;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{observe(){}disconnect(){}};
+  globalThis.IntersectionObserver=class{constructor(fn){intersectionCallback=fn;}observe(){}disconnect(){}};
+  const host={dataset:{},closest:()=>null},renderer={transmissionResolutionScale:.25,setPixelRatio(){},setSize(){}};let runtime;
+  try{
+    runtime=createSceneRuntime({host,renderer,render(){assert.equal(renderer.transmissionResolutionScale,1);throw new Error('failed warm render');}});
+    intersectionCallback([{isIntersecting:false}]);runtime.prewarm();
+    const pending=[...frames.values()];frames.clear();assert.throws(()=>pending[0](0),/failed warm render/);
+    assert.equal(renderer.transmissionResolutionScale,.25);assert.equal(runtime.active,false);assert.equal(host.dataset.renderState,'suspended');
+    runtime.prewarm();assert.equal(frames.size,0,'a failed optional warm frame does not create a retry loop');
+  }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
+});
+
+test('hidden documents cancel pending warmup and never submit an offscreen frame',()=>{
+  const saved=Object.fromEntries(['ResizeObserver','IntersectionObserver','requestAnimationFrame','cancelAnimationFrame','document','devicePixelRatio'].map(k=>[k,globalThis[k]]));
+  const frames=new Map();let next=0,intersectionCallback,visibility,draws=0;
+  globalThis.document={hidden:false,addEventListener(name,fn){if(name==='visibilitychange')visibility=fn;},removeEventListener(){}};globalThis.devicePixelRatio=2;
+  globalThis.requestAnimationFrame=fn=>{frames.set(++next,fn);return next;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.ResizeObserver=class{observe(){}disconnect(){}};
+  globalThis.IntersectionObserver=class{constructor(fn){intersectionCallback=fn;}observe(){}disconnect(){}};
+  const host={dataset:{},closest:()=>null},renderer={setPixelRatio(){},setSize(){}};
+  const tick=t=>{const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(t));};let runtime;
+  try{
+    runtime=createSceneRuntime({host,renderer,render(){draws++;return true;}});
+    intersectionCallback([{isIntersecting:false}]);runtime.prewarm();assert.equal(frames.size,1);
+    document.hidden=true;visibility();assert.equal(frames.size,0);
+    runtime.prewarm();tick(0);assert.equal(draws,0);assert.equal(frames.size,0);assert.equal(host.dataset.renderState,'suspended');
+    document.hidden=false;visibility();tick(16);assert.equal(draws,0,'visibility alone does not replay cancelled optional work');
+    runtime.prewarm();tick(32);assert.equal(draws,1);assert.equal(frames.size,0);
+    runtime.dispose();runtime.prewarm();tick(48);assert.equal(draws,1,'disposed scenes cannot warm again');
+  }finally{runtime?.dispose();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}}
+});

@@ -115,3 +115,5 @@
 .sport-load-error button{display:inline-block;min-height:44px;margin-top:18px;padding:9px 15px;border:1px solid #557e93;border-radius:6px;background:#fff;color:#163e57;font-size:16px;font-weight:700}
 @media(max-width:599px){.sport-load-error{top:13%;left:8%;width:84%;padding:18px}.sport-load-error h3{font-size:22px}.sport-load-error p{margin-top:9px}.sport-load-error button{margin-top:12px}}
 @media(min-width:600px) and (max-width:899px){.sport-load-error{top:16%;left:7%;width:45%;padding:18px}.sport-load-error h3{font-size:21px}.sport-load-error p{margin-top:8px}.sport-load-error button{margin-top:12px}}
+/* The static chapter already identifies itself in its footer. */
+.sport-still .sport-cue{display:none}

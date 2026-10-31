@@ -1,4 +1,4 @@
-import React,{lazy,Suspense,useLayoutEffect,useRef,useState} from 'react';
+import React,{lazy,Suspense,useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {gsap} from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import {createStoryMotion,range} from './StoryMotion';
@@ -26,9 +26,54 @@ class SportSceneBoundary extends React.Component{
 export default function SportChapter({reduced}){
   const section=useRef(null),copy=useRef(null),title=useRef(null),cue=useRef(null),bar=useRef(null);
   const [motion]=useState(()=>createStoryMotion(1050));const [ready,setReady]=useState(false);
-  useLayoutEffect(()=>{
-    const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){loadSport().then(m=>m.preloadSportAssets()).catch(()=>{});setReady(true);observer.disconnect();}},{rootMargin:'1200px'});observer.observe(section.current);return()=>observer.disconnect();
-  },[]);
+  useEffect(()=>{
+    if(ready)return;
+    let alive=true,started=false,preloading=false,prepared=false,near=false,heroReady=false;
+    let timer=0,idle=0,loadedModule=null;
+    const connection=navigator.connection,pointer=matchMedia('(pointer: fine)');
+    const canWarm=()=>!reduced&&pointer.matches&&!document.hidden&&!connection?.saveData&&!/^(slow-2g|2g)$/.test(connection?.effectiveType||'')&&(!navigator.deviceMemory||navigator.deviceMemory>=4);
+    const cancelPending=()=>{clearTimeout(timer);timer=0;if(idle){window.cancelIdleCallback(idle);idle=0;}};
+    const mount=()=>{if(alive&&prepared&&!document.hidden)setReady(true);};
+    const complete=()=>{if(alive){prepared=true;mount();}};
+    const preload=()=>{
+      if(!alive||document.hidden||!loadedModule||preloading)return;
+      preloading=true;
+      // Reuse the byte cache consumed by the one real scene; no second renderer.
+      loadedModule.preloadSportAssets().then(complete,complete);
+    };
+    const begin=()=>{
+      if(!alive||started||document.hidden)return;
+      started=true;cancelPending();observer.disconnect();
+      loadSport().then(module=>{if(alive){loadedModule=module;preload();}},complete);
+    };
+    const schedule=()=>{
+      if(!alive||started||!heroReady||timer||idle||!canWarm())return;
+      // Let the hero finish its entrance, then use spare browser time. Required
+      // near-entry work has its own observer, so idle work needs no forced timeout.
+      timer=setTimeout(()=>{
+        timer=0;if(!alive||!canWarm())return;
+        if(window.requestIdleCallback)idle=window.requestIdleCallback(()=>{idle=0;if(canWarm())begin();});
+        else timer=setTimeout(()=>{timer=0;if(canWarm())begin();},700);
+      },1800);
+    };
+    const resume=()=>{
+      if(document.hidden){cancelPending();return;}
+      if(started){preload();mount();}
+      else if(near)begin();
+      else schedule();
+    };
+    const preference=()=>{if(!canWarm())cancelPending();else schedule();};
+    const observer=new IntersectionObserver(entries=>{
+      near=entries.some(entry=>entry.isIntersecting);
+      if(near)begin();
+    },{rootMargin:'1200px'});
+    observer.observe(section.current);
+    document.addEventListener('visibilitychange',resume);
+    pointer.addEventListener('change',preference);connection?.addEventListener?.('change',preference);
+    const pictures=[...document.querySelectorAll('.storybook-hero img')];
+    Promise.all([document.fonts.ready,...pictures.map(img=>img.decode().catch(()=>{}))]).then(()=>{if(alive){heroReady=true;schedule();}});
+    return()=>{alive=false;cancelPending();observer.disconnect();document.removeEventListener('visibilitychange',resume);pointer.removeEventListener('change',preference);connection?.removeEventListener?.('change',preference);};
+  },[reduced,ready]);
   useLayoutEffect(()=>{
     if(reduced){motion.setFrame(1160);return;}
     const playhead={frame:1050};
