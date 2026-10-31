@@ -72,7 +72,7 @@ function Experience(){return <section className="experience section-pad" id="exp
     ['02','Workflow','业务流程适配','围绕国际商业化场景，适配 Agent 工作流与业务流程。'],
     ['03','Skills','能力优化','开展 Skill 优化，让智能体能力更贴合实际任务。'],
     ['04','Bad Case Studio','问题分析与迭代','参与 Bad Case Studio 相关开发，从实际问题推进系统改进。'],
-  ].map(([n,en,title,body])=><article key={n} className="experience-file" data-file><span>{n}</span><div><h3>{en}</h3><h4>{title}</h4><p>{body}</p></div><i aria-hidden="true">↗</i></article>)}</div></div>
+  ].map(([n,en,title,body])=><article key={n} className="experience-file" data-file><span>{n}</span><div><h3>{en}</h3><h4>{title}</h4><p>{body}</p></div></article>)}</div></div>
 </section>;}
 function Archive(){
   const [selected,setSelected]=useState(null);const dialog=useRef(null),opener=useRef(null);

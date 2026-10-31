@@ -107,3 +107,11 @@
 .sport-cue{left:7%;top:70%}}
 @media(prefers-reduced-motion:reduce){.sport-chapter{height:100svh}
 .sport-stage{position:relative}}
+
+/* Only rendered when the optional scene fails to load or render. */
+.sport-load-error{position:absolute;top:34%;left:8%;width:min(420px,44%);padding:24px;background:#f7fcff;border:1px solid #aecbdc;border-radius:12px;color:#163e57;pointer-events:auto}
+.sport-load-error h3{font:700 23px/1.4 var(--serif)}
+.sport-load-error p{font-size:16px;line-height:1.65;margin-top:12px}
+.sport-load-error button{display:inline-block;min-height:44px;margin-top:18px;padding:9px 15px;border:1px solid #557e93;border-radius:6px;background:#fff;color:#163e57;font-size:16px;font-weight:700}
+@media(max-width:599px){.sport-load-error{top:13%;left:8%;width:84%;padding:18px}.sport-load-error h3{font-size:22px}.sport-load-error p{margin-top:9px}.sport-load-error button{margin-top:12px}}
+@media(min-width:600px) and (max-width:899px){.sport-load-error{top:16%;left:7%;width:45%;padding:18px}.sport-load-error h3{font-size:21px}.sport-load-error p{margin-top:8px}.sport-load-error button{margin-top:12px}}

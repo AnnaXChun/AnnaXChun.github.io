@@ -3,8 +3,8 @@
 Live site: https://annaxchun.github.io/
 
 The current GitHub Pages website lives in `pages-site/`. The front half is a
-Retro-Futurist editorial portfolio: layered CRT portrait, pointer-driven 2.5D
-head/gaze, a photographic reel and perspective files. GSAP drives bounded
+hand-painted personal field journal: airy hills, an original forest messenger
+with pointer-driven 2.5D head/body layers, a paper glider and scrapbook notes. GSAP drives bounded
 transform/opacity motion; React owns content. The final Three.js badminton
 scene retains the accepted models, photographic lighting and reversible
 scroll choreography. `/profile.html` contains the same facts without JavaScript.
@@ -23,7 +23,7 @@ node --test pages-site/test/badminton.test.mjs pages-site/test/scene-runtime.tes
 
 Build output: `dist-pages/`. Content source: `pages-site/src/data.js`.
 Current visual standards: `docs/design-taste.md`. Independent Chrome evidence:
-`docs/retro-futurist-review.md`. Older courtyard documents are historical.
+`docs/storybook-review.md`. Retro-Futurist and courtyard documents are historical.
 
 The sports scene is lazy-loaded near its chapter. Render targets have a pixel
 budget; offscreen/background work suspends. Intro and 2.5D effects use GSAP
