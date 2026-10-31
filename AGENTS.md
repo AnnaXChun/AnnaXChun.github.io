@@ -1,8 +1,8 @@
 # Personal portfolio
 
 - Published app: `pages-site/`. Root `app/` is legacy; do not modify it for this site.
-- Read `docs/design-taste.md` before UI work. The user's **2026-10-28 complete rebuild** supersedes all previous courtyard, ink-wash, falling-maple, glyph-collision and gate-transition requirements. Do not restore those scenes. Preserve the accepted final badminton scene.
-- Follow the specific [MotionSites Retro-Futurist](https://motionsites.ai/?prompt=retro-futurist) reference: oversized photographic CRT-headed character, neutral grey studio, strong black type, spare white pills and restrained motion. Main image is an original generated editorial illustration, not a portrait or true 3D model of the user. Do not claim paid source code was obtained.
+- Read `docs/design-taste.md` before UI work. The user's **2026-10-31 hand-painted animation direction** supersedes the 10-28 Retro-Futurist direction as well as the old courtyard/ink/maple scenes. Preserve the approved final badminton chapter.
+- Current visual: airy blue sky, green hills, original forest messenger with independently turning head/body, paper airplane and travel journal details. Personal, warm and curious; no CRT/metal reels/industrial studio. Hand-painted 2.5D layers are illustrations, not true 3D or a portrait of the user. Keep layers readable and grounded, avoiding a beige wash or copied film characters.
 - This is a personal showcase. No unrelated controls, game UI, framed banner, reading modes or product dashboard. Keep facts direct and legible, body 16–20px, headings prominent and font weight 700.
 - Content order: identity → OPD + RL / user-confirmed open benchmark SOTA → ByteDance international commercialization Agent internship → real project/award evidence → person/life → contact. ByteDance dates: 2026.09.20–present. Work: Claude Code core integration into internal Agent, business workflows, Skill optimization, Bad Case Studio. Do not invent metrics, benchmark names or claims.
 - Keep genuine certificate images with contain fit, keyboard-accessible preview dialog, Escape and focus return. Facts stay in `src/data.js`; `/profile.html` is generated from it.
