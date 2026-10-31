@@ -2,64 +2,52 @@
 
 Live site: https://annaxchun.github.io/
 
-The current GitHub Pages website lives in `pages-site/`. React owns the page;
-GSAP ScrollTrigger drives a continuous personal story through a real Three.js
-Minnan courtyard and a photographic badminton scene. Cannon-es simulates
-maple leaves resting on the solid title strokes. The palette is cool white,
-ice blue and blue-black. A complete static profile is available at `/profile.html`.
+The current GitHub Pages website lives in `pages-site/`. The front half is a
+hand-painted personal field journal: airy hills, an original forest messenger
+with pointer-driven 2.5D head/body layers, a paper glider and scrapbook notes. GSAP drives bounded
+transform/opacity motion; React owns content. The final Three.js badminton
+scene retains the accepted models, photographic lighting and reversible
+scroll choreography. `/profile.html` contains the same facts without JavaScript.
 
-## Develop and build the current website
+## Develop and verify
 
-Use Node.js 22.12+ or a newer supported LTS release. The Pages site has its own
-lockfile; it does not require installing the legacy app's dependencies.
+Use Node.js 24 LTS. The Pages app has its own lockfile and does not need the
+legacy application's dependencies.
 
 ```bash
 npm --prefix pages-site ci
 npm run dev:pages
 npm run build:pages
-npm run preview:pages
+node --test pages-site/test/badminton.test.mjs pages-site/test/scene-runtime.test.mjs pages-site/test/story-motion.test.mjs
 ```
 
-The build output is `dist-pages/`, including `.nojekyll`. Personal content is in
-`pages-site/src/data.js`; the illustrated portrait and supporting images are in
-`pages-site/public/assets/`.
+Build output: `dist-pages/`. Content source: `pages-site/src/data.js`.
+Current visual standards: `docs/design-taste.md`. Independent Chrome evidence:
+`docs/storybook-review.md`. Retro-Futurist and courtyard documents are historical.
 
-Animation references and license distinctions are recorded in
-`docs/open-source-motion-performance.md`. Scroll does not update a video
-player or rerender the story through React. Glyph geometry is built in a
-worker and cached; scene render targets are bounded, stay warm between
-chapters, and shrink when offscreen or hidden.
+The sports scene is lazy-loaded near its chapter. Render targets have a pixel
+budget; offscreen/background work suspends. Intro and 2.5D effects use GSAP
+ScrollTrigger/quickTo. Reduced motion preserves static content and imagery.
+GSAP is distributed under its Standard No Charge license, not MIT.
 
-For a local production benchmark, run `node pages-site/scripts/prepare-benchmark.mjs <label>`
-after building, serve `outputs/performance/<label>/`, then use the visible
-benchmark button in Chrome. The 19-second forward/reverse scroll records rAF
-cadence and long tasks. It is not a GPU frame-rate measurement. The probe is
-injected only into that disposable copy, never `dist-pages/`.
+For local production measurements, run
+`node pages-site/scripts/prepare-benchmark.mjs <label>` after a build and serve
+that ignored output directory. Its opt-in button records 19 seconds of forward
+and reverse scroll. rAF/long-task metrics describe main-thread cadence, not
+GPU presentation FPS. The measurement UI is never included in `dist-pages/`.
 
-## Publish to GitHub Pages
+## Deploy
 
-Pages serves the root of the `gh-pages` branch. Pushing `main` alone does not
-publish a new version. After committing source changes on `main`, build and
-update a separate clean checkout of the publishing branch:
+`.github/workflows/portfolio-pages.yml` uses GitHub's official, commit-pinned
+checkout/setup-node/upload-pages-artifact/deploy-pages actions. Pull requests
+build and run the retained sports/runtime checks. Merging an accepted version
+to `main` builds and deploys that same artifact; deployment can also be started
+with `workflow_dispatch`. Only the deploy job gets Pages/OIDC write permissions.
 
-```bash
-npm run build:pages
-git push origin main
-git fetch origin gh-pages
-git worktree add --detach ../chunxiang-pages-publish origin/gh-pages
-rsync -a --delete --exclude=.git dist-pages/ ../chunxiang-pages-publish/
-git -C ../chunxiang-pages-publish add -A
-git -C ../chunxiang-pages-publish commit -m "deploy: update portfolio"
-git -C ../chunxiang-pages-publish push origin HEAD:gh-pages
-git worktree remove ../chunxiang-pages-publish
-```
-
-Use a new checkout path if that directory already exists. Push without force;
-if someone publishes concurrently, fetch the new head and rebuild the release
-on top of it. Confirm the Pages deployment succeeds before announcing it live.
-
-The current design was synchronized from Sites source commit
-`30b6c43fc057835db268dbbbe75e760f23e30030`.
+The repository Pages source is GitHub Actions. The old `gh-pages` branch stays
+as a historical release snapshot, not the active delivery path. Confirm the
+workflow deployment succeeds and inspect the public site in Chrome before
+reporting a release complete. Do not force-push publishing branches.
 
 ## Legacy application reference
 
