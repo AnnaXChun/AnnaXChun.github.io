@@ -30,9 +30,11 @@
 
 ## 验证与发布
 
-`npm run build:pages`、11项体育/运行时/连续进度测试已通过。旧庭院测试中的历史命名不作为本版审美门槛。独立Chrome检查见 `storybook-review.md`，与性能采样、正式部署分别记录，不借用旧PASS。
+`npm run build:pages`、14项体育/运行时/连续进度测试已通过。旧庭院测试中的历史命名不作为本版审美门槛。独立Chrome检查见 `storybook-review.md`，与性能采样、正式部署分别记录，不借用旧PASS。
 
-当前文档是实现记录；最终发布状态在实际合并与Pages部署成功后补充。
+2026-10-31 19:31（Asia/Shanghai）正式发布成功。PR #2 已合并，发布提交 `aabc7e8d07c1b407f78a8d50f7c38086688a8026`；GitHub Actions [41197151320](https://github.com/AnnaXChun/AnnaXChun.github.io/actions/runs/41197151320) 的 build 与 deploy 均成功。Pages 使用官方 Actions artifact 部署。
+
+正式站点 https://annaxchun.github.io/ 已在 Chrome 1200×940、DPR2 复验：入口加载最终 `index-Bl8V2s4M.js`；首屏插画、研究纸飞机、体育模型与实际滚动挥拍均显示正常，横向溢出为0，检查期间控制台无 warn/error。首屏预热后体育 canvas 为1×1，进入体育恢复1800×1410且状态 active。线上截图保存在 `outputs/visual-review/storybook-live.png`、`storybook-live-research.png`、`storybook-live-sports.png`。
 
 ### 发布前性能与容错记录
 
