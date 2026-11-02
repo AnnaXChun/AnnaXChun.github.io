@@ -2,6 +2,8 @@ import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {gsap} from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import SportChapter from './SportChapter';
+import ForestStage from './ForestStage';
+import PaperFlight from './PaperFlight';
 import {profile,projects,awards,interests} from './data';
 import {pointerPose} from './RetroMotion';
 gsap.registerPlugin(ScrollTrigger);
@@ -23,23 +25,11 @@ function Hero({reduced}){
       context=gsap.context(()=>{
         gsap.from('.hero-line > span',{yPercent:105,duration:1.05,ease:'power3.out',stagger:.1,clearProps:'transform'});
         gsap.from('.hero-detail',{y:16,opacity:0,duration:.8,delay:.2,stagger:.07,clearProps:'all'});
-        gsap.from('.forest-entrance',{y:45,opacity:0,scale:1.025,duration:1.25,ease:'power3.out',clearProps:'all'});
-        gsap.to('.forest-parallax',{yPercent:9,rotation:2,ease:'none',scrollTrigger:{trigger:element,start:'top top',end:'bottom top',scrub:.35}});
         gsap.to('.hero-landscape',{yPercent:6,ease:'none',scrollTrigger:{trigger:element,start:'top top',end:'bottom top',scrub:.7}});
         gsap.to('.hero-copy',{yPercent:-12,ease:'none',scrollTrigger:{trigger:element,start:'top top',end:'bottom top',scrub:.35}});
       },element);
     });
-    const observer=new IntersectionObserver(([entry])=>{element.dataset.visible=String(entry.isIntersecting);});observer.observe(element);
-    const head=element.querySelector('.forest-head'),body=element.querySelector('.forest-body');
-    const targets=[[head,'rotationY',.65],[head,'rotationX',.65],[head,'rotation',.7],[head,'x',.7],[body,'x',.95]];
-    const setters=targets.map(([node,key,duration])=>gsap.quickTo(node,key,{duration,ease:'power3.out'}));
-    const move=event=>{
-      if(event.pointerType==='touch')return;
-      const pose=pointerPose(event.clientX/innerWidth,event.clientY/innerHeight);
-      [pose.yaw,pose.pitch,pose.roll,pose.shift,pose.shift*.25].forEach((value,i)=>setters[i](value));
-    };
-    const leave=()=>setters.forEach(set=>set(0));element.addEventListener('pointermove',move);element.addEventListener('pointerleave',leave);
-    return()=>{alive=false;context?.revert();observer.disconnect();element.removeEventListener('pointermove',move);element.removeEventListener('pointerleave',leave);setters.forEach(set=>set.tween.kill());gsap.set([head,body],{clearProps:'transform'});};
+    return()=>{alive=false;context?.revert();};
   },[reduced]);
   return <section className="storybook-hero" id="top" ref={root} data-visible="true" aria-labelledby="hero-title">
     <div className="hero-landscape" aria-hidden="true"><img src="./assets/story-landscape.webp" alt="" width="1672" height="941" fetchPriority="high"/></div>
@@ -53,15 +43,15 @@ function Hero({reduced}){
       <p className="hero-intro hero-detail">从 OPD + RL 到真实业务中的 Agent。<br/>让研究有结果，让想法能运行。</p>
       <div className="hero-links hero-detail"><a className="pill" href="#research">看看我的研究 <span>↗</span></a><a className="pill" href="#experience">现在在字节 <span>↗</span></a><a className="pill pill-outline" href="#about">认识我 <span>↓</span></a></div>
     </div>
-    <div className="forest-parallax" aria-hidden="true"><div className="forest-entrance"><div className="forest-character"><img className="forest-body" src="./assets/story-body.webp" alt="" width="1086" height="1448" fetchPriority="high"/><div className="forest-head"><img src="./assets/story-messenger.webp" alt="" width="1086" height="1448"/></div></div></div></div>
+    <ForestStage reduced={reduced}/>
     <p className="hero-postcard" aria-hidden="true">带着好奇，去远一点。<span>一封写给未来的信 ↗</span></p>
     <div className="hero-bottom"><span>武汉大学 · 软件工程</span><a href="#research">向下探索 <span>↓</span></a><span>一点好奇，一直向前。</span></div>
   </section>;
 }
-function Research(){return <section id="research" className="research section-pad" aria-labelledby="research-title">
+function Research({reduced}){return <section id="research" className="research section-pad" aria-labelledby="research-title">
   <SectionLabel number="01" aside="一页研究手记">后训练 · 探索新的可能</SectionLabel>
   <div className="research-heading"><h2 id="research-title" data-reveal>让模型，<br/>更进一步。</h2><p data-reveal>我关注智能体后训练，<br/>从训练方法到真实评测，<br/>持续追问能力的下一步。</p></div>
-  <div className="training-composition" data-tilt-stage aria-label="OPD 加强化学习，开源 benchmark SOTA"><div className="training-type" data-drift><span>OPD</span><em>+</em><span>RL</span></div><div className="paper-depth" data-tilt><div className="paper-scroll"><img src="./assets/story-plane.webp" alt="" width="1280" height="1280" loading="lazy"/></div></div><div className="sota-stamp"><span>OPEN BENCHMARK</span><strong>SOTA</strong><span>AGENT POST-TRAINING ↗</span></div><span className="flight-note" aria-hidden="true">每一次尝试，向前一点。<svg viewBox="0 0 300 85"><path d="M4 70 C100 10 150 120 240 25 L255 8 M235 10 L255 8 L250 29" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 7"/></svg></span></div>
+  <div className="training-composition" data-tilt-stage aria-label="OPD 加强化学习，开源 benchmark SOTA"><div className="training-type" data-drift><span>OPD</span><em>+</em><span>RL</span></div><PaperFlight reduced={reduced}/><div className="sota-stamp"><span>OPEN BENCHMARK</span><strong>SOTA</strong><span>AGENT POST-TRAINING ↗</span></div><span className="flight-note" aria-hidden="true">每一次尝试，向前一点。<svg viewBox="0 0 300 85"><path d="M4 70 C100 10 150 120 240 25 L255 8 M235 10 L255 8 L250 29" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 7"/></svg></span></div>
   <div className="research-bottom"><p>围绕 OPD + RL 开展智能体后训练研究，<br/>在开源 benchmark 上取得 SOTA。</p><span>探索 → 训练 → 评测</span></div>
 </section>;}
 function Experience(){return <section className="experience section-pad" id="experience" aria-labelledby="experience-title">
@@ -94,7 +84,6 @@ export default function App(){
     if(reduced)return;
     const context=gsap.context(()=>{
       gsap.utils.toArray('[data-reveal]').forEach(node=>gsap.from(node,{y:38,opacity:0,duration:.85,ease:'power3.out',scrollTrigger:{trigger:node,start:'top 94%',once:true}}));
-      gsap.fromTo('.paper-scroll',{rotation:-12,x:-35,y:80},{rotation:9,x:35,y:-70,ease:'none',scrollTrigger:{trigger:'.training-composition',start:'top bottom',end:'bottom top',scrub:.55}});
       gsap.utils.toArray('[data-file]').forEach((node,i)=>gsap.from(node,{x:i%2?-65:65,y:60,rotation:i%2?-8:8,opacity:0,duration:1,ease:'power3.out',scrollTrigger:{trigger:node,start:'top 94%',once:true},clearProps:'all'}));
       gsap.utils.toArray('[data-drift]').forEach(node=>gsap.fromTo(node,{xPercent:-3},{xPercent:3,ease:'none',scrollTrigger:{trigger:node,start:'top bottom',end:'bottom top',scrub:.4}}));
     },root);
@@ -107,9 +96,10 @@ export default function App(){
       stage.addEventListener('pointerenter',enter);stage.addEventListener('pointermove',move);stage.addEventListener('pointerleave',leave);
       return()=>{stage.removeEventListener('pointerenter',enter);stage.removeEventListener('pointermove',move);stage.removeEventListener('pointerleave',leave);setters.forEach(set=>{set.x.tween.kill();set.y.tween.kill();gsap.set(set.node,{clearProps:'transform'});});};
     });
-    let raf;const refresh=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>ScrollTrigger.refresh());};
+    // Safe refresh waits for active scrolling, including native anchor easing.
+    let raf,alive=true;const refresh=()=>{if(!alive)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>ScrollTrigger.refresh(true));};
     const observer=new ResizeObserver(refresh);observer.observe(root.current);document.fonts.ready.then(refresh);
-    return()=>{tiltCleanup.forEach(cleanup=>cleanup());context.revert();observer.disconnect();cancelAnimationFrame(raf);};
+    return()=>{alive=false;tiltCleanup.forEach(cleanup=>cleanup());context.revert();observer.disconnect();cancelAnimationFrame(raf);};
   },[reduced]);
-  return <><a className="skip-link" href="#research">跳到研究与经历</a><main ref={root}><Hero reduced={reduced}/><Research/><Experience/><Archive/><About/><SportChapter reduced={reduced}/><Contact/></main></>;
+  return <><a className="skip-link" href="#research">跳到研究与经历</a><main ref={root}><Hero reduced={reduced}/><Research reduced={reduced}/><Experience/><Archive/><About/><SportChapter reduced={reduced}/><Contact/></main></>;
 }

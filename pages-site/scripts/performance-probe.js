@@ -21,7 +21,7 @@ button.onclick=()=>{
   const samples=[],longTasks=[],longFrames=[];
   const observe=(type,entries)=>{
     if(!PerformanceObserver.supportedEntryTypes.includes(type))return null;
-    const observer=new PerformanceObserver(list=>entries.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration,blocking:e.blockingDuration}))));
+    const observer=new PerformanceObserver(list=>entries.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration,blocking:e.blockingDuration,scripts:e.scripts?.map(s=>({source:s.sourceURL,function:s.sourceFunctionName,invoker:s.invoker,duration:s.duration,layout:s.forcedStyleAndLayoutDuration}))}))));
     observer.observe({type,buffered:false});return observer;
   };
   const taskObserver=observe('longtask',longTasks),frameObserver=observe('long-animation-frame',longFrames);
@@ -45,7 +45,7 @@ button.onclick=()=>{
       const at=p=>+(values[Math.floor((values.length-1)*p)]||0).toFixed(2);
       return {samples:values.length,rafHz:+(1000*values.length/total).toFixed(1),p50Ms:at(.5),p95Ms:at(.95),p99Ms:at(.99),over25ms:values.filter(n=>n>25).length,over50ms:values.filter(n=>n>50).length};
     };
-    const authoredNodes=[...document.querySelectorAll(legacy?'.depth-title span,.shot-copy,.cinema-evidence-primary,.cinema-evidence-secondary':'.forest-parallax,.paper-scroll')];
+    const authoredNodes=[...document.querySelectorAll(legacy?'.depth-title span,.shot-copy,.cinema-evidence-primary,.cinema-evidence-secondary':'.fs-camera,.pf-scroll')];
     const authoredTransforms=authoredNodes.length>0&&authoredNodes.every(node=>node.style.transform&&getComputedStyle(node).transform!=='none');
     const result={run,build:document.documentElement.dataset.benchmarkBuild,valid:!interrupted,authoredTransforms,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,visibility:document.visibilityState,...summarize(samples),front:summarize(samples.filter(s=>s.fraction<sportsTop)),sports:summarize(samples.filter(s=>s.fraction>=sportsTop)),longTasks:longTasks.filter(e=>e.start>=start+1000),longAnimationFrames:longFrames.filter(e=>e.start>=start+1000)};
     output.textContent=JSON.stringify(result,null,2);panel.dataset.result=JSON.stringify(result);button.disabled=false;
