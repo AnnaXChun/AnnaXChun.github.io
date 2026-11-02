@@ -1,0 +1,31 @@
+/* Separate planes retain their own scroll, pointer, idle and greeting transforms. */
+.forest-stage{position:absolute;right:2%;bottom:6%;width:43%;max-width:690px;aspect-ratio:3/4;z-index:3;perspective:1050px;perspective-origin:47% 45%;pointer-events:none;isolation:isolate}
+.fs-camera{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform-origin:50% 65%}
+.fs-layer{position:absolute;pointer-events:none;transform-style:preserve-3d}
+.fs-layer .fs-scroll,.fs-layer .fs-pointer,.fs-layer .fs-idle{width:100%;height:100%;transform-style:preserve-3d}
+.fs-layer img{width:100%;height:100%;max-width:none;object-fit:contain;user-select:none}
+.fs-cloud-far{width:105%;aspect-ratio:3/1;left:-49%;top:-4%;z-index:1}
+.fs-cloud-near{width:78%;aspect-ratio:3/1;left:-42%;top:44%;z-index:2}
+.fs-cloud-far img{opacity:.92}.fs-cloud-near img{opacity:.95}
+.fs-branch{width:70%;aspect-ratio:1;right:-26%;bottom:-7%;z-index:5}
+.fs-branch .fs-idle{transform-origin:90% 90%}
+.fs-character-scroll,.fs-character-pointer{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform-origin:45% 90%;z-index:3}
+.fs-character{display:block;position:relative;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:44%;background:transparent;box-shadow:none;appearance:none;cursor:pointer;pointer-events:auto;touch-action:pan-y;perspective:1000px;isolation:isolate;transform-style:flat}
+.fs-character:focus-visible{outline:2px dashed #85593b;outline-offset:-12px}
+.fs-character-breath,.fs-character-action{display:block;position:relative;width:100%;height:100%;transform-origin:43% 94%;perspective:1000px;transform-style:flat;isolation:isolate}
+.fs-body{display:block;position:relative;z-index:1;width:100%;height:100%;max-width:none;object-fit:contain;user-select:none;pointer-events:none}
+.fs-head-greet,.fs-head-idle,.fs-head-pointer{display:block;position:absolute;inset:0;transform-origin:40% 45%;transform-style:flat;perspective:1000px;pointer-events:none}
+.fs-head-greet{z-index:2}
+.fs-head-pointer>img{width:100%;height:100%;max-width:none;object-fit:contain;user-select:none;clip-path:polygon(5% 40%,5% 25%,20% 14%,22% 0%,45% 12%,57% 17%,73% 10%,76% 29%,72% 45.5%,49% 47%,13% 43%)}
+.fs-cue{position:absolute;left:58%;top:7%;z-index:8;font:700 14px/1.6 var(--serif);color:#315c49;white-space:nowrap;transform:rotate(6deg);padding:5px 9px;background:#f8faeecf;border-radius:3px;pointer-events:none}
+.fs-cue>span{display:inline-block;margin-left:6px;font-size:24px;vertical-align:middle}
+.fs-reply{position:absolute;left:68%;top:25%;z-index:9;padding:12px 21px;background:#fffdf0;border:1px solid #a5b78c;border-radius:55% 55% 55% 8%;font:700 24px/1.3 var(--serif);color:#416240;visibility:hidden;opacity:0;pointer-events:none;white-space:nowrap}
+.fs-announcement{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.forest-stage[data-visible="true"] .fs-head-pointer,.forest-stage[data-visible="true"] .fs-character-action,.forest-stage[data-visible="true"] .fs-branch .fs-idle{will-change:transform}
+.forest-stage[data-reduced="true"][data-greeted="true"] .fs-reply{visibility:visible;opacity:1}
+@media(min-width:1600px){.forest-stage{right:5%;bottom:4%;width:42%}}
+@media(min-width:900px) and (max-width:1199px){.forest-stage{right:-2%;width:48%;bottom:12%}.fs-cue{left:55%;font-size:13px}.fs-branch{right:-32%;width:65%}}
+@media(min-width:900px) and (max-height:700px){.forest-stage{width:37%;bottom:6%}.fs-cue{font-size:13px}}
+@media(max-width:899px){.forest-stage{position:relative;right:auto;bottom:auto;width:min(70%,510px);max-width:none;margin:25px 5% 30px auto;perspective:900px}.fs-cloud-far{width:115%;left:-37%;top:1%}.fs-cloud-near{width:77%;left:-29%;top:48%}.fs-branch{width:67%;right:-27%;bottom:-5%}.fs-cue{top:3%;left:52%;font-size:13px}.fs-reply{left:63%;font-size:22px}}
+@media(max-width:599px){.forest-stage{width:95%;margin:24px -2% 60px auto}.fs-cue{font-size:12px;left:49%;top:5%}.fs-cue>span{font-size:20px}.fs-reply{left:62%;top:25%;font-size:20px;padding:10px 15px}.fs-cloud-far{left:-25%;width:104%}.fs-cloud-near{left:-27%;top:49%;width:70%}.fs-branch{width:65%;right:-25%;bottom:-2%}}
+@media(prefers-reduced-motion:reduce){.forest-stage .fs-camera,.forest-stage .fs-scroll,.forest-stage .fs-pointer,.forest-stage .fs-idle,.fs-character-scroll,.fs-character-pointer,.fs-character-breath,.fs-character-action,.fs-head-greet,.fs-head-idle,.fs-head-pointer{transform:none!important;will-change:auto!important}}

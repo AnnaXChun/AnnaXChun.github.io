@@ -1,0 +1,35 @@
+/* A folded paper object: the wing hinges, reverse faces and keel occupy real
+   CSS 3D planes; scroll, steering, idle drift and the tap roll have own wrappers. */
+.paper-flight{position:absolute;z-index:2;right:-1%;bottom:1%;width:54%;aspect-ratio:1.1;pointer-events:none}
+.pf-camera{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 45%}
+.pf-scroll,.pf-steer,.pf-float,.pf-roll{position:absolute;inset:0;transform-style:preserve-3d}
+.pf-scroll{will-change:transform}
+.pf-touch{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:none;color:inherit;transform-style:preserve-3d;pointer-events:auto;cursor:pointer;touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+.pf-touch:focus-visible{outline:2px dashed #457c64;outline-offset:-14px;border-radius:45%}
+.pf-touch:disabled{cursor:default;pointer-events:none}
+.pf-airframe{position:absolute;display:block;width:90%;height:74%;left:5%;top:12%;transform:rotateZ(-34deg) rotateY(-18deg) rotateX(38deg);transform-style:preserve-3d}
+.pf-wing{position:absolute;display:block;left:0;width:100%;height:50%;transform-style:preserve-3d}
+.pf-wing--upper{top:0;transform-origin:50% 100%;transform:rotateX(-18deg)}
+.pf-wing--lower{top:50%;transform-origin:50% 0;transform:rotateX(18deg)}
+.pf-surface{position:absolute;inset:0;width:100%;height:100%;overflow:visible;backface-visibility:hidden}
+.pf-surface--front{transform:translateZ(.4px)}
+.pf-surface--back{transform:rotateX(180deg) scaleY(-1) translateZ(.4px)}
+.pf-paper{fill:#fff9df;stroke:#b58b57;stroke-width:.9;stroke-linejoin:round}
+.pf-wing--lower .pf-paper{fill:#e6eadc}
+.pf-surface--back .pf-paper{fill:#a9c5bf;stroke:#72958c}
+.pf-wing--lower .pf-surface--back .pf-paper{fill:#c5d7c9}
+.pf-pencil{fill:none;stroke:#a47748;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;opacity:.65}
+.pf-grain{fill:none;stroke:#b7bda6;stroke-width:.6;opacity:.3}
+.pf-ink-mark{fill:#447da5;stroke:#396a92;stroke-width:.5}
+.pf-keel{position:absolute;top:50%;left:0;width:100%;height:30%;transform-origin:50% 0;transform:rotateX(-78deg);transform-style:preserve-3d}
+.pf-keel svg{display:block;width:100%;height:100%;overflow:visible}.pf-keel polygon{fill:#7a9c98;stroke:#9b885b;stroke-width:1}.pf-keel path{fill:none;stroke:#547976;stroke-width:1.4}
+.pf-spine{position:absolute;left:18%;top:calc(50% - 1px);width:82%;height:2px;background:#b49b71;transform:translateZ(.8px)}
+.pf-sprig{position:absolute;left:24%;top:16%;width:19%;height:40%;overflow:visible;transform:translateZ(10px) rotateZ(-18deg);transform-origin:54% 95%}
+.pf-stem{fill:none;stroke:#a59656;stroke-width:3;stroke-linecap:round}.pf-leaf{fill:#6c8d49;stroke:#486d45;stroke-width:1.2;stroke-linejoin:round}.pf-leaf-b{fill:#97a45c}.pf-leaf-c{fill:#82974d}.pf-vein{fill:none;stroke:#c1c48a;stroke-width:1;opacity:.8}
+.pf-cue{position:absolute;right:14%;bottom:0;font:700 15px/1.6 var(--serif);letter-spacing:.04em;color:#57735d;transform:rotate(-5deg);pointer-events:none}.pf-cue>span{display:inline-block;margin-left:12px;font:700 24px/1 var(--serif)}
+.paper-flight[data-flying=true] .pf-cue{opacity:.4}
+.paper-flight[data-reduced=true] .pf-scroll{will-change:auto}
+@media(min-width:1600px){.paper-flight{width:52%;right:0;bottom:-3%}}
+@media(max-width:899px){.paper-flight{width:62%;bottom:2%;right:-2%}.pf-cue{font-size:14px;right:10%}}
+@media(max-width:599px){.paper-flight{width:81%;bottom:1%;right:-8%;aspect-ratio:1}.pf-airframe{width:95%;left:0}.pf-cue{font-size:12px;right:19%;bottom:2%}.pf-cue>span{font-size:19px;margin-left:5px}}
+@media(prefers-reduced-motion:reduce){.pf-cue{display:none}.pf-scroll{will-change:auto}}
