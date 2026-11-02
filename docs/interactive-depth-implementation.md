@@ -34,3 +34,13 @@
 ## 验证
 
 原体育与运行时14项回归测试通过；完整Vite构建通过。初次联调Chrome已观察到真实指针改变头部与枝叶不同的matrix3d、角色问候status和折面纸飞机，控制台无warn/error。正式独立审查、性能采样、发布结果另行追加，不能沿用旧版本PASS。
+
+### 最终独立验收与采样
+
+独立评审见`interactive-depth-review.md`，新模块的实际指针、鼠标/键盘回应、390/320、实际200%、真实reduce媒体偏好与离屏暂停通过，无剩余P1/P2。后台hidden事件和真实手机双指未实测，源码已检查对应清理/暂停和touch-action策略，不冒称实机通过。
+
+Chrome1200×940/DPR2，同一生产构建，19秒正反合成滚动。四轮原始JSON保存于`outputs/performance/interactive-depth-run-{1,2,3,4}.json`，均valid/authoredTransforms=true。rAF p95依次9.3/9.3/9.3/9.1ms；>50ms间隔1/10/1/5次。不能将rAF称为GPU FPS，也不能只挑最好一轮声称零卡顿。
+
+第2轮出现9个longtask（最高296ms），因此关闭额外预览页、重载并为诊断增加LoAF脚本来源后再做第3/4轮。第3轮无longtask、1个无脚本归因的104.5ms LoAF；第4轮有4个52–65ms longtask，4个LoAF中3个将约49–59ms归到本地`performance-probe.js`的主动scrollTo回调，没有将该归因等同于证明页面本身无成本。四轮体育区均无>50ms间隔。测试数据存在波动，未取得GPU trace或弱设备证据；实际视觉滚动验收未发现持续阻塞。诊断脚本只在本地副本中，不进入部署。
+
+最终构建入口`index-CE0nCpGW.js`，gzip125.95KB；新增交互相比10-31主入口增加约2.2KB gzip。CSS gzip8.42KB。新云/枝素材合计约512KB。原体育包和正常画质未改。

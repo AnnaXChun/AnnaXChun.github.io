@@ -21,7 +21,7 @@ button.onclick=()=>{
   const samples=[],longTasks=[],longFrames=[];
   const observe=(type,entries)=>{
     if(!PerformanceObserver.supportedEntryTypes.includes(type))return null;
-    const observer=new PerformanceObserver(list=>entries.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration,blocking:e.blockingDuration}))));
+    const observer=new PerformanceObserver(list=>entries.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration,blocking:e.blockingDuration,scripts:e.scripts?.map(s=>({source:s.sourceURL,function:s.sourceFunctionName,invoker:s.invoker,duration:s.duration,layout:s.forcedStyleAndLayoutDuration}))}))));
     observer.observe({type,buffered:false});return observer;
   };
   const taskObserver=observe('longtask',longTasks),frameObserver=observe('long-animation-frame',longFrames);
