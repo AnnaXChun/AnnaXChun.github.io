@@ -10,7 +10,7 @@
 .fs-branch{width:70%;aspect-ratio:1;right:-26%;bottom:-7%;z-index:5}
 .fs-branch .fs-idle{transform-origin:90% 90%}
 .fs-character-scroll,.fs-character-pointer{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform-origin:45% 90%;z-index:3}
-.fs-character{display:block;position:relative;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:44%;background:transparent;box-shadow:none;appearance:none;cursor:pointer;pointer-events:auto;touch-action:pan-y;perspective:1000px;isolation:isolate;transform-style:flat}
+.fs-character{display:block;position:relative;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:44%;background:transparent;box-shadow:none;appearance:none;cursor:pointer;pointer-events:auto;touch-action:pan-y pinch-zoom;perspective:1000px;isolation:isolate;transform-style:flat}
 .fs-character:focus-visible{outline:2px dashed #85593b;outline-offset:-12px}
 .fs-character-breath,.fs-character-action{display:block;position:relative;width:100%;height:100%;transform-origin:43% 94%;perspective:1000px;transform-style:flat;isolation:isolate}
 .fs-body{display:block;position:relative;z-index:1;width:100%;height:100%;max-width:none;object-fit:contain;user-select:none;pointer-events:none}

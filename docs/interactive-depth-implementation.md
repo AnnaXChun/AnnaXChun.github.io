@@ -7,7 +7,7 @@
 - `ForestStage`：天空仍是远景底图；新增独立透明远云、近云和枝叶。相机、滚动、指针、环境风、角色问候各用独立wrapper，避免多个动画争写同一transform。整头yaw±17°/pitch±9°，人物、云、枝随指针差速位移；滚动推动CSS透视相机。角色有可见呼吸和轻歪头。
 - 角色本身是可访问button，鼠标/触屏/Enter/Space触发压缩、跳起、落地、点头和问候。复用预建timeline，屏幕阅读器有status。减少动态模式只显示静态问候。
 - `PaperFlight`：机翼在共同折线上连接；独立正反面、机腹和叶枝位于CSS三维空间。滚动可逆地控制接近、侧倾和飞离；悬停转向，点击/Enter进行一圈翻滚。无需点击即可看到滚动运动。
-- 两组件重复动画在离屏/后台暂停；GSAP context在卸载、减少动态切换时清理。指针复用quickTo，无React逐帧更新。触屏不阻止纵向滚动。
+- 两组件重复动画在离屏/后台暂停；GSAP context在卸载、减少动态切换时清理。指针复用quickTo，无React逐帧更新。触屏通过`pan-y pinch-zoom`保留纵向滚动与双指缩放（源代码独立审查发现原pan-y禁用pinch后已修正）。
 - 主页面ResizeObserver刷新改为`ScrollTrigger.refresh(true)`，避免在原生锚点平滑跳转期间同步刷新。字体ready回调增加alive检查。依据[GSAP safe refresh](https://gsap.com/docs/v3/Plugins/ScrollTrigger/refresh%28%29/)。
 - CSS3D中间容器保留preserve-3d，裁剪与透明度放在叶节点；[MDN变换扁平化规则](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/transform-style)供后续维护参考。角色仍是插画切层，不声称为解剖三维模型；纸飞机是CSS折面对象。
 
